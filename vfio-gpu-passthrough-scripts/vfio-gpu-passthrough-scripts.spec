@@ -1,11 +1,11 @@
 Name:           vfio-gpu-passthrough-scripts
-Version:        0.0.0
+Version:        0.0.1
 Release:        1%{?dist}
 Summary:        Helper scripts for gpu passthrough
 
 License:        GPLv3+
 URL:            https://github.com/raro28/vfio-gpu-passthrough-scripts
-Source0:        vfio-gpu-passthrough-scripts-0.0.0.tar.gz    
+Source0:        https://github.com/raro28/vfio-gpu-passthrough-scripts/releases/download/0.0.0/vfio-gpu-passthrough-scripts-%{version}.tar.gz   
 
 %description
 Helper scripts for gpu passthrough
