@@ -1,6 +1,6 @@
 Name:           qemu-hook-scripts
 Version:        0.0.0
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        QEMU hook scripts
 
 License:        GPLv3+
@@ -9,6 +9,7 @@ Source0:        https://github.com/raro28/qemu-hook-scripts/releases/download/%{
 
 Requires:       bash
 Requires:       systemd
+Requires:       libvirt-daemon
 
 %description
 QEMU hook scripts
@@ -24,11 +25,18 @@ cp -a ./etc/libvirt/hooks/qemu %{buildroot}%{_sysconfdir}/libvirt/hooks/.
 %attr(0755,root,root) %{_sysconfdir}/libvirt/hooks/qemu
 
 %post
-systemctl is-active --quiet libvirt && systemctl restart libvirt
+systemctl is-active libvirtd && systemctl restart libvirtd || $(exit 0)
 
 %postun
-systemctl is-active --quiet libvirt && systemctl restart libvirt
+systemctl is-active libvirtd && systemctl restart libvirtd || $(exit 0)
 
 %changelog
+* Sat Feb 12 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-3
+- Override exit code
+
+* Sat Feb 12 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-2
+- Fix systemctl unit reference
+- Add dependencies
+
 * Sat Feb 12 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-1
 - Initial version of the package
