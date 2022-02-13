@@ -1,5 +1,5 @@
 Name:           vfio-gpu-passthrough-scripts
-Version:        0.0.1
+Version:        0.0.2
 Release:        1%{?dist}
 Summary:        Helper scripts for gpu passthrough
 
@@ -7,9 +7,14 @@ License:        GPLv3+
 URL:            https://github.com/raro28/vfio-gpu-passthrough-scripts
 Source0:        https://github.com/raro28/vfio-gpu-passthrough-scripts/releases/download/%{version}/vfio-gpu-passthrough-scripts-%{version}.tar.gz   
 
+Requires:       bash
+Requires:       coreutils
+Requires:       findutils
+Requires:       dracut
+Requires:       kernel-core
+
 %description
 Helper scripts for gpu passthrough
-
 
 %prep
 %autosetup
@@ -31,8 +36,17 @@ cp -a ./etc/dracut.conf.d/vfio.conf %{buildroot}%{_sysconfdir}/dracut.conf.d/.
 %attr(0755,root,root) %{_bindir}/checkiommu
 %attr(0644,root,root) %{_sysconfdir}/dracut.conf.d/vfio.conf
 
+%post
+dracut -f
 
+%postun
+dracut -f
 
 %changelog
+* Sat Feb 12 2022 Hector Diaz <hdiazc@live.com> - 0.0.2-1
+- bump scripts version
+- dependencies
+- dracut scripts
+
 * Sat Feb 12 2022 Hector Diaz <hdiazc@live.com>
 - Initial version of the package
