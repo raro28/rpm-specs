@@ -16,7 +16,6 @@ Requires:       kernel-core
 %description
 Helper scripts for gpu passthrough
 
-
 %prep
 %autosetup
 
