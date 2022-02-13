@@ -44,7 +44,7 @@ dracut -f
 dracut -f
 
 %changelog
-* Sat Feb 13 2022 Hector Diaz <hdiazc@live.com> - 0.0.2-1
+* Sat Feb 12 2022 Hector Diaz <hdiazc@live.com> - 0.0.2-1
 - bump scripts version
 - dependencies
 - dracut scripts
