@@ -6,7 +6,9 @@ Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthr
 License:        GPLv2
 Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}.desktop
+Source2:        10-%{name}.conf
 
+Requires:       systemd
 Requires:       dejavu-sans-mono-fonts
 Requires:       texlive-gnu-freefont
 
@@ -63,6 +65,9 @@ cp -a ./client/build/redhat-linux-build/%{name} %{buildroot}%{_bindir}/.
 mkdir -p %{buildroot}%{_datadir}/pixmaps
 cp -a ./resources/lg-logo.png %{buildroot}%{_datadir}/pixmaps/%{name}.png
 
+mkdir -p %{buildroot}%{_sysconfdir}/tmpfiles.d
+cp -a %{SOURCE2} %{buildroot}%{_sysconfdir}/tmpfiles.d/.
+
 desktop-file-install                                    \
 --delete-original                                       \
 --dir=%{buildroot}%{_datadir}/applications              \
@@ -72,6 +77,13 @@ desktop-file-install                                    \
 %attr(0755,root,root) %{_bindir}/%{name}
 %attr(0644,root,root) %{_datadir}/pixmaps/%{name}.png
 %attr(0644,root,root) %{_datadir}/applications/%{name}.desktop
+%attr(0644,root,root) %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
+
+%post
+systemd-tmpfiles --create %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
+
+%postun
+systemd-tmpfiles --remove %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
 
 %changelog
 * Sun Feb 13 2022 Hector Diaz <hdiazc@live.com> - B5.0.1-1
