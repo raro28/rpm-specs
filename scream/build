@@ -1,0 +1,9 @@
+#!/bin/bash
+rm -rf scream scream-3.9
+
+git clone --recursive https://github.com/duncanthrax/scream.git -b 3.9
+
+mv scream scream-3.9
+tar -zcf scream-3.9.tar.gz scream-3.9
+
+rm -rf scream-3.9
