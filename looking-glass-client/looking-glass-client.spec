@@ -4,11 +4,13 @@ Release:        1%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPLv2
-Source0:        looking-glass-client-%{version}.tar.gz   
+Source0:        %{name}-%{version}.tar.gz
+Source1:        %{name}.desktop
 
 Requires:       dejavu-sans-mono-fonts
 Requires:       texlive-gnu-freefont
 
+BuildRequires:       desktop-file-utils
 BuildRequires:       coreutils
 BuildRequires:       binutils-devel
 BuildRequires:       cmake
@@ -56,10 +58,20 @@ popd
 
 %install
 mkdir -p %{buildroot}%{_bindir}
-cp -a ./client/build/redhat-linux-build/looking-glass-client %{buildroot}%{_bindir}/.
+cp -a ./client/build/redhat-linux-build/%{name} %{buildroot}%{_bindir}/.
+
+mkdir -p %{buildroot}%{_datadir}/pixmaps
+cp -a ./resources/lg-logo.png %{buildroot}%{_datadir}/pixmaps/%{name}.png
+
+desktop-file-install                                    \
+--delete-original                                       \
+--dir=%{buildroot}%{_datadir}/applications              \
+%{SOURCE1}
 
 %files
-%attr(0755,root,root) %{_bindir}/looking-glass-client
+%attr(0755,root,root) %{_bindir}/%{name}
+%attr(0644,root,root) %{_datadir}/pixmaps/%{name}.png
+%attr(0644,root,root) %{_datadir}/applications/%{name}.desktop
 
 %changelog
 * Sun Feb 13 2022 Hector Diaz <hdiazc@live.com> - B5.0.1-1
