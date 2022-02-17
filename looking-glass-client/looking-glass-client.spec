@@ -7,10 +7,12 @@ License:        GPLv2
 Source0:        %{name}-%{version}.tar.gz
 Source1:        %{name}.desktop
 Source2:        10-%{name}.conf
+Source3:        %{name}-tmp.cil
 
 Requires:       systemd
 Requires:       dejavu-sans-mono-fonts
 Requires:       texlive-gnu-freefont
+Requires:       policycoreutils
 
 BuildRequires:       desktop-file-utils
 BuildRequires:       coreutils
@@ -81,9 +83,11 @@ desktop-file-install                                    \
 
 %post
 systemd-tmpfiles --create %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
+semodule -i %{name}-tmp.cil
 
 %postun
 systemd-tmpfiles --remove %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
+semodule -r %{name}-tmp.cil
 
 %changelog
 * Sun Feb 13 2022 Hector Diaz <hdiazc@live.com> - B5.0.1-1
