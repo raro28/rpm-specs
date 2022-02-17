@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Looking Glass
+Icon=/usr/share/pixmaps/looking-glass-client.png
+Exec=/usr/bin/looking-glass-client win:size=1920x1080 -S
+Categories=System
+Terminal=false
