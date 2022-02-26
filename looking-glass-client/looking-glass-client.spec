@@ -1,13 +1,13 @@
 Name:           looking-glass-client
 Version:        B5.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPLv2
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/raro28/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        %{name}.desktop
 Source2:        10-%{name}.conf
-Source3:        %{name}-tmp.cil
+#Source3:        %{name}-tmp.cil
 
 Requires:       systemd
 Requires:       dejavu-sans-mono-fonts
@@ -83,12 +83,15 @@ desktop-file-install                                    \
 
 %post
 systemd-tmpfiles --create %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
-semodule -i %{name}-tmp.cil
+#semodule -i %{name}-tmp.cil
 
 %postun
 systemd-tmpfiles --remove %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
-semodule -r %{name}-tmp.cil
+#semodule -r %{name}-tmp.cil
 
 %changelog
+* Sun Feb 26 2022 Hector Diaz <hdiazc@live.com> - B5.0.1-2
+- Remote packaged tar.gz
+
 * Sun Feb 13 2022 Hector Diaz <hdiazc@live.com> - B5.0.1-1
 - Initial version of the package
