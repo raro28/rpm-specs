@@ -1,11 +1,11 @@
 Name:           gdm-laptop-monitor-xml
 Version:        0.0.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        GDM laptop monitor xml
 
 License:        GPLv3+
-URL:            https://github.com/raro28/gdm-laptop-monitor-xml
-Source0:        https://github.com/raro28/gdm-laptop-monitor-xml/releases/download/%{version}/gdm-laptop-monitor-xml-%{version}.tar.gz
+URL:            https://github.com/raro28/%{name}
+Source0:        https://github.com/raro28/%{name}/archive/refs/tags/%{version}.tar.gz
 
 Requires:       gdm
 
@@ -27,6 +27,9 @@ cp -a ./etc/skel/.config/monitors.xml %{buildroot}%{_sharedstatedir}/gdm/.config
 %attr(0644,gdm,gdm) %{_sharedstatedir}/gdm/.config/monitors.xml
 
 %changelog
+* Sund Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-3
+- Change source url
+
 * Thu Feb 17 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-2
 - Configure GDM
 
