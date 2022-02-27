@@ -1,11 +1,11 @@
 Name:           vfio-gpu-passthrough-scripts
 Version:        0.0.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Helper scripts for gpu passthrough
 
 License:        GPLv3+
-URL:            https://github.com/raro28/vfio-gpu-passthrough-scripts
-Source0:        https://github.com/raro28/vfio-gpu-passthrough-scripts/releases/download/%{version}/vfio-gpu-passthrough-scripts-%{version}.tar.gz   
+URL:            https://github.com/raro28/%{name}
+Source0:        https://github.com/raro28/%{name}/archive/refs/tags/%{version}.tar.gz
 
 Requires:       bash
 Requires:       coreutils
@@ -43,6 +43,9 @@ dracut -f
 dracut -f
 
 %changelog
+* Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.2-2
+- Change source url
+
 * Sat Feb 12 2022 Hector Diaz <hdiazc@live.com> - 0.0.2-1
 - bump scripts version
 - dependencies
