@@ -27,7 +27,7 @@ cp -a ./etc/skel/.config/monitors.xml %{buildroot}%{_sharedstatedir}/gdm/.config
 %attr(0644,gdm,gdm) %{_sharedstatedir}/gdm/.config/monitors.xml
 
 %changelog
-* Sund Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-3
+* Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-3
 - Change source url
 
 * Thu Feb 17 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-2
