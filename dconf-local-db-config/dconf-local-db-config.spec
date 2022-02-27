@@ -1,13 +1,12 @@
 Name:           dconf-local-db-config
 Version:        0.0.2
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Dconf local db config files
 
 License:        GPLv3+
 URL:            https://github.com/raro28/%{name}
 Source0:        https://github.com/raro28/%{name}/archive/refs/tags/%{version}.tar.gz
 
-Requires:       gdm
 Requires:       dconf
 
 %description
@@ -34,6 +33,9 @@ dconf update
 dconf update
 
 %changelog
+* Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.2-2
+- Remove gdm
+
 * Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.2-1
 - Update sources
 
