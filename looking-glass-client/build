@@ -1,9 +1,0 @@
-#!/bin/bash
-rm -rf LookingGlass looking-glass-client-B5.0.1
-
-git clone --recursive https://github.com/gnif/LookingGlass.git -b B5.0.1
-
-mv LookingGlass looking-glass-client-B5.0.1
-tar -zcf looking-glass-client-B5.0.1.tar.gz looking-glass-client-B5.0.1
-
-rm -rf looking-glass-client-B5.0.1
