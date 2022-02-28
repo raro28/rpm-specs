@@ -1,5 +1,5 @@
 Name:           dconf-local-db-config
-Version:        0.0.3
+Version:        0.0.4
 Release:        1%{?dist}
 Summary:        Dconf local db config files
 
@@ -33,6 +33,9 @@ dconf update
 dconf update
 
 %changelog
+* Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.4-1
+- Update sources
+
 * Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.3-1
 - Update sources
 
