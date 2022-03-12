@@ -1,5 +1,5 @@
 Name:           dconf-local-db-config
-Version:        0.0.4
+Version:        0.0.5
 Release:        1%{?dist}
 Summary:        Dconf local db config files
 
@@ -20,11 +20,13 @@ mkdir -p %{buildroot}%{_sysconfdir}/dconf/db/local.d
 cp -a ./etc/dconf/db/local.d/00-appearance %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
 cp -a ./etc/dconf/db/local.d/01-behaviour %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
 cp -a ./etc/dconf/db/local.d/02-shell %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
+cp -a ./etc/dconf/db/local.d/03-virt %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
 
 %files
 %attr(0644,root,root) %{_sysconfdir}/dconf/db/local.d/00-appearance
 %attr(0644,root,root) %{_sysconfdir}/dconf/db/local.d/01-behaviour
 %attr(0644,root,root) %{_sysconfdir}/dconf/db/local.d/02-shell
+%attr(0644,root,root) %{_sysconfdir}/dconf/db/local.d/03-virt
 
 %post
 dconf update
@@ -33,6 +35,9 @@ dconf update
 dconf update
 
 %changelog
+* Sun Mar 12 2022 Hector Diaz <hdiazc@live.com> - 0.0.5-1
+- Update sources
+
 * Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.4-1
 - Update sources
 
