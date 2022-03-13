@@ -1,5 +1,5 @@
 Name:           user-files
-Version:        0.0.0
+Version:        0.0.1
 Release:        1%{?dist}
 Summary:        User files
 
@@ -21,5 +21,8 @@ cp -a ./etc/skel/.config %{buildroot}%{_sysconfdir}/skel/.
 %{_sysconfdir}/skel/.config
 
 %changelog
+* Sun Mar 13 2022 Hector Diaz <hdiazc@live.com> - 0.0.1-1
+- Bump version
+
 * Sun Mar 13 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-1
 - Initial version of the package
