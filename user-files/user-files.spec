@@ -21,7 +21,7 @@ cp -a %{SOURCE0} %{buildroot}%{_sysconfdir}/skel/.config/.
 
 %changelog
 * Tue Mar 15 2022 Hector Diaz <hdiazc@live.com> - 0.0.1-2
-- Bump version
+- Track sources
 
 * Sun Mar 13 2022 Hector Diaz <hdiazc@live.com> - 0.0.1-1
 - Bump version
