@@ -1,11 +1,11 @@
 Name:           qemu-hook-scripts
 Version:        0.0.0
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        QEMU hook scripts
 
 License:        GPLv3+
-URL:            https://github.com/raro28/qemu-hook-scripts
-Source0:        https://github.com/raro28/qemu-hook-scripts/releases/download/%{version}/qemu-hook-scripts-%{version}.tar.gz
+URL:            https://github.com/raro28/%{name}
+Source0:        https://github.com/raro28/%{name}/archive/refs/tags/%{version}.tar.gz
 
 Requires:       bash
 Requires:       systemd
@@ -31,6 +31,9 @@ systemctl is-active libvirtd && systemctl restart libvirtd || $(exit 0)
 systemctl is-active libvirtd && systemctl restart libvirtd || $(exit 0)
 
 %changelog
+* Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-4
+- Change source url
+
 * Sat Feb 12 2022 Hector Diaz <hdiazc@live.com> - 0.0.0-3
 - Override exit code
 

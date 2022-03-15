@@ -1,0 +1,37 @@
+[Default Applications]
+application/gzip=org.gnome.FileRoller.desktop;
+application/vnd.comicbook+zip=mcomix3.desktop;
+application/x-compressed-tar=org.gnome.FileRoller.desktop;
+application/x-shellscript=code.desktop;
+image/bmp=org.gnome.gThumb.desktop
+image/gif=org.gnome.gThumb.desktop
+image/jpeg=org.gnome.gThumb.desktop
+image/jxl=org.gnome.gThumb.desktop
+image/png=org.gnome.gThumb.desktop
+image/svg+xml=org.gnome.gThumb.desktop
+image/tiff=org.gnome.gThumb.desktop
+image/webp=org.gnome.gThumb.desktop
+image/x-bmp=org.gnome.gThumb.desktop
+image/x-ico=org.gnome.gThumb.desktop
+image/x-pcx=org.gnome.gThumb.desktop
+image/x-png=org.gnome.gThumb.desktop
+image/x-tga=org.gnome.gThumb.desktop
+image/xpm=org.gnome.gThumb.desktop
+text/html=google-chrome.desktop
+text/markdown=code.desktop;
+text/plain=code.desktop;
+text/vnd.trolltech.linguist=code.desktop;
+text/x-maven+xml=code.desktop;
+video/mp4=org.gnome.gThumb.desktop;
+x-scheme-handler/about=google-chrome.desktop
+x-scheme-handler/http=google-chrome.desktop
+x-scheme-handler/https=google-chrome.desktop
+x-scheme-handler/jetbrains=jetbrains-toolbox.desktop
+x-scheme-handler/msteams=teams.desktop
+x-scheme-handler/tg=userapp-Telegram Desktop-4YL6H1.desktop
+x-scheme-handler/unknown=google-chrome.desktop
+
+[Added Associations]
+application/x-rpm=org.gnome.FileRoller.desktop;
+inode/directory=code.desktop;
+text/csv=code.desktop;

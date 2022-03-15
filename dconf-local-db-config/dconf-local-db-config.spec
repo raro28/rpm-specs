@@ -1,30 +1,31 @@
 Name:           dconf-local-db-config
-Version:        0.0.1
-Release:        1%{?dist}
+Version:        0.0.5
+Release:        3%{?dist}
 Summary:        Dconf local db config files
 
 License:        GPLv3+
-URL:            https://github.com/raro28/dconf-local-db-config
-Source0:        https://github.com/raro28/dconf-local-db-config/releases/download/%{version}/dconf-local-db-config-%{version}.tar.gz
+URL:            https://github.com/raro28/%{name}
+Source0:        00-appearance
+Source1:        01-behaviour
+Source2:        02-shell
+Source3:        03-virt
 
-Requires:       gdm
+Requires:       dconf
 
 %description
 Dconf local db config files
 
 %prep
-%autosetup
 
 %install
 mkdir -p %{buildroot}%{_sysconfdir}/dconf/db/local.d
-cp -a ./etc/dconf/db/local.d/00-appearance %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
-cp -a ./etc/dconf/db/local.d/01-behaviour %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
-cp -a ./etc/dconf/db/local.d/02-shell %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
+cp -a %{SOURCE0} %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
+cp -a %{SOURCE1} %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
+cp -a %{SOURCE2} %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
+cp -a %{SOURCE3} %{buildroot}%{_sysconfdir}/dconf/db/local.d/.
 
 %files
-%attr(0644,root,root) %{_sysconfdir}/dconf/db/local.d/00-appearance
-%attr(0644,root,root) %{_sysconfdir}/dconf/db/local.d/01-behaviour
-%attr(0644,root,root) %{_sysconfdir}/dconf/db/local.d/02-shell
+%{_sysconfdir}/dconf/db/local.d
 
 %post
 dconf update
@@ -33,6 +34,27 @@ dconf update
 dconf update
 
 %changelog
+* Tue Mar 15 2022 Hector Diaz <hdiazc@live.com> - 0.0.5-3
+- Track sources
+
+* Sat Mar 12 2022 Hector Diaz <hdiazc@live.com> - 0.0.5-1
+- Update sources
+
+* Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.4-1
+- Update sources
+
+* Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.3-1
+- Update sources
+
+* Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.2-2
+- Remove gdm
+
+* Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.2-1
+- Update sources
+
+* Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 0.0.1-2
+- Update dependencies
+
 * Mon Feb 14 2022 Hector Diaz <hdiazc@live.com> - 0.0.1-1
 - Initial version of the package
 

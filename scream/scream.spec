@@ -1,10 +1,10 @@
 Name:           scream
 Version:        3.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Audio receiver using Pulseaudio, ALSA or stdout as audio output
 
 License:        MS-PL
-Source0:        %{name}-%{version}.tar.gz
+Source0:        https://github.com/raro28/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 
 BuildRequires:       gcc
 BuildRequires:       binutils-devel
@@ -39,5 +39,8 @@ cp -a ./Receivers/unix/build/redhat-linux-build/%{name} %{buildroot}%{_bindir}/.
 %attr(0755,root,root) %{_bindir}/%{name}
 
 %changelog
+* Sun Feb 26 2022 Hector Diaz <hdiazc@live.com> - 3.9-2
+- Grab tar.gz file
+ 
 * Sun Feb 13 2022 Hector Diaz <hdiazc@live.com> - 3.9-1
 - Initial version of the package
