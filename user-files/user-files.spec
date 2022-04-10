@@ -1,6 +1,6 @@
 Name:           user-files
-Version:        0.0.1
-Release:        2%{?dist}
+Version:        0.0.2
+Release:        1%{?dist}
 Summary:        User files
 
 License:        GPLv3+
@@ -20,6 +20,9 @@ cp -a %{SOURCE0} %{buildroot}%{_sysconfdir}/skel/.config/.
 %{_sysconfdir}/skel/.config
 
 %changelog
+* Sun Apr 10 2022 Hector Diaz <hdiazc@live.com> - 0.0.2-1
+- Add more types
+
 * Tue Mar 15 2022 Hector Diaz <hdiazc@live.com> - 0.0.1-2
 - Track sources
 
