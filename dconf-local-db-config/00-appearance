@@ -9,6 +9,7 @@ font-antialiasing='rgba'
 enable-hot-corners=false
 cursor-theme='Qogir-white-cursors'
 icon-theme='Tela-circle-black-dark'
+color-scheme='prefer-dark'
 
 [org/gnome/desktop/wm/preferences]
 titlebar-font='Noto Sans Display Bold 11'
