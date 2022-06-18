@@ -1,5 +1,5 @@
 Name:           dconf-local-db-config
-Version:        0.0.6
+Version:        0.0.7
 Release:        1%{?dist}
 Summary:        Dconf local db config files
 
@@ -34,6 +34,9 @@ dconf update
 dconf update
 
 %changelog
+* Sat Jun 18 2022 Hector Diaz <hdiazc@live.com> - 0.0.7-1
+- Default dark
+
 * Tue May 02 2022 Hector Diaz <hdiazc@live.com> - 0.0.6-1
 - Disable automount
 
