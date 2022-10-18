@@ -1,8 +1,12 @@
 [Default Applications]
 application/gzip=org.gnome.FileRoller.desktop;
+application/json=code.desktop;
 application/vnd.comicbook+zip=mcomix3.desktop;
+application/x-7z-compressed=org.gnome.FileRoller.desktop;
 application/x-compressed-tar=org.gnome.FileRoller.desktop;
 application/x-shellscript=code.desktop;
+application/xml=code.desktop;
+application/zip=org.gnome.FileRoller.desktop;
 image/bmp=org.gnome.gThumb.desktop
 image/gif=org.gnome.gThumb.desktop
 image/jpeg=org.gnome.gThumb.desktop
@@ -17,7 +21,7 @@ image/x-pcx=org.gnome.gThumb.desktop
 image/x-png=org.gnome.gThumb.desktop
 image/x-tga=org.gnome.gThumb.desktop
 image/xpm=org.gnome.gThumb.desktop
-text/html=google-chrome.desktop
+text/html=code.desktop
 text/markdown=code.desktop;
 text/plain=code.desktop;
 text/vnd.trolltech.linguist=code.desktop;
@@ -28,7 +32,7 @@ x-scheme-handler/http=google-chrome.desktop
 x-scheme-handler/https=google-chrome.desktop
 x-scheme-handler/jetbrains=jetbrains-toolbox.desktop
 x-scheme-handler/msteams=teams.desktop
-x-scheme-handler/tg=userapp-Telegram Desktop-4YL6H1.desktop
+x-scheme-handler/tg=telegramdesktop.desktop
 x-scheme-handler/unknown=google-chrome.desktop
 
 [Added Associations]

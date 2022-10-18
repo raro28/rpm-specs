@@ -1,6 +1,6 @@
 Name:           dconf-local-db-config
-Version:        0.0.5
-Release:        3%{?dist}
+Version:        0.0.7
+Release:        1%{?dist}
 Summary:        Dconf local db config files
 
 License:        GPLv3+
@@ -34,6 +34,12 @@ dconf update
 dconf update
 
 %changelog
+* Sat Jun 18 2022 Hector Diaz <hdiazc@live.com> - 0.0.7-1
+- Default dark
+
+* Tue May 02 2022 Hector Diaz <hdiazc@live.com> - 0.0.6-1
+- Disable automount
+
 * Tue Mar 15 2022 Hector Diaz <hdiazc@live.com> - 0.0.5-3
 - Track sources
 
