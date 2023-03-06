@@ -1,13 +1,13 @@
 Name:           qogir-theme
-Version:        20211225
-Release:        2%{?dist}
+Version:        20230227
+Release:        1%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
 License:        GPLv3+
 
 %define dname Qogir-theme
-%define dversion 2021-12-25
+%define dversion 2023-02-27
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
@@ -34,6 +34,9 @@ mkdir -p %{buildroot}%{_datarootdir}/themes
 %{_datarootdir}/themes
 
 %changelog
+* Mon Mar 06 2023 Hector Diaz <hdiazc@live.com> - 20230227-1
+- Bump version
+
 * Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 20211225-2
 - add gnome-shell
 

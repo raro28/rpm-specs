@@ -1,13 +1,13 @@
 Name:           fluent-gtk-theme-red-compact
-Version:        20220115
-Release:        2%{?dist}
+Version:        20221215
+Release:        1%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch: noarch
 
 License:        GPLv3+
 
 %define dname Fluent-gtk-theme
-%define dversion 2022-01-15
+%define dversion 2022-12-15
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
@@ -31,6 +31,9 @@ mkdir -p %{buildroot}%{_datarootdir}/themes
 %{_datarootdir}/themes
 
 %changelog
+* Mon Mar 06 2023 Hector Diaz <hdiazc@live.com> - 20221215-1
+- Bump version
+
 * Sun Feb 27 2022 Hector Diaz <hdiazc@live.com> - 20220115-2
 - add gnome-shell
 
