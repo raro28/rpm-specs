@@ -1,6 +1,6 @@
 Name:           qogir-icon-theme
 Version:        20230223
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A flat colorful design icon theme for linux desktops
 BuildArch:      noarch
 
@@ -21,12 +21,15 @@ A flat colorful design icon theme for linux desktops
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/icons
-./install.sh --dest "%{buildroot}%{_datarootdir}/icons"
+./install.sh --theme deault --color dark --dest "%{buildroot}%{_datarootdir}/icons"
 
 %files
 %{_datarootdir}/icons
 
 %changelog
+* Mon Mar 06 2023 Hector Diaz <hdiazc@live.com> - 20230223-2
+- Set options
+
 * Mon Mar 06 2023 Hector Diaz <hdiazc@live.com> - 20230223-1
 - Bump version
 

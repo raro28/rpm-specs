@@ -1,6 +1,6 @@
 Name:           qogir-theme
 Version:        20230227
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -28,12 +28,15 @@ Cinnamon Pantheon, XFCE, Mate, etc
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh --dest %{buildroot}%{_datarootdir}/themes --theme default -l fedora --tweaks round
+./install.sh --theme default --icon fedora --tweaks round --libadwaita --dest %{buildroot}%{_datarootdir}/themes
 
 %files
 %{_datarootdir}/themes
 
 %changelog
+* Mon Mar 06 2023 Hector Diaz <hdiazc@live.com> - 20230227-2
+- Set options
+
 * Mon Mar 06 2023 Hector Diaz <hdiazc@live.com> - 20230227-1
 - Bump version
 
