@@ -21,7 +21,7 @@ A flat colorful design icon theme for linux desktops
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/icons
-./install.sh --theme default --color dark --dest "%{buildroot}%{_datarootdir}/icons"
+./install.sh --theme default --dest "%{buildroot}%{_datarootdir}/icons"
 
 %files
 %{_datarootdir}/icons
