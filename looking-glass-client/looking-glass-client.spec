@@ -1,5 +1,5 @@
 Name:           looking-glass-client
-Version:        B6.0.0
+Version:        B7.0.0
 Release:        1%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
@@ -92,6 +92,9 @@ systemd-tmpfiles --remove %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
 #semodule -r %{name}-tmp.cil
 
 %changelog
+* Sat Jun 29 2024 Hector Diaz <hdiazc@live.com> - B7.0.0-2
+- Update to B7-rc1
+
 * Fri Jan 6 2023 Hector Diaz <hdiazc@live.com> - B6.0.0-1
 - B6 release
 
