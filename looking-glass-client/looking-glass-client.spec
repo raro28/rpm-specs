@@ -1,6 +1,6 @@
 Name:           looking-glass-client
-Version:        B5.0.1
-Release:        2%{?dist}
+Version:        B7.0.0
+Release:        1%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPLv2
@@ -39,7 +39,9 @@ BuildRequires:       SDL2_ttf-devel
 BuildRequires:       spice-protocol
 BuildRequires:       wayland-devel
 BuildRequires:       wayland-protocols-devel
-
+BuildRequires:       libsamplerate-devel
+BuildRequires:       pipewire-devel
+BuildRequires:       pulseaudio-libs-devel
 
 %description
 Looking Glass is an open source application that allows the use of a KVM 
@@ -90,7 +92,13 @@ systemd-tmpfiles --remove %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
 #semodule -r %{name}-tmp.cil
 
 %changelog
-* Sun Feb 26 2022 Hector Diaz <hdiazc@live.com> - B5.0.1-2
+* Sat Jun 29 2024 Hector Diaz <hdiazc@live.com> - B7.0.0-2
+- Update to B7-rc1
+
+* Fri Jan 6 2023 Hector Diaz <hdiazc@live.com> - B6.0.0-1
+- B6 release
+
+* Sat Feb 26 2022 Hector Diaz <hdiazc@live.com> - B5.0.1-2
 - Remote packaged tar.gz
 
 * Sun Feb 13 2022 Hector Diaz <hdiazc@live.com> - B5.0.1-1
