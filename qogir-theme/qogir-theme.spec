@@ -1,15 +1,15 @@
 Name:           qogir-theme
-Version:        20230227
-Release:        2%{?dist}
+Version:        20240522
+Release:        1%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
 License:        GPLv3+
 
 %define dname Qogir-theme
-%define dversion 2023-02-27
+%define dversion 2024-05-22
 URL:            https://github.com/vinceliuice/%{dname}
-Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
+Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dname}-%{dversion}.tar.gz
 
 Requires:       gtk2-engines
 Requires:       gtk-murrine-engine
@@ -34,6 +34,9 @@ mkdir -p %{buildroot}%{_datarootdir}/themes
 %{_datarootdir}/themes
 
 %changelog
+* Sat Nov 30 2024 Hector Diaz <hdiazc@live.com> - 20240522-1
+- Bump version
+
 * Mon Mar 06 2023 Hector Diaz <hdiazc@live.com> - 20230227-2
 - Set options
 
