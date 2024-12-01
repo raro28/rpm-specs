@@ -24,7 +24,7 @@ A macOS like theme for Linux GTK Desktops
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh -o solid -t grey -N mojave -l -c dark --shell -i gnome --dest %{buildroot}%{_datarootdir}/themes
+./install.sh -t grey -N mojave -l -c dark --shell -i gnome --dest %{buildroot}%{_datarootdir}/themes
 
 %files
 %{_datarootdir}/themes
