@@ -9,7 +9,7 @@ License:        GPLv3+
 %define dname WhiteSur-gtk-theme
 %define dversion 2024-11-18
 URL:            https://github.com/vinceliuice/%{dname}
-Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dname}-%{dversion}.tar.gz
+Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
 BuildRequires: glib2-devel
 BuildRequires:  sassc

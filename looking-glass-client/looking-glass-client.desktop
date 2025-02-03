@@ -2,6 +2,6 @@
 Type=Application
 Name=Looking Glass
 Icon=/usr/share/pixmaps/looking-glass-client.png
-Exec=/usr/bin/looking-glass-client win:size=1920x1080 -S
+Exec=/usr/bin/looking-glass-client win:size=1920x1080 -S -k -m KEY_F12
 Categories=System
 Terminal=false

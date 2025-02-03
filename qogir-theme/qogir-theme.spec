@@ -9,7 +9,7 @@ License:        GPLv3+
 %define dname Qogir-theme
 %define dversion 2024-05-22
 URL:            https://github.com/vinceliuice/%{dname}
-Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dname}-%{dversion}.tar.gz
+Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
 Requires:       gtk2-engines
 Requires:       gtk-murrine-engine
@@ -28,7 +28,7 @@ Cinnamon Pantheon, XFCE, Mate, etc
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh --icon fedora -c dark --tweaks round --libadwaita --dest %{buildroot}%{_datarootdir}/themes
+./install.sh --icon gnome -c dark --tweaks round --libadwaita --dest %{buildroot}%{_datarootdir}/themes
 
 %files
 %{_datarootdir}/themes
