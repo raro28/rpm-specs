@@ -9,7 +9,7 @@ License:        GPLv3+
 %define dname Orchis-theme
 %define dversion 2024-11-03
 URL:            https://github.com/vinceliuice/%{dname}
-Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dname}-%{dversion}.tar.gz
+Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
 Requires:       gtk-murrine-engine
 

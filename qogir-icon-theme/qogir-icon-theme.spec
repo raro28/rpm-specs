@@ -9,7 +9,7 @@ License:        GPLv3+
 %define dname Qogir-icon-theme
 %define dversion 2023-06-05
 URL:            https://github.com/vinceliuice/%{dname}
-Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dname}-%{dversion}.tar.gz
+Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
 BuildRequires:  gtk-update-icon-cache
 

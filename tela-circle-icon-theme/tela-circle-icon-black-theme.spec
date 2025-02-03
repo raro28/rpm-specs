@@ -10,7 +10,7 @@ License:        GPLv3+
 %define dname Tela-circle-icon-theme
 %define dversion 2024-11-15
 URL:            https://github.com/vinceliuice/%{dname}
-Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dname}-%{dversion}.tar.gz
+Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
 BuildRequires:  gtk-update-icon-cache
 

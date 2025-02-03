@@ -9,7 +9,7 @@ License:        GPLv3+
 %define dname Fluent-gtk-theme
 %define dversion 2024-06-12
 URL:            https://github.com/vinceliuice/%{dname}
-Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dname}-%{dversion}.tar.gz
+Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
 Requires:       gnome-themes-extra
 Requires:       gtk-murrine-engine
@@ -25,7 +25,7 @@ Fluent is a Fluent design theme for GNOME/GTK based desktop environments
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh --dest %{buildroot}%{_datarootdir}/themes --theme grey -i fedora --size compact --tweaks solid round -c dark
+./install.sh --dest %{buildroot}%{_datarootdir}/themes --theme grey -i gnome --size compact --tweaks solid round -c dark
 
 %files
 %{_datarootdir}/themes
