@@ -1,4 +1,0 @@
-(typeattributeset cil_gen_require tmpfs_t)
-(typeattributeset cil_gen_require svirt_t)
-(allow svirt_t tmpfs_t (file (getattr open)))
-(allow svirt_t tmpfs_t (file (map)))

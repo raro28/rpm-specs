@@ -1,0 +1,10 @@
+module looking-glass-client 1.0;
+
+require {
+    type tmpfs_t;
+    type svirt_image_t;
+    class file { read write getattr open };
+}
+
+# Allow any domain with tmpfs_t to access this as svirt_image_t
+allow tmpfs_t svirt_image_t:file { read write getattr open };

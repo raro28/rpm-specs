@@ -1,13 +1,13 @@
 Name:           looking-glass-client
 Version:        B7.0.0
-Release:        2%{?dist}
+Release:        4%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPLv2
 Source0:        https://github.com/raro28/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
 Source1:        %{name}.desktop
 Source2:        10-%{name}.conf
-#Source3:        %{name}-tmp.cil
+Source3:        %{name}.te
 
 Requires:       systemd
 Requires:       dejavu-sans-mono-fonts
@@ -42,6 +42,7 @@ BuildRequires:       wayland-protocols-devel
 BuildRequires:       libsamplerate-devel
 BuildRequires:       pipewire-devel
 BuildRequires:       pulseaudio-libs-devel
+BuildRequires:       selinux-policy-devel
 
 %description
 Looking Glass is an open source application that allows the use of a KVM 
@@ -77,21 +78,30 @@ desktop-file-install                                    \
 --dir=%{buildroot}%{_datadir}/applications              \
 %{SOURCE1}
 
+mkdir -p %{buildroot}/usr/share/selinux/packages
+checkmodule -M -m -o %{name}.mod %{SOURCE3}
+semodule_package -o %{name}.pp -m %{name}.mod
+cp -a %{name}.pp %{buildroot}/usr/share/selinux/packages/
+
 %files
 %attr(0755,root,root) %{_bindir}/%{name}
 %attr(0644,root,root) %{_datadir}/pixmaps/%{name}.png
 %attr(0644,root,root) %{_datadir}/applications/%{name}.desktop
 %attr(0644,root,root) %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
+%attr(0644,root,root) /usr/share/selinux/packages/%{name}.pp
 
 %post
 systemd-tmpfiles --create %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
-#semodule -i %{name}-tmp.cil
+semodule -i /usr/share/selinux/packages/%{name}.pp || :
+restorecon /dev/shm/looking-glass || :
 
 %postun
 systemd-tmpfiles --remove %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
-#semodule -r %{name}-tmp.cil
+semodule -r %{name} || :
 
 %changelog
+* Sat Apr 12 2025 Hector Diaz <hdiazc@live.com> - B7.0.0-4
+- SE linux module
 
 * Sat Mar 29 2025 Hector Diaz <hdiazc@live.com> - B7.0.0-3
 - B7 release
