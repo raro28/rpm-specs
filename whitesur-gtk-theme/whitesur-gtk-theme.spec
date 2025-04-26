@@ -1,6 +1,6 @@
 Name:           whitesur-gtk-theme
 Version:        20250403
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -24,12 +24,15 @@ A macOS like theme for Linux GTK Desktops
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh -t grey -N mojave -l -c dark --shell -i gnome --dest %{buildroot}%{_datarootdir}/themes
+./install.sh -t grey -N mojave -l --shell -i gnome --dest %{buildroot}%{_datarootdir}/themes
 
 %files
 %{_datarootdir}/themes
 
 %changelog
+* Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250403-2
+- Include light
+
 * Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250403-1
 - Bump version
 
