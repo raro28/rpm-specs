@@ -1,6 +1,6 @@
 Name:           colloid-gtk-theme
 Version:        20241116
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -24,11 +24,14 @@ Theme for GNOME/GTK based desktop environments.
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh -t grey -c dark --libadwaita --dest %{buildroot}%{_datarootdir}/themes
+./install.sh -t grey --libadwaita --dest %{buildroot}%{_datarootdir}/themes
 
 %files
 %{_datarootdir}/themes
 
 %changelog
+* Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20241116-2
+- Include light
+
 * Sun Dec 01 2024 Hector Diaz <hdiazc@live.com> - 20241116-1
 - Initial version of the package

@@ -1,6 +1,6 @@
 Name:           qogir-theme
 Version:        20240522
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -28,12 +28,15 @@ Cinnamon Pantheon, XFCE, Mate, etc
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh --icon gnome -c dark --tweaks round --libadwaita --dest %{buildroot}%{_datarootdir}/themes
+./install.sh --icon gnome --tweaks round --libadwaita --dest %{buildroot}%{_datarootdir}/themes
 
 %files
 %{_datarootdir}/themes
 
 %changelog
+* Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20240522-3
+- Include light
+
 * Sun Dec 01 2024 Hector Diaz <hdiazc@live.com> - 20240522-2
 - Dark theme only
 

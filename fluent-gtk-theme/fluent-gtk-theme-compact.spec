@@ -1,6 +1,6 @@
 Name:           fluent-gtk-theme-compact
 Version:        20250417
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch: noarch
 
@@ -25,12 +25,15 @@ Fluent is a Fluent design theme for GNOME/GTK based desktop environments
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh --dest %{buildroot}%{_datarootdir}/themes --theme grey -i gnome --size compact --tweaks solid round -c dark
+./install.sh --dest %{buildroot}%{_datarootdir}/themes --theme grey -i gnome --size compact --tweaks solid round
 
 %files
 %{_datarootdir}/themes
 
 %changelog
+* Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250417-2
+- Include light
+
 * Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250417-1
 - Bump version
 
