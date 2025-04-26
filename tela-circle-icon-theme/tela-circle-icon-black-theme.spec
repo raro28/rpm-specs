@@ -1,5 +1,5 @@
 Name:           tela-circle-icon-black-theme
-Version:        20241115
+Version:        20250210
 Release:        1%{?dist}
 Summary:        A flat colorful Design icon theme
 
@@ -8,7 +8,7 @@ BuildArch:      noarch
 License:        GPLv3+
 
 %define dname Tela-circle-icon-theme
-%define dversion 2024-11-15
+%define dversion 2025-02-10
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
@@ -28,6 +28,9 @@ mkdir -p %{buildroot}%{_datarootdir}/icons
 %{_datarootdir}/icons
 
 %changelog
+* Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250210-1
+- Bump version
+
 * Sat Nov 30 2024 Hector Diaz <hdiazc@live.com> - 20241115-1
 - Bump version
 

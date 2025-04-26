@@ -1,13 +1,13 @@
 Name:           qogir-cursors-theme
-Version:        20230605
-Release:        2%{?dist}
+Version:        20250215
+Release:        1%{?dist}
 Summary:        A flat colorful design icon theme for linux desktops
 BuildArch:      noarch
 
 License:        GPLv3+
 
 %define dname Qogir-icon-theme
-%define dversion 2023-06-05
+%define dversion 2025-02-15
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
@@ -25,6 +25,9 @@ cp -r ./src/cursors/dist-dark/ %{buildroot}%{_datarootdir}/icons/Qogir-white-cur
 %{_datarootdir}/icons
 
 %changelog
+* Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250215-1
+- Bump version
+
 * Sat Nov 30 2024 Hector Diaz <hdiazc@live.com> - 20230605-2
 - Only white cursors
 

@@ -1,5 +1,5 @@
 Name:           qogir-icon-theme
-Version:        20230605
+Version:        20250215
 Release:        1%{?dist}
 Summary:        A flat colorful design icon theme for linux desktops
 BuildArch:      noarch
@@ -7,7 +7,7 @@ BuildArch:      noarch
 License:        GPLv3+
 
 %define dname Qogir-icon-theme
-%define dversion 2023-06-05
+%define dversion 2025-02-15
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
@@ -27,6 +27,9 @@ mkdir -p %{buildroot}%{_datarootdir}/icons
 %{_datarootdir}/icons
 
 %changelog
+* Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250215-1
+- Bump version
+
 * Sun Dec 01 2024 Hector Diaz <hdiazc@live.com> - 20230605-1
 - Bump versions
 

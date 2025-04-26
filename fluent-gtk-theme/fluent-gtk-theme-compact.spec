@@ -1,13 +1,13 @@
 Name:           fluent-gtk-theme-compact
-Version:        20240612
-Release:        2%{?dist}
+Version:        20250417
+Release:        1%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch: noarch
 
 License:        GPLv3+
 
 %define dname Fluent-gtk-theme
-%define dversion 2024-06-12
+%define dversion 2025-04-17
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
@@ -31,6 +31,9 @@ mkdir -p %{buildroot}%{_datarootdir}/themes
 %{_datarootdir}/themes
 
 %changelog
+* Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250417-1
+- Bump version
+
 * Sun Dec 01 2024 Hector Diaz <hdiazc@live.com> - 20240612-2
 - Dark theme only
 
