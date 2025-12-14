@@ -104,7 +104,8 @@ semodule -r %{name} || :
 
 %changelog
 * Sat Dec 13 2025 Hector Diaz <hdiazc@live.com> - B7.0.0-5
-- Fix SE linux module
+- Fix SE linux module with proper file context and access rules
+- Add tmpfiles.d SELinux context application on boot
 
 * Sat Apr 12 2025 Hector Diaz <hdiazc@live.com> - B7.0.0-4
 - SE linux module

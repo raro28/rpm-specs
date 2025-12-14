@@ -1,5 +1,11 @@
 policy_module(looking-glass-client, 1.0.0)
 
 require {
+    type svirt_t;
     type svirt_image_t;
+    type tmpfs_t;
+    class file { read write open getattr };
 }
+
+# Allow QEMU (svirt_t) to access the shared memory file labeled as svirt_image_t
+allow svirt_t svirt_image_t:file { read write open getattr };
