@@ -1,13 +1,13 @@
 Name:           whitesur-gtk-theme
-Version:        20250403
-Release:        2%{?dist}
+Version:        20250724
+Release:        1%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
 License:        GPLv3+
 
 %define dname WhiteSur-gtk-theme
-%define dversion 2025-04-03
+%define dversion 2025-07-24
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 
@@ -30,6 +30,9 @@ mkdir -p %{buildroot}%{_datarootdir}/themes
 %{_datarootdir}/themes
 
 %changelog
+* Sat Dec 13 2025 Hector Diaz <hdiazc@live.com> - 20250724-1
+- Bump version
+
 * Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250403-2
 - Include light
 
