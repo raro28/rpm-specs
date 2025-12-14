@@ -1,6 +1,6 @@
 Name:           looking-glass-client
 Version:        B7.0.0
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPLv2
@@ -8,6 +8,7 @@ Source0:        https://github.com/raro28/%{name}/releases/download/%{version}/%
 Source1:        %{name}.desktop
 Source2:        10-%{name}.conf
 Source3:        %{name}.te
+Source4:        %{name}.fc
 
 Requires:       systemd
 Requires:       dejavu-sans-mono-fonts
@@ -79,9 +80,11 @@ desktop-file-install                                    \
 %{SOURCE1}
 
 mkdir -p %{buildroot}/usr/share/selinux/packages
-checkmodule -M -m -o %{name}.mod %{SOURCE3}
-semodule_package -o %{name}.pp -m %{name}.mod
-cp -a %{name}.pp %{buildroot}/usr/share/selinux/packages/
+mkdir -p selinux_build
+cp -a %{SOURCE3} selinux_build/%{name}.te
+cp -a %{SOURCE4} selinux_build/%{name}.fc
+make -f /usr/share/selinux/devel/Makefile -C selinux_build
+cp -a selinux_build/%{name}.pp %{buildroot}/usr/share/selinux/packages/
 
 %files
 %attr(0755,root,root) %{_bindir}/%{name}
@@ -91,15 +94,18 @@ cp -a %{name}.pp %{buildroot}/usr/share/selinux/packages/
 %attr(0644,root,root) /usr/share/selinux/packages/%{name}.pp
 
 %post
-systemd-tmpfiles --create %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
 semodule -i /usr/share/selinux/packages/%{name}.pp || :
-restorecon /dev/shm/looking-glass || :
+systemd-tmpfiles --create %{_sysconfdir}/tmpfiles.d/10-%{name}.conf || :
+restorecon -F /dev/shm/looking-glass || :
 
 %postun
 systemd-tmpfiles --remove %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
 semodule -r %{name} || :
 
 %changelog
+* Sat Dec 13 2025 Hector Diaz <hdiazc@live.com> - B7.0.0-5
+- Fix SE linux module
+
 * Sat Apr 12 2025 Hector Diaz <hdiazc@live.com> - B7.0.0-4
 - SE linux module
 
