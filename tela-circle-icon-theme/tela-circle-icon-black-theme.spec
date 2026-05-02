@@ -1,11 +1,11 @@
 Name:           tela-circle-icon-black-theme
 Version:        20250210
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A flat colorful Design icon theme
 
 BuildArch:      noarch
 
-License:        GPLv3+
+License:        GPL-3.0-or-later
 
 %define dname Tela-circle-icon-theme
 %define dversion 2025-02-10
@@ -28,6 +28,9 @@ mkdir -p %{buildroot}%{_datarootdir}/icons
 %{_datarootdir}/icons
 
 %changelog
+* Sat May 02 2026 Hector Diaz <hdiazc@live.com> - 20250210-2
+- Modernize: SPDX license tag (GPLv3+ → GPL-3.0-or-later)
+
 * Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250210-1
 - Bump version
 

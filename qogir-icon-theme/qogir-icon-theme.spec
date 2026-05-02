@@ -1,10 +1,10 @@
 Name:           qogir-icon-theme
 Version:        20250215
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A flat colorful design icon theme for linux desktops
 BuildArch:      noarch
 
-License:        GPLv3+
+License:        GPL-3.0-or-later
 
 %define dname Qogir-icon-theme
 %define dversion 2025-02-15
@@ -27,6 +27,9 @@ mkdir -p %{buildroot}%{_datarootdir}/icons
 %{_datarootdir}/icons
 
 %changelog
+* Sat May 02 2026 Hector Diaz <hdiazc@live.com> - 20250215-3
+- Modernize: SPDX license tag (GPLv3+ → GPL-3.0-or-later)
+
 * Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250215-2
 - Include light
 

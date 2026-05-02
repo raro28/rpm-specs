@@ -1,10 +1,10 @@
 Name:           fluent-gtk-theme-compact
 Version:        20250417
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
-BuildArch: noarch
+BuildArch:      noarch
 
-License:        GPLv3+
+License:        GPL-3.0-or-later
 
 %define dname Fluent-gtk-theme
 %define dversion 2025-04-17
@@ -25,12 +25,16 @@ Fluent is a Fluent design theme for GNOME/GTK based desktop environments
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh --dest %{buildroot}%{_datarootdir}/themes --theme grey -i gnome --size compact --tweaks solid round
+./install.sh --dest %{buildroot}%{_datarootdir}/themes --theme grey -i gnome --size compact --tweaks solid round -l
 
 %files
 %{_datarootdir}/themes
 
 %changelog
+* Sat May 02 2026 Hector Diaz <hdiazc@live.com> - 20250417-3
+- Modernize: SPDX license tag (GPLv3+ → GPL-3.0-or-later)
+- Add -l (libadwaita) to install.sh for GTK4/libadwaita app theming
+
 * Sat Apr 26 2025 Hector Diaz <hdiazc@live.com> - 20250417-2
 - Include light
 

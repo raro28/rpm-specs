@@ -1,10 +1,10 @@
 Name:           qogir-theme
 Version:        20250817
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
-License:        GPLv3+
+License:        GPL-3.0-or-later
 
 %define dname Qogir-theme
 %define dversion 2025-08-17
@@ -13,6 +13,7 @@ Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dver
 
 Requires:       gtk2-engines
 Requires:       gtk-murrine-engine
+Requires:       gnome-themes-extra
 
 BuildRequires:  gnome-shell
 BuildRequires:  sassc
@@ -34,6 +35,10 @@ mkdir -p %{buildroot}%{_datarootdir}/themes
 %{_datarootdir}/themes
 
 %changelog
+* Sat May 02 2026 Hector Diaz <hdiazc@live.com> - 20250817-2
+- Modernize: SPDX license tag (GPLv3+ → GPL-3.0-or-later)
+- Add gnome-themes-extra runtime dependency
+
 * Sat Dec 13 2025 Hector Diaz <hdiazc@live.com> - 20250817-1
 - Bump version
 
