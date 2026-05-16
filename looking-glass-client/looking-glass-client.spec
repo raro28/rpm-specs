@@ -12,7 +12,7 @@
 
 Name:           looking-glass-client
 Version:        7.0.0
-Release:        10%{?dist}
+Release:        12%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPL-2.0-only
@@ -150,6 +150,18 @@ fi
 %selinux_relabel_post -s targeted
 
 %changelog
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-12
+- Fullscreen action: drop input:autoCapture and spice:captureOnStart
+  (caused invisible cursor on launch until capture was cycled).
+  Fullscreen now matches the default windowed flag set, just with -F -a.
+- Drop the Debug action.
+
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-11
+- Update desktop entry with launch presets:
+  * Default: windowed 1920x1080, raw mouse, JIT render, screensaver inhibit
+  * Fullscreen action (auto-capture, capture-on-start)
+  * Borderless, Debug (FPS), No audio, Spectator, Clipboard-only, Night vision
+
 * Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-10
 - Switch from raro28 pre-bundled tarball to upstream gnif/LookingGlass:
   Use canonical Fedora pattern of one Source: per git submodule, pinned to
