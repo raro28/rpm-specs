@@ -139,25 +139,131 @@ System devices** with the Looking Glass driver loaded. Then launch
 RPM ships dedicated `Kvmfr` and `Fullscreen + kvmfr` desktop actions for
 GNOME search).
 
-## Rollback
+## Rollback to `/dev/shm/looking-glass`
 
-To go back to `/dev/shm/looking-glass`:
+The cutover is fully reversible. You can either **temporarily switch back**
+(keep kvmfr installed, just point the VM at the old backing) or **fully
+uninstall** the module along the way. Steps below go from one to the other.
+
+### Shut the VM down first
 
 ```bash
-sudo virsh destroy win11-system     # stop the running VM
+sudo virsh shutdown win11-system     # graceful, from inside Windows
+# or, if not responsive:
+sudo virsh destroy win11-system      # hard power-off
+```
+
+Wait until `sudo virsh list` no longer shows it running.
+
+### Restore the original VM XML
+
+If you kept the pre-cutover dump (recommended — `sudo virsh dumpxml
+win11-system > ~/win11-pre-kvmfr.xml.bak` before the original cutover):
+
+```bash
 sudo virsh define ~/win11-pre-kvmfr.xml.bak
+```
+
+This atomically reverts the persistent definition: the `<shmem
+name='looking-glass'>` block returns, the `<qemu:commandline>` block is
+gone, and the `xmlns:qemu` declaration is removed from `<domain>`.
+
+Verify:
+
+```bash
+sudo virsh dumpxml win11-system | grep -E '(shmem|kvmfr|qemu:commandline)'
+# Expect <shmem ...> only — no kvmfr or qemu:commandline lines
+```
+
+### (optional) Revert the `cgroup_device_acl` edit
+
+The addition to `/etc/libvirt/qemu.conf` (whitelisting `/dev/kvmfr0`) is
+harmless to leave in place — it simply allows a device that won't exist
+after uninstall. For a fully clean revert, restore the backup created
+when the ACL was first added and reload the daemon:
+
+```bash
+sudo cp /etc/libvirt/qemu.conf.bak.<timestamp> /etc/libvirt/qemu.conf
+sudo systemctl restart virtqemud
+```
+
+### (optional) Fully uninstall the kvmfr packages
+
+If you only want to swap the backing temporarily, skip this — leaving the
+module installed is harmless when unused. To remove everything:
+
+```bash
+sudo dnf remove \
+    akmod-kvmfr \
+    kmod-kvmfr \
+    'kmod-kvmfr-*.vanilla.fc44.x86_64' \
+    kvmfr-kmod-common \
+    kvmfr-kmod-selinux
+```
+
+The package scriptlets clean up automatically:
+
+- `/lib/modules/<kver>/extra/kvmfr/kvmfr.ko.xz` deleted
+- SELinux policy `kvmfr` removed via `semodule -r kvmfr` (in `%postun`)
+- `/dev/kvmfr0`'s `kvmfr_device_t` label is no longer registered (file
+  context mapping removed); the device itself disappears when the module
+  is unloaded
+- `/usr/lib/modprobe.d/kvmfr.conf`, `/usr/lib/udev/rules.d/99-kvmfr.rules`,
+  `/usr/lib/modules-load.d/kvmfr.conf` all removed
+
+Then unload the currently-running module (requires refcount 0 — VM down +
+LG client closed):
+
+```bash
+sudo modprobe -r kvmfr
+ls /dev/kvmfr0    # expect: No such file or directory
+```
+
+If `modprobe -r` refuses with `Module kvmfr is in use`, find what's
+holding it (`sudo lsof /dev/kvmfr0`) and close that first.
+
+### Start the VM — `/dev/shm/looking-glass` is recreated automatically
+
+```bash
+sudo virsh start win11-system
+ls -la /dev/shm/looking-glass
+# Expect: -rw-rw---- 1 root kvm <size> (created by libvirt at VM start)
+```
+
+When libvirt sees an `<shmem name='looking-glass'>` block with
+`model='ivshmem-plain'`, it creates the tmpfs file at start and removes
+it at shutdown — no manual setup needed.
+
+### Launching the LG client after rollback
+
+The default `looking-glass-client` Exec line (no `-f` flag) reads from
+`/dev/shm/looking-glass`, so the main GNOME launcher and every non-kvmfr
+action just work again. The two `Kvmfr` / `Fullscreen + kvmfr` actions
+will fail silently against the missing device — harmless, but you can
+remove them if you like:
+
+1. Delete the `Kvmfr;KvmfrFullscreen;` entries from `Actions=` in
+   `looking-glass-client.desktop`
+2. Remove the `[Desktop Action Kvmfr]` and `[Desktop Action
+   KvmfrFullscreen]` sections
+3. Bump `looking-glass-client.spec`, rebuild, reinstall
+
+### TL;DR
+
+```bash
+sudo virsh shutdown win11-system
+# wait until stopped...
+sudo virsh define ~/win11-pre-kvmfr.xml.bak
+sudo dnf remove akmod-kvmfr kmod-kvmfr 'kmod-kvmfr-*.vanilla.fc44.x86_64' \
+    kvmfr-kmod-common kvmfr-kmod-selinux
+sudo modprobe -r kvmfr
 sudo virsh start win11-system
 ```
 
-The kvmfr module + config can stay loaded — it does no harm when unused.
-To fully uninstall:
-
-```bash
-sudo dnf remove akmod-kvmfr kmod-kvmfr kvmfr-kmod-common kvmfr-kmod-selinux
-sudo modprobe -r kvmfr
-```
-
-This also removes the SELinux module via the `%postun` scriptlet.
+About 30 seconds plus VM boot. Coming back to kvmfr is the symmetric
+opposite: reinstall the akmod, apply the XML diff from the
+[Manual host configuration](#2-switch-the-vms-ivshmem-backing-from-devshm-to-devkvmfr0)
+section, start the VM.
 
 ## Layout reference
 
