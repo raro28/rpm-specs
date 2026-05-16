@@ -1,6 +1,6 @@
 Name:           fluent-gtk-theme-compact
 Version:        20250417
-Release:        3%{?dist}
+Release:        5%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -10,9 +10,6 @@ License:        GPL-3.0-or-later
 %define dversion 2025-04-17
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
-
-Requires:       gnome-themes-extra
-Requires:       gtk-murrine-engine
 
 BuildRequires:  gnome-shell
 BuildRequires:  sassc
@@ -31,6 +28,14 @@ mkdir -p %{buildroot}%{_datarootdir}/themes
 %{_datarootdir}/themes
 
 %changelog
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 20250417-5
+- Drop GTK2-era runtime deps (adwaita-gtk2-theme, gtk-murrine-engine):
+  adwaita-gtk2-theme was removed from Fedora 44 repos, and the gtk-2.0/
+  payload only matters for legacy GTK2 apps
+
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 20250417-4
+- Replace gnome-themes-extra dep with Fedora's adwaita-gtk2-theme
+
 * Sat May 02 2026 Hector Diaz <hdiazc@live.com> - 20250417-3
 - Modernize: SPDX license tag (GPLv3+ → GPL-3.0-or-later)
 - Add -l (libadwaita) to install.sh for GTK4/libadwaita app theming
