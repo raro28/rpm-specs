@@ -12,7 +12,7 @@
 
 Name:           looking-glass-client
 Version:        7.0.0
-Release:        13%{?dist}
+Release:        14%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPL-2.0-only
@@ -91,6 +91,7 @@ pushd client
     -DENABLE_X11=no \
     -DENABLE_PULSEAUDIO=no \
     -DENABLE_LIBDECOR=yes \
+    -DOPTIMIZE_FOR_NATIVE=x86-64-v3 \
     .
 %cmake_build
 popd
@@ -150,6 +151,13 @@ fi
 %selinux_relabel_post -s targeted
 
 %changelog
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-14
+- Pin OPTIMIZE_FOR_NATIVE=x86-64-v3 instead of upstream's AUTO default.
+  Upstream's cmake module would pick -march=native at AUTO, baking the
+  COPR builder's CPU instructions into the binary; the resulting RPM
+  hit SIGILL on Zen 3 hosts. x86-64-v3 is the Haswell/Zen-2+ baseline,
+  enables AVX2/BMI/FMA, runs on any reasonably modern x86_64 CPU.
+
 * Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-13
 - Two new desktop actions targeting /dev/kvmfr0 (paired with the
   looking-glass-kvmfr-kmod akmod package):
