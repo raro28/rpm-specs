@@ -1,6 +1,6 @@
-Name:           tela-circle-icon-black-theme
+Name:           tela-circle-icon-theme
 Version:        20250210
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A flat colorful Design icon theme
 
 BuildArch:      noarch
@@ -10,7 +10,7 @@ License:        GPL-3.0-or-later
 %define dname Tela-circle-icon-theme
 %define dversion 2025-02-10
 URL:            https://github.com/vinceliuice/%{dname}
-Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
+Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz#/%{dname}-%{dversion}.tar.gz
 
 BuildRequires:  gtk-update-icon-cache
 
@@ -22,12 +22,16 @@ A flat colorful Design icon theme
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/icons
-./install.sh -d "%{buildroot}%{_datarootdir}/icons" -c black
+./install.sh -d "%{buildroot}%{_datarootdir}/icons" -c standard
 
 %files
 %{_datarootdir}/icons
 
 %changelog
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 20250210-3
+- Rename package: drop 'black' from name, switch to standard color variant
+  (install.sh -c standard instead of -c black)
+
 * Sat May 02 2026 Hector Diaz <hdiazc@live.com> - 20250210-2
 - Modernize: SPDX license tag (GPLv3+ → GPL-3.0-or-later)
 
