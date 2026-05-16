@@ -1,18 +1,36 @@
-%global upstream_version B7.0.0
+%global upstream_tag       B7
 %global selinux_modulename %{name}
+
+# Git submodule pins (from `git ls-tree %%{upstream_tag} repos/` in gnif/LookingGlass
+# and `git ls-tree <cimgui_sha> imgui` in cimgui/cimgui)
+%global commit_lgmp        de89c63bfe5e31f4ff83ea999c17022e235d96e4
+%global commit_purespice   5e844a62878c74eda556009b91d6c7f1098cf3d2
+%global commit_cimgui      d6b4ecda718352bb4adcd30ec25784fd16538b73
+%global commit_imgui       dbb5eeaadffb6a3ba6a60de1290312e5802dba5a
+%global commit_nanosvg     cb0ae54e6b147ccdf85401ef3ef20f2c761252c0
+%global commit_wp          d324986823519c15b2162fc3e0a720f349e43b0c
 
 Name:           looking-glass-client
 Version:        7.0.0
-Release:        9%{?dist}
+Release:        10%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPL-2.0-only
 URL:            https://looking-glass.io/
-Source0:        https://github.com/raro28/%{name}/releases/download/%{upstream_version}/%{name}-%{upstream_version}.tar.gz
+
+Source0:        https://github.com/gnif/LookingGlass/archive/refs/tags/%{upstream_tag}.tar.gz#/LookingGlass-%{upstream_tag}.tar.gz
 Source1:        %{name}.desktop
 Source2:        10-%{name}.conf
 Source3:        %{name}.te
 Source4:        %{name}.fc
+
+# Submodule tarballs (GitHub/GitLab archives by commit SHA)
+Source10:       https://github.com/gnif/LGMP/archive/%{commit_lgmp}.tar.gz#/LGMP-%{commit_lgmp}.tar.gz
+Source11:       https://github.com/gnif/PureSpice/archive/%{commit_purespice}.tar.gz#/PureSpice-%{commit_purespice}.tar.gz
+Source12:       https://github.com/cimgui/cimgui/archive/%{commit_cimgui}.tar.gz#/cimgui-%{commit_cimgui}.tar.gz
+Source13:       https://github.com/ocornut/imgui/archive/%{commit_imgui}.tar.gz#/imgui-%{commit_imgui}.tar.gz
+Source14:       https://github.com/memononen/nanosvg/archive/%{commit_nanosvg}.tar.gz#/nanosvg-%{commit_nanosvg}.tar.gz
+Source15:       https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/%{commit_wp}/wayland-protocols-%{commit_wp}.tar.gz
 
 Requires:       font(dejavusansmono)
 Requires:       texlive-gnu-freefont
@@ -54,7 +72,17 @@ SELinux policy module for %{name}. Grants the client the access it needs to
 the KVMFR shared-memory device under /dev/shm.
 
 %prep
-%autosetup -n %{name}-%{upstream_version}
+%autosetup -n LookingGlass-%{upstream_tag}
+# Populate git submodule directories (upstream's GitHub archive doesn't recurse).
+# Order matches Source10..15.
+mkdir -p repos/LGMP repos/PureSpice repos/cimgui repos/cimgui/imgui \
+         repos/nanosvg repos/wayland-protocols
+tar xf %{SOURCE10} --strip-components=1 -C repos/LGMP
+tar xf %{SOURCE11} --strip-components=1 -C repos/PureSpice
+tar xf %{SOURCE12} --strip-components=1 -C repos/cimgui
+tar xf %{SOURCE13} --strip-components=1 -C repos/cimgui/imgui
+tar xf %{SOURCE14} --strip-components=1 -C repos/nanosvg
+tar xf %{SOURCE15} --strip-components=1 -C repos/wayland-protocols
 
 %build
 pushd client
@@ -122,6 +150,13 @@ fi
 %selinux_relabel_post -s targeted
 
 %changelog
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-10
+- Switch from raro28 pre-bundled tarball to upstream gnif/LookingGlass:
+  Use canonical Fedora pattern of one Source: per git submodule, pinned to
+  the gitlink commit SHA. Each submodule extracts into its repos/<name>/
+  directory during %%prep. Reproducible from upstream alone, no fork needed.
+- Upstream tag is B7 (not B7.0.0 as raro28's fork renamed it)
+
 * Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-9
 - Optimize for Wayland + PipeWire target environment:
   * -DENABLE_X11=no: drop X11/Xrandr/XScrnSaver/xkb-x11 BRs (Wayland-only)
