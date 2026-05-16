@@ -12,7 +12,7 @@
 Name:           looking-glass-kvmfr-kmod
 Summary:        Looking Glass KVMFR shared-memory kernel module (akmod)
 Version:        0.0.12
-Release:        5%{?dist}
+Release:        7%{?dist}
 License:        GPL-2.0-or-later
 
 URL:            https://looking-glass.io/
@@ -20,6 +20,9 @@ URL:            https://looking-glass.io/
 Source0:        https://github.com/gnif/LookingGlass/archive/refs/tags/%{upstream_tag}.tar.gz#/LookingGlass-%{upstream_tag}.tar.gz
 Source1:        kvmfr.conf
 Source2:        99-kvmfr.rules
+Source3:        kvmfr.te
+Source4:        kvmfr.fc
+Source5:        kvmfr-modules-load.conf
 
 Patch0:         0001-add-module-description.patch
 
@@ -31,6 +34,7 @@ Patch0:         0001-add-module-description.patch
 BuildRequires:  kmodtool
 BuildRequires:  systemd-rpm-macros
 BuildRequires:  kernel-rpm-macros
+BuildRequires:  selinux-policy-devel
 %{?kernels:BuildRequires: kernel-devel}
 %{?kernels:BuildRequires: gcc}
 %{?kernels:BuildRequires: make}
@@ -56,13 +60,28 @@ Summary:        Runtime configuration for the kvmfr kernel module
 BuildArch:      noarch
 Requires:       systemd
 Requires(post): systemd
+Recommends:     %{kmod_name}-kmod-selinux = %{version}-%{release}
 Recommends:     looking-glass-client
 
 %description -n %{kmod_name}-kmod-common
-Modprobe options and udev rules shared by all kmod-kvmfr-<kernel>
-packages and required by akmod-kvmfr:
+Runtime configuration shared by all kmod-kvmfr-<kernel> packages and
+required by akmod-kvmfr:
  - %{_modprobedir}/kvmfr.conf       (sets static_size_mb=256)
  - %{_udevrulesdir}/99-kvmfr.rules  (gives /dev/kvmfr0 to group kvm)
+ - %{_modulesloaddir}/kvmfr.conf    (auto-loads the module at boot)
+
+%package -n %{kmod_name}-kmod-selinux
+Summary:        SELinux policy module for /dev/kvmfr* access by libvirt/qemu
+BuildArch:      noarch
+%{?selinux_requires}
+Requires(post): %{kmod_name}-kmod-common = %{version}-%{release}
+
+%description -n %{kmod_name}-kmod-selinux
+SELinux targeted policy module that:
+ - Defines a kvmfr_device_t type
+ - Labels /dev/kvmfr[0-9]+ with that type via file_contexts
+ - Grants svirt_t (qemu) read/write/ioctl/map access to that type
+so libvirt-managed VMs can open /dev/kvmfr0 without AVC denials.
 
 %prep
 %{?kmodtool_check}
@@ -93,6 +112,15 @@ done
 
 install -D -m 644 %{SOURCE1} %{buildroot}%{_modprobedir}/%{kmod_name}.conf
 install -D -m 644 %{SOURCE2} %{buildroot}%{_udevrulesdir}/99-%{kmod_name}.rules
+install -D -m 644 %{SOURCE5} %{buildroot}%{_modulesloaddir}/%{kmod_name}.conf
+
+# Build the SELinux policy module (.pp) from kvmfr.te + kvmfr.fc
+mkdir -p selinux_build
+install -m 644 %{SOURCE3} selinux_build/%{kmod_name}.te
+install -m 644 %{SOURCE4} selinux_build/%{kmod_name}.fc
+make -f /usr/share/selinux/devel/Makefile -C selinux_build %{kmod_name}.pp
+install -D -m 644 selinux_build/%{kmod_name}.pp \
+    %{buildroot}%{_datadir}/selinux/packages/%{kmod_name}.pp
 
 %{?akmod_install}
 
@@ -100,12 +128,41 @@ install -D -m 644 %{SOURCE2} %{buildroot}%{_udevrulesdir}/99-%{kmod_name}.rules
 udevadm control --reload-rules || :
 udevadm trigger --subsystem-match=kvmfr || :
 
+%post -n %{kmod_name}-kmod-selinux
+%selinux_modules_install -s targeted %{_datadir}/selinux/packages/%{kmod_name}.pp
+restorecon -F /dev/kvmfr* || :
+
+%postun -n %{kmod_name}-kmod-selinux
+if [ $1 -eq 0 ]; then
+    %selinux_modules_uninstall -s targeted %{kmod_name}
+fi
+
+%posttrans -n %{kmod_name}-kmod-selinux
+%selinux_relabel_post -s targeted
+
 %files -n %{kmod_name}-kmod-common
 %license %{mod_workdir}/LICENSE
 %{_modprobedir}/%{kmod_name}.conf
 %{_udevrulesdir}/99-%{kmod_name}.rules
+%{_modulesloaddir}/%{kmod_name}.conf
+
+%files -n %{kmod_name}-kmod-selinux
+%{_datadir}/selinux/packages/%{kmod_name}.pp
 
 %changelog
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 0.0.12-7
+- Ship %{_modulesloaddir}/kvmfr.conf so systemd-modules-load.service
+  auto-loads kvmfr at boot. VMs that depend on /dev/kvmfr0 no longer need
+  a manual `modprobe kvmfr` after install/reboot.
+
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 0.0.12-6
+- Add kvmfr-kmod-selinux subpackage:
+  * Targeted policy defines kvmfr_device_t and grants svirt_t access
+  * file_contexts labels /dev/kvmfr[0-9]+ accordingly via restorecon
+  * Uses %%selinux_* scriptlets for upgrade-safe install/uninstall/relabel
+  * Recommended by kvmfr-kmod-common (auto-installs unless --setopt
+    install_weak_deps=False)
+
 * Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 0.0.12-5
 - Polish:
   * Move toolchain BRs (gcc, make, elfutils-libelf-devel, kernel-devel)

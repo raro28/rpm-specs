@@ -1,0 +1,17 @@
+policy_module(kvmfr, 1.0.0)
+
+# /dev/kvmfr[0-9]+ char devices get their own type so we can grant
+# svirt_t (qemu) explicit access without opening up device_t broadly.
+gen_require(`
+    type svirt_t;
+')
+
+type kvmfr_device_t;
+dev_node(kvmfr_device_t)
+
+# Let qemu running as svirt_t use the kvmfr character device:
+#  read/write   - frame data path
+#  ioctl        - kvmfr DMA-BUF ioctls (KVMFR_DMABUF_CREATE / GETSIZE)
+#  map          - required for the mmap-based shared memory access
+#  open/getattr - obvious prerequisites
+allow svirt_t kvmfr_device_t:chr_file { read write open ioctl getattr map };

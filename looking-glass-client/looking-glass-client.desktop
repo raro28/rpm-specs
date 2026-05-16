@@ -5,12 +5,20 @@ Icon=/usr/share/pixmaps/looking-glass-client.png
 Exec=/usr/bin/looking-glass-client win:size=1920x1080 -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes
 Categories=System
 Terminal=false
-Actions=Fullscreen;Borderless;NoAudio;Spectator;ClipboardOnly;NightVision;
+Actions=Fullscreen;Kvmfr;KvmfrFullscreen;Borderless;NoAudio;Spectator;ClipboardOnly;NightVision;
 X-Desktop-File-Install-Version=0.27
 
 [Desktop Action Fullscreen]
 Name=Fullscreen
 Exec=/usr/bin/looking-glass-client -F -a -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes
+
+[Desktop Action Kvmfr]
+Name=kvmfr (DMA-BUF via /dev/kvmfr0)
+Exec=/usr/bin/looking-glass-client -f /dev/kvmfr0 win:size=1920x1080 -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes
+
+[Desktop Action KvmfrFullscreen]
+Name=Fullscreen + kvmfr
+Exec=/usr/bin/looking-glass-client -f /dev/kvmfr0 -F -a -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes
 
 [Desktop Action Borderless]
 Name=Borderless window
