@@ -1,0 +1,1 @@
+/dev/kvmfr[0-9]+    -c    gen_context(system_u:object_r:kvmfr_device_t,s0)

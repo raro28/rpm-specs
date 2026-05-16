@@ -2,7 +2,40 @@
 Type=Application
 Name=Looking Glass
 Icon=/usr/share/pixmaps/looking-glass-client.png
-Exec=/usr/bin/looking-glass-client win:size=1920x1080 -S -k -m KEY_F12
+Exec=/usr/bin/looking-glass-client win:size=1920x1080 -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes
 Categories=System
 Terminal=false
+Actions=Fullscreen;Kvmfr;KvmfrFullscreen;Borderless;NoAudio;Spectator;ClipboardOnly;NightVision;
 X-Desktop-File-Install-Version=0.27
+
+[Desktop Action Fullscreen]
+Name=Fullscreen
+Exec=/usr/bin/looking-glass-client -F -a -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes
+
+[Desktop Action Kvmfr]
+Name=kvmfr (DMA-BUF via /dev/kvmfr0)
+Exec=/usr/bin/looking-glass-client -f /dev/kvmfr0 win:size=1920x1080 -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes
+
+[Desktop Action KvmfrFullscreen]
+Name=Fullscreen + kvmfr
+Exec=/usr/bin/looking-glass-client -f /dev/kvmfr0 -F -a -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes
+
+[Desktop Action Borderless]
+Name=Borderless window
+Exec=/usr/bin/looking-glass-client -d -a -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes
+
+[Desktop Action NoAudio]
+Name=No audio
+Exec=/usr/bin/looking-glass-client win:size=1920x1080 -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes spice:audio=no
+
+[Desktop Action Spectator]
+Name=Spectator (view only)
+Exec=/usr/bin/looking-glass-client win:size=1920x1080 -S -m KEY_F12 win:jitRender=yes spice:input=no
+
+[Desktop Action ClipboardOnly]
+Name=Clipboard sync only
+Exec=/usr/bin/looking-glass-client win:size=480x270 -m KEY_F12 win:jitRender=yes spice:input=no
+
+[Desktop Action NightVision]
+Name=Night vision (gain 5)
+Exec=/usr/bin/looking-glass-client win:size=1920x1080 -S -m KEY_F12 input:rawMouse=yes win:jitRender=yes egl:nvGain=5

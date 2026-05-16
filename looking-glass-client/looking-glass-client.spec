@@ -1,71 +1,103 @@
+%global upstream_tag       B7
+%global selinux_modulename %{name}
+
+# Git submodule pins (from `git ls-tree %%{upstream_tag} repos/` in gnif/LookingGlass
+# and `git ls-tree <cimgui_sha> imgui` in cimgui/cimgui)
+%global commit_lgmp        de89c63bfe5e31f4ff83ea999c17022e235d96e4
+%global commit_purespice   5e844a62878c74eda556009b91d6c7f1098cf3d2
+%global commit_cimgui      d6b4ecda718352bb4adcd30ec25784fd16538b73
+%global commit_imgui       dbb5eeaadffb6a3ba6a60de1290312e5802dba5a
+%global commit_nanosvg     cb0ae54e6b147ccdf85401ef3ef20f2c761252c0
+%global commit_wp          d324986823519c15b2162fc3e0a720f349e43b0c
+
 Name:           looking-glass-client
-Version:        B7.0.0
-Release:        4%{?dist}
+Version:        7.0.0
+Release:        13%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
-License:        GPLv2
-Source0:        https://github.com/raro28/%{name}/releases/download/%{version}/%{name}-%{version}.tar.gz
+License:        GPL-2.0-only
+URL:            https://looking-glass.io/
+
+Source0:        https://github.com/gnif/LookingGlass/archive/refs/tags/%{upstream_tag}.tar.gz#/LookingGlass-%{upstream_tag}.tar.gz
 Source1:        %{name}.desktop
 Source2:        10-%{name}.conf
 Source3:        %{name}.te
+Source4:        %{name}.fc
 
-Requires:       systemd
-Requires:       dejavu-sans-mono-fonts
+# Submodule tarballs (GitHub/GitLab archives by commit SHA)
+Source10:       https://github.com/gnif/LGMP/archive/%{commit_lgmp}.tar.gz#/LGMP-%{commit_lgmp}.tar.gz
+Source11:       https://github.com/gnif/PureSpice/archive/%{commit_purespice}.tar.gz#/PureSpice-%{commit_purespice}.tar.gz
+Source12:       https://github.com/cimgui/cimgui/archive/%{commit_cimgui}.tar.gz#/cimgui-%{commit_cimgui}.tar.gz
+Source13:       https://github.com/ocornut/imgui/archive/%{commit_imgui}.tar.gz#/imgui-%{commit_imgui}.tar.gz
+Source14:       https://github.com/memononen/nanosvg/archive/%{commit_nanosvg}.tar.gz#/nanosvg-%{commit_nanosvg}.tar.gz
+Source15:       https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/%{commit_wp}/wayland-protocols-%{commit_wp}.tar.gz
+
+Requires:       font(dejavusansmono)
 Requires:       texlive-gnu-freefont
-Requires:       policycoreutils
+Recommends:     %{name}-selinux = %{version}-%{release}
 
 BuildRequires:       desktop-file-utils
 BuildRequires:       coreutils
-BuildRequires:       binutils-devel
 BuildRequires:       cmake
 BuildRequires:       fontconfig-devel
 BuildRequires:       gcc
 BuildRequires:       gcc-c++
 BuildRequires:       libglvnd-devel
-BuildRequires:       libX11-devel
-BuildRequires:       libXcursor-devel
-BuildRequires:       libXfixes-devel
-BuildRequires:       libXi-devel
-BuildRequires:       libXinerama-devel
-BuildRequires:       libxkbcommon-x11-devel
-BuildRequires:       libXpresent-devel
-BuildRequires:       libXrandr-devel
-BuildRequires:       libXScrnSaver-devel
-BuildRequires:       make
+BuildRequires:       libxkbcommon-devel
+BuildRequires:       libdecor-devel
 BuildRequires:       nettle-devel
 BuildRequires:       pkgconf-pkg-config
-BuildRequires:       SDL2-devel
-BuildRequires:       SDL2_ttf-devel
 BuildRequires:       spice-protocol
 BuildRequires:       wayland-devel
 BuildRequires:       wayland-protocols-devel
 BuildRequires:       libsamplerate-devel
 BuildRequires:       pipewire-devel
-BuildRequires:       pulseaudio-libs-devel
 BuildRequires:       selinux-policy-devel
 
 %description
-Looking Glass is an open source application that allows the use of a KVM 
-(Kernel-based Virtual Machine) configured for VGA PCI Pass-through 
-without an attached physical monitor, keyboard or mouse. This is the final 
-step required to move away from dual booting with other operating systems 
+Looking Glass is an open source application that allows the use of a KVM
+(Kernel-based Virtual Machine) configured for VGA PCI Pass-through
+without an attached physical monitor, keyboard or mouse. This is the final
+step required to move away from dual booting with other operating systems
 for legacy programs that require high performance graphics.
 
+%package selinux
+Summary:        SELinux policy module for %{name}
+BuildArch:      noarch
+%{?selinux_requires}
+Requires(post): %{name} = %{version}-%{release}
+
+%description selinux
+SELinux policy module for %{name}. Grants the client the access it needs to
+the KVMFR shared-memory device under /dev/shm.
+
 %prep
-%autosetup
+%autosetup -n LookingGlass-%{upstream_tag}
+# Populate git submodule directories (upstream's GitHub archive doesn't recurse).
+# Order matches Source10..15.
+mkdir -p repos/LGMP repos/PureSpice repos/cimgui repos/cimgui/imgui \
+         repos/nanosvg repos/wayland-protocols
+tar xf %{SOURCE10} --strip-components=1 -C repos/LGMP
+tar xf %{SOURCE11} --strip-components=1 -C repos/PureSpice
+tar xf %{SOURCE12} --strip-components=1 -C repos/cimgui
+tar xf %{SOURCE13} --strip-components=1 -C repos/cimgui/imgui
+tar xf %{SOURCE14} --strip-components=1 -C repos/nanosvg
+tar xf %{SOURCE15} --strip-components=1 -C repos/wayland-protocols
 
 %build
-mkdir ./client/build
-pushd client/build
-%cmake ../
-pushd redhat-linux-build
-make -j`nproc`
-popd
+pushd client
+%cmake \
+    -DENABLE_BACKTRACE=no \
+    -DENABLE_X11=no \
+    -DENABLE_PULSEAUDIO=no \
+    -DENABLE_LIBDECOR=yes \
+    .
+%cmake_build
 popd
 
 %install
 mkdir -p %{buildroot}%{_bindir}
-cp -a ./client/build/redhat-linux-build/%{name} %{buildroot}%{_bindir}/.
+cp -a ./client/%{_vpath_builddir}/%{name} %{buildroot}%{_bindir}/.
 
 mkdir -p %{buildroot}%{_datadir}/pixmaps
 cp -a ./resources/lg-logo.png %{buildroot}%{_datadir}/pixmaps/%{name}.png
@@ -78,28 +110,101 @@ desktop-file-install                                    \
 --dir=%{buildroot}%{_datadir}/applications              \
 %{SOURCE1}
 
-mkdir -p %{buildroot}/usr/share/selinux/packages
-checkmodule -M -m -o %{name}.mod %{SOURCE3}
-semodule_package -o %{name}.pp -m %{name}.mod
-cp -a %{name}.pp %{buildroot}/usr/share/selinux/packages/
+mkdir -p %{buildroot}%{_datadir}/selinux/packages
+mkdir -p selinux_build
+cp -a %{SOURCE3} selinux_build/%{selinux_modulename}.te
+cp -a %{SOURCE4} selinux_build/%{selinux_modulename}.fc
+make -f /usr/share/selinux/devel/Makefile -C selinux_build
+cp -a selinux_build/%{selinux_modulename}.pp %{buildroot}%{_datadir}/selinux/packages/
+
+%check
+desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
 
 %files
 %attr(0755,root,root) %{_bindir}/%{name}
 %attr(0644,root,root) %{_datadir}/pixmaps/%{name}.png
 %attr(0644,root,root) %{_datadir}/applications/%{name}.desktop
 %attr(0644,root,root) %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
-%attr(0644,root,root) /usr/share/selinux/packages/%{name}.pp
+
+%files selinux
+%attr(0644,root,root) %{_datadir}/selinux/packages/%{selinux_modulename}.pp
 
 %post
-systemd-tmpfiles --create %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
-semodule -i /usr/share/selinux/packages/%{name}.pp || :
-restorecon /dev/shm/looking-glass || :
+systemd-tmpfiles --create %{_sysconfdir}/tmpfiles.d/10-%{name}.conf || :
 
 %postun
-systemd-tmpfiles --remove %{_sysconfdir}/tmpfiles.d/10-%{name}.conf
-semodule -r %{name} || :
+if [ $1 -eq 0 ]; then
+    systemd-tmpfiles --remove %{_sysconfdir}/tmpfiles.d/10-%{name}.conf || :
+fi
+
+%post selinux
+%selinux_modules_install -s targeted %{_datadir}/selinux/packages/%{selinux_modulename}.pp
+restorecon -F /dev/shm/looking-glass || :
+
+%postun selinux
+if [ $1 -eq 0 ]; then
+    %selinux_modules_uninstall -s targeted %{selinux_modulename}
+fi
+
+%posttrans selinux
+%selinux_relabel_post -s targeted
 
 %changelog
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-13
+- Two new desktop actions targeting /dev/kvmfr0 (paired with the
+  looking-glass-kvmfr-kmod akmod package):
+  * "kvmfr (DMA-BUF via /dev/kvmfr0)" - windowed 1080p
+  * "Fullscreen + kvmfr"
+  Other actions and the default Exec keep using /dev/shm/looking-glass
+  until the libvirt XML cutover.
+
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-12
+- Fullscreen action: drop input:autoCapture and spice:captureOnStart
+  (caused invisible cursor on launch until capture was cycled).
+  Fullscreen now matches the default windowed flag set, just with -F -a.
+- Drop the Debug action.
+
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-11
+- Update desktop entry with launch presets:
+  * Default: windowed 1920x1080, raw mouse, JIT render, screensaver inhibit
+  * Fullscreen action (auto-capture, capture-on-start)
+  * Borderless, Debug (FPS), No audio, Spectator, Clipboard-only, Night vision
+
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-10
+- Switch from raro28 pre-bundled tarball to upstream gnif/LookingGlass:
+  Use canonical Fedora pattern of one Source: per git submodule, pinned to
+  the gitlink commit SHA. Each submodule extracts into its repos/<name>/
+  directory during %%prep. Reproducible from upstream alone, no fork needed.
+- Upstream tag is B7 (not B7.0.0 as raro28's fork renamed it)
+
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-9
+- Optimize for Wayland + PipeWire target environment:
+  * -DENABLE_X11=no: drop X11/Xrandr/XScrnSaver/xkb-x11 BRs (Wayland-only)
+  * -DENABLE_PULSEAUDIO=no: pipewire-pulse shim is enough, drop pulseaudio-libs-devel
+  * -DENABLE_LIBDECOR=yes: upstream recommends for GNOME-on-Wayland
+- Add BuildRequires: libxkbcommon-devel (for Wayland keyboard), libdecor-devel
+
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-8
+- Disable ENABLE_BACKTRACE to drop libbfd dependency:
+  Fedora 44's binutils 2.46 libbfd.a references ZSTD_* symbols but
+  binutils-devel doesn't expose libzstd as a link dep, causing link
+  failure. Upstream provides ENABLE_BACKTRACE=no as the supported knob.
+- Drop unused BuildRequires: binutils-devel
+
+* Sat May 02 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-7
+- Split SELinux policy into looking-glass-client-selinux subpackage
+- Use %%selinux_* scriptlet macros (upgrade-safe install/uninstall/relabel)
+- Guard %%postun against firing on upgrades
+
+* Sat May 02 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-6
+- Modernize spec: SPDX license, add URL, drop unused SDL2/make BRs
+- Switch to %%cmake_build, virtual font provide, normalize Version (B7.0.0 → 7.0.0)
+- Add %%check with desktop-file-validate
+
+* Sat Dec 13 2025 Hector Diaz <hdiazc@live.com> - B7.0.0-5
+- Fix SE linux module with proper file context and access rules
+- Add tmpfiles.d SELinux context application on boot
+
 * Sat Apr 12 2025 Hector Diaz <hdiazc@live.com> - B7.0.0-4
 - SE linux module
 
