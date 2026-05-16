@@ -3,7 +3,7 @@
 
 Name:           looking-glass-client
 Version:        7.0.0
-Release:        7%{?dist}
+Release:        9%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPL-2.0-only
@@ -20,21 +20,13 @@ Recommends:     %{name}-selinux = %{version}-%{release}
 
 BuildRequires:       desktop-file-utils
 BuildRequires:       coreutils
-BuildRequires:       binutils-devel
 BuildRequires:       cmake
 BuildRequires:       fontconfig-devel
 BuildRequires:       gcc
 BuildRequires:       gcc-c++
 BuildRequires:       libglvnd-devel
-BuildRequires:       libX11-devel
-BuildRequires:       libXcursor-devel
-BuildRequires:       libXfixes-devel
-BuildRequires:       libXi-devel
-BuildRequires:       libXinerama-devel
-BuildRequires:       libxkbcommon-x11-devel
-BuildRequires:       libXpresent-devel
-BuildRequires:       libXrandr-devel
-BuildRequires:       libXScrnSaver-devel
+BuildRequires:       libxkbcommon-devel
+BuildRequires:       libdecor-devel
 BuildRequires:       nettle-devel
 BuildRequires:       pkgconf-pkg-config
 BuildRequires:       spice-protocol
@@ -42,7 +34,6 @@ BuildRequires:       wayland-devel
 BuildRequires:       wayland-protocols-devel
 BuildRequires:       libsamplerate-devel
 BuildRequires:       pipewire-devel
-BuildRequires:       pulseaudio-libs-devel
 BuildRequires:       selinux-policy-devel
 
 %description
@@ -67,7 +58,12 @@ the KVMFR shared-memory device under /dev/shm.
 
 %build
 pushd client
-%cmake .
+%cmake \
+    -DENABLE_BACKTRACE=no \
+    -DENABLE_X11=no \
+    -DENABLE_PULSEAUDIO=no \
+    -DENABLE_LIBDECOR=yes \
+    .
 %cmake_build
 popd
 
@@ -126,6 +122,20 @@ fi
 %selinux_relabel_post -s targeted
 
 %changelog
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-9
+- Optimize for Wayland + PipeWire target environment:
+  * -DENABLE_X11=no: drop X11/Xrandr/XScrnSaver/xkb-x11 BRs (Wayland-only)
+  * -DENABLE_PULSEAUDIO=no: pipewire-pulse shim is enough, drop pulseaudio-libs-devel
+  * -DENABLE_LIBDECOR=yes: upstream recommends for GNOME-on-Wayland
+- Add BuildRequires: libxkbcommon-devel (for Wayland keyboard), libdecor-devel
+
+* Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-8
+- Disable ENABLE_BACKTRACE to drop libbfd dependency:
+  Fedora 44's binutils 2.46 libbfd.a references ZSTD_* symbols but
+  binutils-devel doesn't expose libzstd as a link dep, causing link
+  failure. Upstream provides ENABLE_BACKTRACE=no as the supported knob.
+- Drop unused BuildRequires: binutils-devel
+
 * Sat May 02 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-7
 - Split SELinux policy into looking-glass-client-selinux subpackage
 - Use %%selinux_* scriptlet macros (upgrade-safe install/uninstall/relabel)
