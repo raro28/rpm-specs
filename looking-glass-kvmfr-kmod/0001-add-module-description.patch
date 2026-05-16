@@ -1,0 +1,16 @@
+From: Hector Diaz <hdiazc@live.com>
+Subject: [PATCH] kvmfr: add MODULE_DESCRIPTION to silence modpost warning
+
+Linux modpost emits a warning for modules lacking MODULE_DESCRIPTION().
+Add one to keep package install logs clean.
+
+--- a/module/kvmfr.c
++++ b/module/kvmfr.c
+@@ -650,6 +650,7 @@ module_init(kvmfr_module_init);
+ module_exit(kvmfr_module_exit);
+
+ MODULE_DEVICE_TABLE(pci, kvmfr_pci_ids);
++MODULE_DESCRIPTION("Looking Glass KVMFR shared-memory module for low-latency VFIO/PCI passthrough");
+ MODULE_LICENSE("GPL v2");
+ MODULE_AUTHOR("Geoffrey McRae <geoff@hostfission.com>");
+ MODULE_AUTHOR("Guanzhong Chen <quantum2048@gmail.com>");
