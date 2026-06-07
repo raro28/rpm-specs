@@ -1,0 +1,10 @@
+# rpmlint configuration for this repo (additive to Fedora's defaults).
+#
+#   rpmlint -c rpmlint.toml */*.spec
+#
+# no-%check-section: deliberately suppressed, not fixed. The vinceliuice GTK/icon
+# themes and the kvmfr akmod have no upstream test suite and nothing meaningful to
+# assert at build time. Suppressing this informational warning is more honest than
+# shipping a no-op "%check\n:" section that tests nothing. Real defects
+# (setup-not-quiet, macro-in-%changelog, no-%build-section) were fixed in the specs.
+Filters = ["no-%check-section"]

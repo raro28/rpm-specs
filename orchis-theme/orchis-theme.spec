@@ -19,7 +19,10 @@ Orchis is a Material Design theme for GNOME/GTK based desktop environments.
 Based on nana-4 -- materia-theme
 
 %prep
-%setup -n %{dname}-%{dversion}
+%setup -q -n %{dname}-%{dversion}
+
+%build
+# Prebuilt assets; nothing to compile (install.sh handles SASS).
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes

@@ -118,7 +118,7 @@ test -x %{buildroot}%{_bindir}/llama-bench
   fast on a 5950X (zen4-class avx2/fma) and still loads on older boxes
   without it. The two flags are coupled by upstream (ggml/CMakeLists.txt:183,
   "requires GGML_BACKEND_DL").
-- Add %{_bindir}/libggml-*.so to %files: with GGML_BACKEND_DL=ON upstream
+- Add %%{_bindir}/libggml-*.so to %%files: with GGML_BACKEND_DL=ON upstream
   installs the dlopen'd backend libs (libggml-cpu-*.so, libggml-vulkan.so)
   under bindir, not libdir, so main binaries find them via $ORIGIN.
 - Keep -DLLAMA_USE_PREBUILT_UI=ON pinned explicitly even though it's the

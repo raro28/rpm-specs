@@ -18,7 +18,10 @@ BuildRequires:  sassc
 Fluent is a Fluent design theme for GNOME/GTK based desktop environments
 
 %prep
-%setup -n %{dname}-%{dversion}
+%setup -q -n %{dname}-%{dversion}
+
+%build
+# Prebuilt assets; nothing to compile (install.sh handles SASS).
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes

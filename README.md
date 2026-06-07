@@ -177,6 +177,25 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 
 When sources drift between the spec directory and `~/rpmbuild/SOURCES/`, the build silently uses the stale copies. Re-copying before `rpmbuild -bs` is cheap insurance.
 
+## Linting
+
+All specs are kept at **zero rpmlint warnings**. Run from the repo root with the
+bundled config:
+
+```bash
+sudo dnf install rpmlint        # once
+rpmlint -c rpmlint.toml */*.spec
+# expect: 0 errors, 0 warnings, 0 badness
+```
+
+The `-c rpmlint.toml` flag is required — it adds one repo-local filter on top of
+Fedora's defaults. `rpmlint.toml` suppresses only `no-%check-section` (the theme
+packages and the kvmfr akmod have no upstream test suite; a no-op `%check` would
+test nothing). Every other warning class is fixed in the specs themselves
+(`%setup -q`, an explicit `%build`, and `%%`-escaped macros in `%changelog`), so
+a plain `rpmlint */*.spec` only ever surfaces the deliberately-filtered
+`no-%check-section`.
+
 ## COPR
 
 The `raro28/wdm` COPR builds these from SRPMs uploaded via `copr-cli`, or via the Custom method pulling from this repo. COPR's chroot matches `mock -r fedora-44-x86_64` exactly — anything that builds locally builds there.
@@ -186,6 +205,7 @@ The `raro28/wdm` COPR builds these from SRPMs uploaded via `copr-cli`, or via th
 ```
 .
 ├── README.md                              # this file
+├── rpmlint.toml                           # repo-local rpmlint filter (see Linting)
 ├── <spec-dir>/
 │   ├── <spec-name>.spec
 │   ├── README.md                          # only where extra runtime/cutover docs apply

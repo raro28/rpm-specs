@@ -21,7 +21,10 @@ based desktop environments like Gnome, Unity, Budgie,
 Cinnamon Pantheon, XFCE, Mate, etc
 
 %prep
-%setup -n %{dname}-%{dversion}
+%setup -q -n %{dname}-%{dversion}
+
+%build
+# Prebuilt assets; nothing to compile (install.sh handles SASS).
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes

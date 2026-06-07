@@ -20,7 +20,10 @@ BuildRequires:  sudo
 A macOS like theme for Linux GTK Desktops
 
 %prep
-%setup -n %{dname}-%{dversion}
+%setup -q -n %{dname}-%{dversion}
+
+%build
+# Prebuilt assets; nothing to compile (install.sh handles SASS).
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes

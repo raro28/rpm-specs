@@ -151,7 +151,7 @@ fi
 
 %changelog
 * Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 0.0.12-7
-- Ship %{_modulesloaddir}/kvmfr.conf so systemd-modules-load.service
+- Ship %%{_modulesloaddir}/kvmfr.conf so systemd-modules-load.service
   auto-loads kvmfr at boot. VMs that depend on /dev/kvmfr0 no longer need
   a manual `modprobe kvmfr` after install/reboot.
 
