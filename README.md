@@ -10,6 +10,7 @@ Each subdirectory is one source package.
 |---|---|---|
 | colloid-gtk-theme | `20250731-4` | GTK theme (vinceliuice) |
 | fluent-gtk-theme-compact | `20250417-5` | GTK theme (vinceliuice) |
+| llama.cpp | `0^b9544-1` | LLM inference, Vulkan backend (ggml-org/llama.cpp) |
 | looking-glass-client | `7.0.0-13` | Looking Glass B7 client + SELinux subpackage |
 | looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module — see [its README](looking-glass-kvmfr-kmod/README.md) |
 | orchis-theme | `20250425-4` | GTK theme (vinceliuice) |
@@ -89,6 +90,20 @@ Substitute the spec path / SRPM filename for any of:
 - `whitesur-gtk-theme`
 - `whitesur-icon-theme`
 
+### llama.cpp
+
+No local sources — pure upstream tarball. Ships `llama-cli`, `llama-server`, `llama-bench`, `llama-quantize` etc. with the Vulkan backend enabled. Runtime needs a Vulkan ICD (`mesa-vulkan-drivers` for AMD/Intel; NVIDIA's proprietary driver provides one).
+
+```bash
+spectool -g -R llama.cpp/llama.cpp.spec
+rpmbuild -bs llama.cpp/llama.cpp.spec
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/llama.cpp-0\^b9544-1.fc44.src.rpm
+```
+
+**Note the `\^` shell-escape** when typing the SRPM filename — `^` is the Fedora-standard post-release snapshot marker (upstream tags are `bNNNN` build numbers, no semver), and the literal caret appears in the filename.
+
+To bump the upstream version, update `%global build_num` in the spec (one line). The current `bNNNN` tag is at <https://github.com/ggml-org/llama.cpp/releases>.
+
 ### looking-glass-client
 
 Builds two installable RPMs: `looking-glass-client` and `looking-glass-client-selinux`. Mock also produces `looking-glass-client-debuginfo` and `looking-glass-client-debugsource` automatically (the spec doesn't suppress them); installing only the first two is the normal path.
@@ -156,10 +171,30 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 | Spec | Local sources? | URL sources? |
 |---|---|---|
 | All 9 theme/icon specs | No | Source0 only |
+| llama.cpp | No | Source0 only |
 | looking-glass-client | **Yes** — 4 files | Source0 + 6 submodule URLs |
 | looking-glass-kvmfr-kmod | **Yes** — 5 files + 1 patch | Source0 only |
 
 When sources drift between the spec directory and `~/rpmbuild/SOURCES/`, the build silently uses the stale copies. Re-copying before `rpmbuild -bs` is cheap insurance.
+
+## Linting
+
+All specs are kept at **zero rpmlint warnings**. Run from the repo root with the
+bundled config:
+
+```bash
+sudo dnf install rpmlint        # once
+rpmlint -c rpmlint.toml */*.spec
+# expect: 0 errors, 0 warnings, 0 badness
+```
+
+The `-c rpmlint.toml` flag is required — it adds one repo-local filter on top of
+Fedora's defaults. `rpmlint.toml` suppresses only `no-%check-section` (the theme
+packages and the kvmfr akmod have no upstream test suite; a no-op `%check` would
+test nothing). Every other warning class is fixed in the specs themselves
+(`%setup -q`, an explicit `%build`, and `%%`-escaped macros in `%changelog`), so
+a plain `rpmlint */*.spec` only ever surfaces the deliberately-filtered
+`no-%check-section`.
 
 ## COPR
 
@@ -170,6 +205,7 @@ The `raro28/wdm` COPR builds these from SRPMs uploaded via `copr-cli`, or via th
 ```
 .
 ├── README.md                              # this file
+├── rpmlint.toml                           # repo-local rpmlint filter (see Linting)
 ├── <spec-dir>/
 │   ├── <spec-name>.spec
 │   ├── README.md                          # only where extra runtime/cutover docs apply

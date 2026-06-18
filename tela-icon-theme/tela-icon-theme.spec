@@ -17,7 +17,10 @@ BuildRequires:  gtk-update-icon-cache
 A flat colorful Design icon theme.
 
 %prep
-%setup -n %{dname}-%{dversion}
+%setup -q -n %{dname}-%{dversion}
+
+%build
+# Prebuilt assets; nothing to compile (install.sh handles SASS).
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/icons

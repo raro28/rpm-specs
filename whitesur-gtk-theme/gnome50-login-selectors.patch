@@ -1,0 +1,39 @@
+diff --git a/src/sass/gnome-shell/common/_login-dialog.scss b/src/sass/gnome-shell/common/_login-dialog.scss
+index bcd59d1..302d935 100644
+--- a/src/sass/gnome-shell/common/_login-dialog.scss
++++ b/src/sass/gnome-shell/common/_login-dialog.scss
+@@ -50,6 +50,7 @@
+     padding: 2px $container_padding * 2 !important;
+   }
+ 
++  .a11y-button,
+   .cancel-button,
+   .switch-user-button,
+   .login-dialog-session-list-button {
+@@ -167,6 +168,7 @@
+     }
+   }
+ 
++  .a11y-button,
+   .cancel-button,
+   .switch-user-button,
+   .login-dialog-session-list-button {
+@@ -318,6 +320,7 @@
+     }
+   }
+ 
++  .a11y-button,
+   .cancel-button,
+   .switch-user-button,
+   .login-dialog-session-list-button {
+@@ -397,3 +400,10 @@
+ .login-dialog-prompt-label {
+   color: $light_hint_fg_color;
+ }
++
++// GNOME 50: container grouping the bottom-row login buttons (a11y, etc.).
++// Values ported from gnome-shell's own gnome-shell-sass/widgets/_login-lock.scss.
++.login-dialog-bottom-button-group {
++  padding: 32px;
++  spacing: 16px;
++}

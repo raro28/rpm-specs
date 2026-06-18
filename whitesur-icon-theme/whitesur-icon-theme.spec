@@ -17,7 +17,10 @@ BuildRequires:  gtk-update-icon-cache
 A macOS BigSur-like icon theme for Linux desktops.
 
 %prep
-%setup -n %{dname}-%{dversion}
+%setup -q -n %{dname}-%{dversion}
+
+%build
+# Prebuilt assets; nothing to compile (install.sh handles SASS).
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/icons
