@@ -7,4 +7,11 @@
 # assert at build time. Suppressing this informational warning is more honest than
 # shipping a no-op "%check\n:" section that tests nothing. Real defects
 # (setup-not-quiet, macro-in-%changelog, no-%build-section) were fixed in the specs.
-Filters = ["no-%check-section"]
+#
+# spelling-error json/ekthor: false positives in the per-monitor-wallpaper
+# extension description -- "json" is part of config.json and "ekthor" is the
+# author tag in the extension UUID. Both are correct, not misspellings.
+Filters = [
+    "no-%check-section",
+    "spelling-error.*'(json|ekthor)'",
+]
