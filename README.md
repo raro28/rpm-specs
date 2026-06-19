@@ -10,15 +10,16 @@ Each subdirectory is one source package.
 |---|---|---|
 | colloid-gtk-theme | `20250731-4` | GTK theme (vinceliuice) |
 | fluent-gtk-theme-compact | `20250417-5` | GTK theme (vinceliuice) |
-| llama.cpp | `0^b9544-1` | LLM inference, Vulkan backend (ggml-org/llama.cpp) |
-| looking-glass-client | `7.0.0-13` | Looking Glass B7 client + SELinux subpackage |
+| gnome-shell-extension-per-monitor-wallpaper | `1.0.1-1` | GNOME Shell extension, per-monitor wallpapers (raro28) |
+| llama.cpp | `0^b9544-1` | LLM inference, Vulkan backend + embedded web UI (ggml-org/llama.cpp) |
+| looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage |
 | looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module — see [its README](looking-glass-kvmfr-kmod/README.md) |
 | orchis-theme | `20250425-4` | GTK theme (vinceliuice) |
 | qogir-icon-theme | `20250215-3` | Icon theme (vinceliuice) |
 | qogir-theme | `20250817-4` | GTK theme (vinceliuice) |
 | tela-circle-icon-theme | `20250210-3` | Icon theme (vinceliuice) |
 | tela-icon-theme | `20250210-1` | Icon theme (vinceliuice) |
-| whitesur-gtk-theme | `20250724-4` | GTK theme (vinceliuice) |
+| whitesur-gtk-theme | `20260606-1` | GTK theme (vinceliuice, GNOME 50 master snapshot) |
 | whitesur-icon-theme | `20251227-1` | Icon theme (vinceliuice) |
 
 ## Host setup (once)
@@ -68,7 +69,7 @@ sudo dnf install /var/lib/mock/fedora-44-x86_64/result/*.rpm
 
 ### Pure-upstream specs (no local sources)
 
-The nine theme specs from vinceliuice have only `Source0` (a GitHub tarball). The workflow is the canonical 4 steps; nothing to copy.
+Eight of the nine vinceliuice theme/icon specs have only `Source0` (a GitHub tarball); `whitesur-gtk-theme` is the exception — it pins a master snapshot and carries a local patch, so it has its own section below. The `per-monitor-wallpaper` GNOME extension is likewise pure-upstream `Source0` only. For all of these the workflow is the canonical 4 steps; nothing to copy.
 
 Example with `qogir-theme`:
 
@@ -82,17 +83,38 @@ Substitute the spec path / SRPM filename for any of:
 
 - `colloid-gtk-theme`
 - `fluent-gtk-theme-compact`
+- `gnome-shell-extension-per-monitor-wallpaper`
 - `orchis-theme`
 - `qogir-icon-theme`
 - `qogir-theme`
 - `tela-circle-icon-theme`
 - `tela-icon-theme`
-- `whitesur-gtk-theme`
 - `whitesur-icon-theme`
+
+`gnome-shell-extension-per-monitor-wallpaper` installs system-wide; each user then enables it with `gnome-extensions enable per-monitor-wallpaper@ekthor`. It requires GNOME Shell 50.x (pinned via a versioned `Requires`) and is pure GJS, so it has no `BuildRequires`.
+
+### whitesur-gtk-theme
+
+Built from a pinned `master` snapshot (`%global commit`) rather than the last upstream tag (`20250724`), which predates GNOME 49/50. The snapshot is date-versioned `20260606` so a future real upstream `YYYYMMDD` tag still sorts above and supersedes it.
+
+**Local source** to stage before `spectool` — `Source0` is a URL but the downstream patch is a local file that must be in `SOURCES/`:
+
+```
+whitesur-gtk-theme/gnome50-login-selectors.patch
+```
+
+```bash
+cp whitesur-gtk-theme/gnome50-login-selectors.patch ~/rpmbuild/SOURCES/
+spectool -g -R whitesur-gtk-theme/whitesur-gtk-theme.spec
+rpmbuild -bs whitesur-gtk-theme/whitesur-gtk-theme.spec
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/whitesur-gtk-theme-20260606-1.fc44.src.rpm
+```
+
+To advance the snapshot, update `%global commit` in the spec; switch back to a plain dated tag once upstream cuts a release with GNOME 49/50 support.
 
 ### llama.cpp
 
-No local sources — pure upstream tarball. Ships `llama-cli`, `llama-server`, `llama-bench`, `llama-quantize` etc. with the Vulkan backend enabled. Runtime needs a Vulkan ICD (`mesa-vulkan-drivers` for AMD/Intel; NVIDIA's proprietary driver provides one).
+No local sources, but two URL sources: `Source0` (the source tarball) and `Source1` (the prebuilt `llama-bNNNN-ui.tar.gz` web-UI bundle from the matching GitHub release, extracted into `tools/ui/dist` during `%prep` so the server embeds the SvelteKit UI without pulling in nodejs/npm at build time). `spectool -g -R` fetches both. Ships `llama-cli`, `llama-server` (with the web UI), `llama-bench`, `llama-quantize` etc. with the Vulkan backend enabled. Runtime needs a Vulkan ICD (`mesa-vulkan-drivers` for AMD/Intel; NVIDIA's proprietary driver provides one).
 
 ```bash
 spectool -g -R llama.cpp/llama.cpp.spec
@@ -124,7 +146,7 @@ cp looking-glass-client/{10-looking-glass-client.conf,looking-glass-client.deskt
    ~/rpmbuild/SOURCES/
 spectool -g -R looking-glass-client/looking-glass-client.spec
 rpmbuild -bs looking-glass-client/looking-glass-client.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-13.fc44.src.rpm
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-14.fc44.src.rpm
 ```
 
 To bump the upstream version, update `%global upstream_tag` in the spec and refresh the six submodule SHAs via:
@@ -170,8 +192,10 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 
 | Spec | Local sources? | URL sources? |
 |---|---|---|
-| All 9 theme/icon specs | No | Source0 only |
-| llama.cpp | No | Source0 only |
+| 8 vinceliuice theme/icon specs | No | Source0 only |
+| gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
+| llama.cpp | No | Source0 + Source1 (web-UI bundle) |
+| whitesur-gtk-theme | **Yes** — 1 patch | Source0 only |
 | looking-glass-client | **Yes** — 4 files | Source0 + 6 submodule URLs |
 | looking-glass-kvmfr-kmod | **Yes** — 5 files + 1 patch | Source0 only |
 
@@ -188,13 +212,19 @@ rpmlint -c rpmlint.toml */*.spec
 # expect: 0 errors, 0 warnings, 0 badness
 ```
 
-The `-c rpmlint.toml` flag is required — it adds one repo-local filter on top of
-Fedora's defaults. `rpmlint.toml` suppresses only `no-%check-section` (the theme
-packages and the kvmfr akmod have no upstream test suite; a no-op `%check` would
-test nothing). Every other warning class is fixed in the specs themselves
-(`%setup -q`, an explicit `%build`, and `%%`-escaped macros in `%changelog`), so
-a plain `rpmlint */*.spec` only ever surfaces the deliberately-filtered
-`no-%check-section`.
+The `-c rpmlint.toml` flag is required — it adds two repo-local filters on top of
+Fedora's defaults:
+
+- `no-%check-section` — suppressed for the specs with no upstream test suite (the
+  theme/icon packages, the kvmfr akmod, and the GJS extension); a no-op `%check`
+  would test nothing.
+- `spelling-error '(json|ekthor)'` — `json` (part of `config.json`) and `ekthor`
+  (the extension's UUID author tag) are correct, not misspellings.
+
+Every other warning class is fixed in the specs themselves (`%setup -q`, an
+explicit `%build`, and `%%`-escaped macros in `%changelog`), so a plain
+`rpmlint */*.spec` only ever surfaces the deliberately-filtered
+`no-%check-section` (11 specs, verified).
 
 ## COPR
 
