@@ -1,0 +1,28 @@
+diff --git a/src/sass/gnome-shell/common/_login-dialog.scss b/src/sass/gnome-shell/common/_login-dialog.scss
+index 719c68ac..302d9354 100644
+--- a/src/sass/gnome-shell/common/_login-dialog.scss
++++ b/src/sass/gnome-shell/common/_login-dialog.scss
+@@ -400,3 +400,10 @@
+ .login-dialog-prompt-label {
+   color: $light_hint_fg_color;
+ }
++
++// GNOME 50: container grouping the bottom-row login buttons (a11y, etc.).
++// Values ported from gnome-shell's own gnome-shell-sass/widgets/_login-lock.scss.
++.login-dialog-bottom-button-group {
++  padding: 32px;
++  spacing: 16px;
++}
+diff --git a/src/sass/gnome-shell/widgets-48-0/_message-list.scss b/src/sass/gnome-shell/widgets-48-0/_message-list.scss
+index a70470e3..bd892048 100644
+--- a/src/sass/gnome-shell/widgets-48-0/_message-list.scss
++++ b/src/sass/gnome-shell/widgets-48-0/_message-list.scss
+@@ -287,3 +287,8 @@ $card_bg_color: if($variant == 'light', mix(white, $bg_color, 95%), lighten($bas
+     }
+   }
+ }
++
++// GNOME 50: notification list "Clear" button gets the pill shape.
++.message-list-controls .message-list-clear-button {
++  border-radius: 999px;
++}

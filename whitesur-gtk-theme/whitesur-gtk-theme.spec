@@ -11,7 +11,7 @@ Name:           whitesur-gtk-theme
 # below any future upstream YYYYMMDD tag (all dated after today), so real
 # upstream updates still win. dname-shortcommit identifies the actual source.
 Version:        20260606
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -20,15 +20,24 @@ License:        GPL-3.0-or-later
 %define dname WhiteSur-gtk-theme
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/%{commit}.tar.gz#/%{dname}-%{shortcommit}.tar.gz
-# Downstream: style the new GNOME 50 login nodes (.a11y-button gains WhiteSur's
-# system-button look; .login-dialog-bottom-button-group spacing). Additive only
-# — these selectors don't exist pre-50, so the rules are inert on older shells.
-Patch0:         gnome50-login-selectors.patch
+# Downstream GNOME 50 styling, split into the uniform two-patch model shared with
+# the other vinceliuice themes. Patch0 (selectors) carries theme-native node
+# coverage: .a11y-button gains WhiteSur's login system-button look, and the
+# notification .message-list-clear-button is styled alongside .dnd-button. Patch1
+# (appearance) carries GNOME-native geometry: the .login-dialog-bottom-button-group
+# 32px/16px spacing and the .message-list-clear-button pill radius. Additive only —
+# these selectors don't exist pre-50, so the rules are inert on older shells.
+Patch0:         gnome50-selectors.patch
+Patch1:         gnome50-appearance.patch
+Patch2:         fix-fsf-address.patch
 
 BuildRequires:  glib2-devel
 BuildRequires:  gnome-shell
 BuildRequires:  sassc
 BuildRequires:  sudo
+# %%check: validate the compiled GTK4 CSS with the real GTK engine
+BuildRequires:  gtk4
+BuildRequires:  python3-gobject-base
 
 %description
 A macOS like theme for Linux GTK Desktops
@@ -43,10 +52,63 @@ A macOS like theme for Linux GTK Desktops
 mkdir -p %{buildroot}%{_datarootdir}/themes
 ./install.sh -t grey -N mojave -l --shell -i gnome --dest %{buildroot}%{_datarootdir}/themes
 
+%check
+# GTK 4.x build-time test: parse every installed gtk-4.0 stylesheet through the
+# real GTK CSS engine (GtkCssProvider) and fail on any genuine syntax error. The
+# benign base-resource @import ("resource:///org/gnome/theme/...") is ignored: it
+# only resolves at runtime inside a GTK application, not when linting standalone.
+python3 - <<'PYEOF'
+import gi, sys, glob
+gi.require_version("Gtk", "4.0")
+from gi.repository import Gtk
+real = 0
+cur = ""
+def on_err(prov, section, err):
+    global real
+    if "does not exist" in err.message:
+        return
+    loc = section.get_start_location()
+    sys.stderr.write("CSS ERROR " + cur + ":" + str(loc.lines + 1) + ": " + err.message + "\n")
+    real += 1
+files = sorted(glob.glob("%{buildroot}%{_datadir}/themes/*/gtk-4.0/*.css"))
+assert files, "no gtk-4.0 css found to validate"
+for cur in files:
+    prov = Gtk.CssProvider()
+    prov.connect("parsing-error", on_err)
+    prov.load_from_path(cur)
+print("GTK4 CSS parse check: " + str(len(files)) + " file(s), " + str(real) + " real error(s)")
+sys.exit(1 if real else 0)
+PYEOF
+# Shell node-gate: the GNOME 50 selectors must have compiled into gnome-shell.css
+for css in %{buildroot}%{_datadir}/themes/*/gnome-shell/gnome-shell.css; do
+  grep -q 'a11y-button' "$css" || { echo "node-gate FAIL: .a11y-button missing in $css"; exit 1; }
+  grep -q 'message-list-clear-button' "$css" || { echo "node-gate FAIL: .message-list-clear-button missing in $css"; exit 1; }
+done
+echo "shell node-gate: OK"
+
 %files
 %{_datarootdir}/themes
 
 %changelog
+* Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20260606-2
+- Split the single GNOME 50 login patch into the uniform two-patch model now
+  shared with the other vinceliuice themes (fluent/colloid/qogir):
+  gnome50-selectors.patch (theme-native node coverage: the .a11y-button login
+  buttons plus the newly-added notification .message-list-clear-button styled
+  alongside .dnd-button) and gnome50-appearance.patch (GNOME 50 native geometry:
+  the .login-dialog-bottom-button-group 32px/16px spacing and the
+  .message-list-clear-button pill border-radius: 999px).
+- Adds the notification clear-button coverage WhiteSur previously lacked.
+- Additive/inert on GNOME < 49 (these selectors don't exist there).
+  Selector-correctness and SASS engine-parse verified; pixel appearance on a
+  live GNOME 50 session not machine-verified.
+- Patch2 (fix-fsf-address): update the outdated FSF postal address in the
+  upstream gnome-shell.css GPL header to the canonical URL form, clearing
+  rpmlint incorrect-fsf-address errors.
+- Add a %%check: parse the compiled gtk-4.0 CSS with the real GTK 4 engine
+  (GtkCssProvider) and assert the GNOME 50 selectors compiled into
+  gnome-shell.css (new BuildRequires: gtk4, python3-gobject-base).
+
 * Sat Jun 06 2026 Hector Diaz <hdiazc@live.com> - 20260606-1
 - Rebase onto a pinned upstream master snapshot (commit a83f467e, 2026-05-25),
   50 commits past the last tag (2025-07-24). This pulls in upstream's own
