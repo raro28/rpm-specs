@@ -1,0 +1,26 @@
+diff --git a/src/_sass/gnome-shell/widgets-48-0/_message-list.scss b/src/_sass/gnome-shell/widgets-48-0/_message-list.scss
+index a253fc7..b6e1055 100644
+--- a/src/_sass/gnome-shell/widgets-48-0/_message-list.scss
++++ b/src/_sass/gnome-shell/widgets-48-0/_message-list.scss
+@@ -43,7 +43,8 @@
+   spacing: $base_padding;
+   @extend %heading;
+ 
+-  .dnd-button {
++  .dnd-button,
++  .message-list-clear-button {
+     // We need this because the focus outline isn't inset like for the buttons
+     // so the dnd button would grow when it gets focus if we didn't change only
+     // its color when focusing.
+diff --git a/src/_sass/gnome-shell/widgets-common/_login-dialog.scss b/src/_sass/gnome-shell/widgets-common/_login-dialog.scss
+index c25376d..09a511c 100644
+--- a/src/_sass/gnome-shell/widgets-common/_login-dialog.scss
++++ b/src/_sass/gnome-shell/widgets-common/_login-dialog.scss
+@@ -35,6 +35,7 @@
+     }
+   }
+ 
++  .a11y-button,
+   .cancel-button,
+   .switch-user-button,
+   .login-dialog-session-list-button {
