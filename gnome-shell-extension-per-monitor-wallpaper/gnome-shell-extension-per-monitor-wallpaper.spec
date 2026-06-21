@@ -2,7 +2,7 @@
 %global uuid    per-monitor-wallpaper@ekthor
 
 Name:           gnome-shell-extension-per-monitor-wallpaper
-Version:        1.0.1
+Version:        1.0.2
 Release:        1%{?dist}
 Summary:        GNOME Shell extension that paints each monitor its own wallpaper
 BuildArch:      noarch
@@ -45,6 +45,10 @@ install -pm 0644 src/metadata.json src/extension.js \
 %{_datadir}/gnome-shell/extensions/%{uuid}/
 
 %changelog
+* Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 1.0.2-1
+- Fix secondary monitors going unpainted (windows smear): assert the
+  background actor is visible whenever the extension paints it
+
 * Thu Jun 18 2026 Hector Diaz <hdiazc@live.com> - 1.0.1-1
 - Correct README config example: drop the unused per-monitor "mode" key and a
   nonexistent monitor-listing command
