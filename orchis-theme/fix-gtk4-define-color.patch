@@ -1,0 +1,22 @@
+diff --git a/src/_sass/gtk/_colors-public.scss b/src/_sass/gtk/_colors-public.scss
+index cc2de909..5b9bed10 100644
+--- a/src/_sass/gtk/_colors-public.scss
++++ b/src/_sass/gtk/_colors-public.scss
+@@ -23,7 +23,7 @@ text widgets and the like base background color */
+ 
+ /*
+ base background color of selections */
+-@define-color theme_selected_bg_color #{"" + $primary};
++@define-color theme_selected_bg_color #{if(type-of($primary) == color, "" + $primary, "@accent_color")};
+ 
+ /*
+ text/foreground color of selections */
+@@ -59,7 +59,7 @@ text widgets and the like base background color on backdrop windows */
+ 
+ /*
+ base background color of selections on backdrop windows */
+-@define-color theme_unfocused_selected_bg_color #{"" + $primary};
++@define-color theme_unfocused_selected_bg_color #{if(type-of($primary) == color, "" + $primary, "@accent_color")};
+ 
+ /*
+ text/foreground color of selections on backdrop windows */

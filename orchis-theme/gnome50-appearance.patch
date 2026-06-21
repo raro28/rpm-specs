@@ -1,0 +1,25 @@
+diff --git a/src/_sass/gnome-shell/widgets/_login-dialog.scss b/src/_sass/gnome-shell/widgets/_login-dialog.scss
+index de12b6f3..19eaa258 100644
+--- a/src/_sass/gnome-shell/widgets/_login-dialog.scss
++++ b/src/_sass/gnome-shell/widgets/_login-dialog.scss
+@@ -148,3 +148,8 @@
+   font-size: 1em;
+   padding-top: 1em;
+ }
++
++.login-dialog-bottom-button-group {
++  padding: 32px;
++  spacing: 16px;
++}
+diff --git a/src/_sass/gnome-shell/widgets/_message-list-48.scss b/src/_sass/gnome-shell/widgets/_message-list-48.scss
+index e4c9af7a..753b7920 100644
+--- a/src/_sass/gnome-shell/widgets/_message-list-48.scss
++++ b/src/_sass/gnome-shell/widgets/_message-list-48.scss
+@@ -257,3 +257,7 @@
+     }
+   }
+ }
++
++.message-list-controls .message-list-clear-button {
++  border-radius: 999px;
++}
