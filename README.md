@@ -8,18 +8,18 @@ Each subdirectory is one source package.
 
 | Spec | Current build | What it ships |
 |---|---|---|
-| colloid-gtk-theme | `20250731-4` | GTK theme (vinceliuice) |
-| fluent-gtk-theme-compact | `20250417-5` | GTK theme (vinceliuice) |
+| colloid-gtk-theme | `20250731-5` | GTK theme (vinceliuice), GNOME 50 patches |
+| fluent-gtk-theme-compact | `20250417-6` | GTK theme (vinceliuice), GNOME 50 patches |
 | gnome-shell-extension-per-monitor-wallpaper | `1.0.1-1` | GNOME Shell extension, per-monitor wallpapers (raro28) |
 | llama.cpp | `0^b9544-1` | LLM inference, Vulkan backend + embedded web UI (ggml-org/llama.cpp) |
 | looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage |
 | looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module — see [its README](looking-glass-kvmfr-kmod/README.md) |
-| orchis-theme | `20250425-4` | GTK theme (vinceliuice) |
+| orchis-theme | `20250425-5` | GTK theme (vinceliuice), GNOME 50 patches |
 | qogir-icon-theme | `20250215-3` | Icon theme (vinceliuice) |
-| qogir-theme | `20250817-4` | GTK theme (vinceliuice) |
+| qogir-theme | `20250817-5` | GTK theme (vinceliuice), GNOME 50 patches |
 | tela-circle-icon-theme | `20250210-3` | Icon theme (vinceliuice) |
 | tela-icon-theme | `20250210-1` | Icon theme (vinceliuice) |
-| whitesur-gtk-theme | `20260606-1` | GTK theme (vinceliuice, GNOME 50 master snapshot) |
+| whitesur-gtk-theme | `20260606-2` | GTK theme (vinceliuice), GNOME 50 master snapshot + patches |
 | whitesur-icon-theme | `20251227-1` | Icon theme (vinceliuice) |
 
 ## Host setup (once)
@@ -69,48 +69,51 @@ sudo dnf install /var/lib/mock/fedora-44-x86_64/result/*.rpm
 
 ### Pure-upstream specs (no local sources)
 
-Eight of the nine vinceliuice theme/icon specs have only `Source0` (a GitHub tarball); `whitesur-gtk-theme` is the exception — it pins a master snapshot and carries a local patch, so it has its own section below. The `per-monitor-wallpaper` GNOME extension is likewise pure-upstream `Source0` only. For all of these the workflow is the canonical 4 steps; nothing to copy.
+`Source0` (GitHub tarball) only; canonical 4 steps, nothing to copy:
 
-Example with `qogir-theme`:
-
-```bash
-spectool -g -R qogir-theme/qogir-theme.spec
-rpmbuild -bs qogir-theme/qogir-theme.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-theme-20250817-4.fc44.src.rpm
-```
-
-Substitute the spec path / SRPM filename for any of:
-
-- `colloid-gtk-theme`
-- `fluent-gtk-theme-compact`
 - `gnome-shell-extension-per-monitor-wallpaper`
-- `orchis-theme`
 - `qogir-icon-theme`
-- `qogir-theme`
 - `tela-circle-icon-theme`
 - `tela-icon-theme`
 - `whitesur-icon-theme`
 
-`gnome-shell-extension-per-monitor-wallpaper` installs system-wide; each user then enables it with `gnome-extensions enable per-monitor-wallpaper@ekthor`. It requires GNOME Shell 50.x (pinned via a versioned `Requires`) and is pure GJS, so it has no `BuildRequires`.
-
-### whitesur-gtk-theme
-
-Built from a pinned `master` snapshot (`%global commit`) rather than the last upstream tag (`20250724`), which predates GNOME 49/50. The snapshot is date-versioned `20260606` so a future real upstream `YYYYMMDD` tag still sorts above and supersedes it.
-
-**Local source** to stage before `spectool` — `Source0` is a URL but the downstream patch is a local file that must be in `SOURCES/`:
-
+```bash
+spectool -g -R qogir-icon-theme/qogir-icon-theme.spec
+rpmbuild -bs qogir-icon-theme/qogir-icon-theme.spec
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-3.fc44.src.rpm
 ```
-whitesur-gtk-theme/gnome50-login-selectors.patch
-```
+
+`gnome-shell-extension-per-monitor-wallpaper` installs system-wide; each user enables it with `gnome-extensions enable per-monitor-wallpaper@ekthor`. Requires GNOME Shell 50.x (versioned `Requires`); pure GJS, no `BuildRequires`.
+
+### vinceliuice GTK themes (GNOME 50 patches)
+
+`colloid-gtk-theme`, `fluent-gtk-theme-compact`, `orchis-theme`, `qogir-theme`, `whitesur-gtk-theme`. Each carries downstream GNOME 50 patches (local files, stage in `SOURCES/`) and a `%check` (GTK 4 CSS engine parse via `GtkCssProvider` + shell selector node-gate; `BuildRequires: gtk4 python3-gobject-base`, auto-installed in the chroot).
+
+| Spec | Patches |
+|---|---|
+| colloid-gtk-theme | gnome50-selectors, gnome50-appearance, fix-fsf-address |
+| fluent-gtk-theme-compact | gnome50-selectors, gnome50-appearance |
+| orchis-theme | gnome50-selectors, gnome50-appearance, fix-gtk4-define-color |
+| qogir-theme | gnome50-selectors, gnome50-appearance |
+| whitesur-gtk-theme | gnome50-selectors, gnome50-appearance, fix-fsf-address |
+
+Stage the patches with the glob, then build. Example (`qogir-theme`):
 
 ```bash
-cp whitesur-gtk-theme/gnome50-login-selectors.patch ~/rpmbuild/SOURCES/
-spectool -g -R whitesur-gtk-theme/whitesur-gtk-theme.spec
-rpmbuild -bs whitesur-gtk-theme/whitesur-gtk-theme.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/whitesur-gtk-theme-20260606-1.fc44.src.rpm
+cp qogir-theme/*.patch ~/rpmbuild/SOURCES/
+spectool -g -R qogir-theme/qogir-theme.spec
+rpmbuild -bs qogir-theme/qogir-theme.spec
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-theme-20250817-5.fc44.src.rpm
 ```
 
-To advance the snapshot, update `%global commit` in the spec; switch back to a plain dated tag once upstream cuts a release with GNOME 49/50 support.
+Patch reference:
+
+- `gnome50-selectors.patch` — styles GNOME 50 login `.a11y-button` and notification `.message-list-clear-button` with the theme's own button styling (additive sibling selectors, inert on GNOME < 49).
+- `gnome50-appearance.patch` — GNOME 50 native geometry: `.login-dialog-bottom-button-group` 32px/16px, `.message-list-clear-button` `border-radius: 999px`.
+- `fix-fsf-address.patch` (colloid, whitesur) — replaces the outdated FSF postal address in the upstream `gnome-shell.css` GPL header with the canonical URL form (clears rpmlint `incorrect-fsf-address`).
+- `fix-gtk4-define-color.patch` (orchis) — the libadwaita build emitted `@define-color theme_{,unfocused_}selected_bg_color var(--accent-bg-color)`, which GTK's `@define-color` rejects; references the defined `@accent_color` in the libadwaita case only (the GTK3 literal is untouched).
+
+`whitesur-gtk-theme` additionally builds from a pinned `master` snapshot (`%global commit`) rather than the last tag (`20250724`, predates GNOME 49/50), date-versioned `20260606` so a future upstream `YYYYMMDD` tag supersedes it. Advance via `%global commit`.
 
 ### llama.cpp
 
@@ -192,10 +195,10 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 
 | Spec | Local sources? | URL sources? |
 |---|---|---|
-| 8 vinceliuice theme/icon specs | No | Source0 only |
+| 4 vinceliuice icon themes | No | Source0 only |
 | gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
 | llama.cpp | No | Source0 + Source1 (web-UI bundle) |
-| whitesur-gtk-theme | **Yes** — 1 patch | Source0 only |
+| 5 vinceliuice GTK themes | **Yes** — 2–3 patches | Source0 only |
 | looking-glass-client | **Yes** — 4 files | Source0 + 6 submodule URLs |
 | looking-glass-kvmfr-kmod | **Yes** — 5 files + 1 patch | Source0 only |
 
@@ -212,19 +215,20 @@ rpmlint -c rpmlint.toml */*.spec
 # expect: 0 errors, 0 warnings, 0 badness
 ```
 
-The `-c rpmlint.toml` flag is required — it adds two repo-local filters on top of
-Fedora's defaults:
+`-c rpmlint.toml` adds two repo-local filters on top of Fedora's defaults:
 
-- `no-%check-section` — suppressed for the specs with no upstream test suite (the
-  theme/icon packages, the kvmfr akmod, and the GJS extension); a no-op `%check`
-  would test nothing.
+- `no-%check-section` — suppressed for the 6 specs with no test to run (the 4
+  icon themes, the kvmfr akmod, the GJS extension). The 5 vinceliuice GTK themes,
+  llama.cpp, and looking-glass-client carry a real `%check`.
 - `spelling-error '(json|ekthor)'` — `json` (part of `config.json`) and `ekthor`
   (the extension's UUID author tag) are correct, not misspellings.
 
-Every other warning class is fixed in the specs themselves (`%setup -q`, an
-explicit `%build`, and `%%`-escaped macros in `%changelog`), so a plain
-`rpmlint */*.spec` only ever surfaces the deliberately-filtered
-`no-%check-section` (11 specs, verified).
+The GTK-theme `%check` parses the compiled `gtk-4.0` CSS through the real GTK 4
+engine (`GtkCssProvider`) and asserts the GNOME 50 selectors compiled into
+`gnome-shell.css`. Every other warning class is fixed in the specs
+(`%setup -q`/`%autosetup`, an explicit `%build`, `%%`-escaped `%changelog`
+macros), so a plain `rpmlint */*.spec` only surfaces the filtered
+`no-%check-section` (6 specs).
 
 ## COPR
 

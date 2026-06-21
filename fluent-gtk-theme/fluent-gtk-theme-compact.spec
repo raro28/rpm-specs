@@ -79,7 +79,7 @@ echo "shell node-gate: OK"
 - Patch1 (gnome50-appearance): import GNOME 50's native geometry
   (.login-dialog-bottom-button-group padding 32px / spacing 16px;
   .message-list-clear-button pill border-radius 999px).
-- Switch %prep to %autosetup -p1 to apply the patches.
+- Switch %%prep to %%autosetup -p1 to apply the patches.
 - Appearance verified for selector-correctness and SCSS engine parse only,
   not for pixel-level rendering.
 - Add a %%check: parse the compiled gtk-4.0 CSS with the real GTK 4 engine
