@@ -1,6 +1,6 @@
 Name:           fluent-gtk-theme-compact
 Version:        20250417
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -12,6 +12,11 @@ URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 Patch0:         gnome50-selectors.patch
 Patch1:         gnome50-appearance.patch
+# St's shell CSS engine rejects the keyword value in the upstream
+# #panelActivities "background-position: center center" (logged at runtime as
+# "Ignoring length property that isn't a number"). St already falls back to 0 0,
+# so the numeric form is pixel-identical and silences the warning.
+Patch2:         fix-shell-bg-position.patch
 
 BuildRequires:  gnome-shell
 BuildRequires:  sassc
@@ -70,6 +75,16 @@ echo "shell node-gate: OK"
 %{_datarootdir}/themes
 
 %changelog
+* Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20250417-7
+- Patch2 (fix-shell-bg-position): the upstream #panelActivities rule sets
+  "background-position: center center", a keyword St's CSS engine cannot parse —
+  it logs "Ignoring length property that isn't a number" on every theme load and
+  drops the declaration, falling back to 0 0. Set the numeric 0 0 explicitly in
+  the gnome-shell %%activities_icon placeholder. St already rendered at 0 0
+  (background-size: auto), so this is no visual change; silences the runtime
+  warning. Verified: the compiled gnome-shell.css no longer carries a keyword
+  background-position.
+
 * Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20250417-6
 - Patch0 (gnome50-selectors): style the GNOME 50 login .a11y-button and the
   notification .message-list-clear-button with the theme's own button styling

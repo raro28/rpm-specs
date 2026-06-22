@@ -1,0 +1,13 @@
+diff --git a/src/sass/gnome-shell/common/_panel.scss b/src/sass/gnome-shell/common/_panel.scss
+index 3dd5a9c..ea79edd 100644
+--- a/src/sass/gnome-shell/common/_panel.scss
++++ b/src/sass/gnome-shell/common/_panel.scss
+@@ -73,7 +73,7 @@ $panel_height: $menuitem_size;
+ %apple_activites {
+   -natural-hpadding: $base_padding * 2;
+   background-image: url("assets/activities.svg");
+-  background-position: center center;
++  background-position: 0 0; // GNOME 50: St rejects keyword positions; 0 0 == its fallback (no visual change)
+   background-size: 24px 24px;
+   width: 24px;
+   height: 24px;

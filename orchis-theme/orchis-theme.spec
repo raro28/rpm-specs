@@ -1,6 +1,6 @@
 Name:           orchis-theme
 Version:        20250425
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -13,6 +13,11 @@ Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dver
 Patch0:         gnome50-selectors.patch
 Patch1:         gnome50-appearance.patch
 Patch2:         fix-gtk4-define-color.patch
+# St's shell CSS engine rejects the keyword value in the upstream
+# #panelActivities "background-position: center center" (logged at runtime as
+# "Ignoring length property that isn't a number"). St already falls back to 0 0,
+# so the numeric form is pixel-identical and silences the warning.
+Patch3:         fix-shell-bg-position.patch
 
 BuildRequires:  gnome-shell
 BuildRequires:  sassc
@@ -72,6 +77,16 @@ echo "shell node-gate: OK"
 %{_datarootdir}/themes
 
 %changelog
+* Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20250425-6
+- Patch3 (fix-shell-bg-position): the upstream #panelActivities rule sets
+  "background-position: center center", a keyword St's CSS engine cannot parse —
+  it logs "Ignoring length property that isn't a number" on every theme load and
+  drops the declaration, falling back to 0 0. Set the numeric 0 0 explicitly in
+  the gnome-shell %%icon_activities placeholder. Pixel-identical (icon size equals
+  the 24px box, and St already rendered at 0 0); silences the runtime warning.
+  Verified: the compiled gnome-shell.css no longer carries a keyword
+  background-position.
+
 * Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20250425-5
 - Patch0 (gnome50-selectors): style the GNOME 50 login .a11y-button and
   notification .message-list-clear-button using the theme's own existing

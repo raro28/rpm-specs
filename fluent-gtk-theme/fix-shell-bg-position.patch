@@ -1,0 +1,13 @@
+diff --git a/src/gnome-shell/sass/widgets/_panel.scss b/src/gnome-shell/sass/widgets/_panel.scss
+index 3a0e377..baee119 100644
+--- a/src/gnome-shell/sass/widgets/_panel.scss
++++ b/src/gnome-shell/sass/widgets/_panel.scss
+@@ -5,7 +5,7 @@ $panel_transition_duration: 250ms; // same as the overview transition duration
+ 
+ %activities_icon {
+   background-image: url("assets/activities.svg");
+-  background-position: center center;
++  background-position: 0 0; // GNOME 50: St rejects keyword positions; 0 0 == its fallback (no visual change)
+   background-repeat: no-repeat;
+   background-size: auto;
+   color: transparent !important;

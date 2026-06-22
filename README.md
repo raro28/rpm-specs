@@ -9,17 +9,17 @@ Each subdirectory is one source package.
 | Spec | Current build | What it ships |
 |---|---|---|
 | colloid-gtk-theme | `20250731-5` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches |
-| fluent-gtk-theme-compact | `20250417-6` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches |
+| fluent-gtk-theme-compact | `20250417-7` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches |
 | gnome-shell-extension-per-monitor-wallpaper | `1.0.2-1` | GNOME Shell extension, per-monitor wallpapers ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
 | llama.cpp | `0^b9544-1` | LLM inference, Vulkan backend + embedded web UI ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](looking-glass-kvmfr-kmod/README.md) |
-| orchis-theme | `20250425-5` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches |
+| orchis-theme | `20250425-6` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches |
 | qogir-icon-theme | `20250215-3` | Icon theme ([vinceliuice/Qogir-icon-theme](https://github.com/vinceliuice/Qogir-icon-theme)) |
 | qogir-theme | `20250817-5` | GTK theme ([vinceliuice/Qogir-theme](https://github.com/vinceliuice/Qogir-theme)), GNOME 50 patches |
 | tela-circle-icon-theme | `20250210-3` | Icon theme ([vinceliuice/Tela-circle-icon-theme](https://github.com/vinceliuice/Tela-circle-icon-theme)) |
 | tela-icon-theme | `20250210-1` | Icon theme ([vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme)) |
-| whitesur-gtk-theme | `20260606-2` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 master snapshot + patches |
+| whitesur-gtk-theme | `20260606-3` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 master snapshot + patches |
 | whitesur-icon-theme | `20251227-1` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)) |
 
 ## Host setup (once)
@@ -92,10 +92,10 @@ mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-3.fc44.src.r
 | Spec | Patches |
 |---|---|
 | colloid-gtk-theme | gnome50-selectors, gnome50-appearance, fix-fsf-address |
-| fluent-gtk-theme-compact | gnome50-selectors, gnome50-appearance |
-| orchis-theme | gnome50-selectors, gnome50-appearance, fix-gtk4-define-color |
+| fluent-gtk-theme-compact | gnome50-selectors, gnome50-appearance, fix-shell-bg-position |
+| orchis-theme | gnome50-selectors, gnome50-appearance, fix-gtk4-define-color, fix-shell-bg-position |
 | qogir-theme | gnome50-selectors, gnome50-appearance |
-| whitesur-gtk-theme | gnome50-selectors, gnome50-appearance, fix-fsf-address |
+| whitesur-gtk-theme | gnome50-selectors, gnome50-appearance, fix-fsf-address, fix-shell-bg-position |
 
 Stage the patches with the glob, then build. Example (`qogir-theme`):
 
@@ -112,6 +112,7 @@ Patch reference:
 - `gnome50-appearance.patch` — GNOME 50 native geometry: `.login-dialog-bottom-button-group` 32px/16px, `.message-list-clear-button` `border-radius: 999px`.
 - `fix-fsf-address.patch` (colloid, whitesur) — replaces the outdated FSF postal address in the upstream `gnome-shell.css` GPL header with the canonical URL form (clears rpmlint `incorrect-fsf-address`).
 - `fix-gtk4-define-color.patch` (orchis) — the libadwaita build emitted `@define-color theme_{,unfocused_}selected_bg_color var(--accent-bg-color)`, which GTK's `@define-color` rejects; references the defined `@accent_color` in the libadwaita case only (the GTK3 literal is untouched).
+- `fix-shell-bg-position.patch` (fluent, orchis, whitesur) — the upstream `#panelActivities` rule sets `background-position: center center`, a keyword St's shell CSS engine cannot parse (logged at runtime as `Ignoring length property that isn't a number`); St drops it and falls back to `0 0`, so setting `0 0` explicitly is pixel-identical and silences the warning.
 
 `whitesur-gtk-theme` additionally builds from a pinned `master` snapshot (`%global commit`) rather than the last tag (`20250724`, predates GNOME 49/50), date-versioned `20260606` so a future upstream `YYYYMMDD` tag supersedes it. Advance via `%global commit`.
 
@@ -198,7 +199,7 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 | 4 vinceliuice icon themes | No | Source0 only |
 | gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
 | llama.cpp | No | Source0 + Source1 (web-UI bundle) |
-| 5 vinceliuice GTK themes | **Yes** — 2–3 patches | Source0 only |
+| 5 vinceliuice GTK themes | **Yes** — 2–4 patches | Source0 only |
 | looking-glass-client | **Yes** — 4 files | Source0 + 6 submodule URLs |
 | looking-glass-kvmfr-kmod | **Yes** — 5 files + 1 patch | Source0 only |
 
