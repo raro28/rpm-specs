@@ -1,0 +1,13 @@
+diff --git a/src/_sass/gnome-shell/widgets/_panel.scss b/src/_sass/gnome-shell/widgets/_panel.scss
+index 973f266..1630938 100644
+--- a/src/_sass/gnome-shell/widgets/_panel.scss
++++ b/src/_sass/gnome-shell/widgets/_panel.scss
+@@ -51,7 +51,7 @@ $panel_button_hpadding: ($panel_height - $base-icon-size) / 2;
+ 
+   %icon_activities {
+     background-image: url("assets/activities.svg");
+-    background-position: center center;
++    background-position: 0 0; // GNOME 50: St rejects keyword positions; 0 0 == its fallback (no visual change)
+     background-repeat: no-repeat;
+     background-size: 24px 24px;
+     width: 24px;

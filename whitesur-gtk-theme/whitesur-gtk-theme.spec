@@ -11,7 +11,7 @@ Name:           whitesur-gtk-theme
 # below any future upstream YYYYMMDD tag (all dated after today), so real
 # upstream updates still win. dname-shortcommit identifies the actual source.
 Version:        20260606
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -30,6 +30,11 @@ Source0:        https://github.com/vinceliuice/%{dname}/archive/%{commit}.tar.gz
 Patch0:         gnome50-selectors.patch
 Patch1:         gnome50-appearance.patch
 Patch2:         fix-fsf-address.patch
+# St's shell CSS engine rejects the keyword value in the upstream
+# #panelActivities "background-position: center center" (logged at runtime as
+# "Ignoring length property that isn't a number"). St already falls back to 0 0,
+# so the numeric form is pixel-identical and silences the warning.
+Patch3:         fix-shell-bg-position.patch
 
 BuildRequires:  glib2-devel
 BuildRequires:  gnome-shell
@@ -90,6 +95,16 @@ echo "shell node-gate: OK"
 %{_datarootdir}/themes
 
 %changelog
+* Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20260606-3
+- Patch3 (fix-shell-bg-position): the upstream #panelActivities rule sets
+  "background-position: center center", a keyword St's CSS engine cannot parse —
+  it logs "Ignoring length property that isn't a number" on every theme load and
+  drops the declaration, falling back to 0 0. Set the numeric 0 0 explicitly in
+  the gnome-shell %%apple_activites placeholder. Pixel-identical (icon size equals
+  the 24px box, and St already rendered at 0 0); silences the runtime warning.
+  Verified: the compiled gnome-shell.css no longer carries a keyword
+  background-position and the journal warning is gone after install.
+
 * Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20260606-2
 - Split the single GNOME 50 login patch into the uniform two-patch model now
   shared with the other vinceliuice themes (fluent/colloid/qogir):
