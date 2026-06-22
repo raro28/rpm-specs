@@ -2,7 +2,7 @@
 %global uuid    per-monitor-wallpaper@ekthor
 
 Name:           gnome-shell-extension-per-monitor-wallpaper
-Version:        2.0.0
+Version:        2.1.0
 Release:        1%{?dist}
 Summary:        GNOME Shell extension that paints each monitor its own wallpaper
 BuildArch:      noarch
@@ -37,7 +37,7 @@ Installed system-wide. Enable it per user with:
 
 %install
 install -d %{buildroot}%{_datadir}/gnome-shell/extensions/%{uuid}
-install -pm 0644 metadata.json extension.js \
+install -pm 0644 metadata.json extension.js prefs.js \
     %{buildroot}%{_datadir}/gnome-shell/extensions/%{uuid}/
 
 %files
@@ -46,6 +46,9 @@ install -pm 0644 metadata.json extension.js \
 %{_datadir}/gnome-shell/extensions/%{uuid}/
 
 %changelog
+* Mon Jun 22 2026 Hector Diaz <hdiazc@live.com> - 2.1.0-1
+- Add preferences UI (per-monitor wallpaper + fit-mode preview); honor the config "mode" field
+
 * Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 2.0.0-1
 - Port to TypeScript/esbuild; Source0 is now the CI-built release tarball (no behavior change)
 

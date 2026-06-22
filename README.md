@@ -10,7 +10,7 @@ Each subdirectory is one source package.
 |---|---|---|
 | colloid-gtk-theme | `20250731-5` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches |
 | fluent-gtk-theme-compact | `20250417-7` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches |
-| gnome-shell-extension-per-monitor-wallpaper | `2.0.0-1` | GNOME Shell extension, per-monitor wallpapers ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
+| gnome-shell-extension-per-monitor-wallpaper | `2.1.0-1` | GNOME Shell extension, per-monitor wallpapers + preferences UI ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
 | llama.cpp | `0^b9544-1` | LLM inference, Vulkan backend + embedded web UI ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](looking-glass-kvmfr-kmod/README.md) |
