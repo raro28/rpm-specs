@@ -2,16 +2,17 @@
 %global uuid    per-monitor-wallpaper@ekthor
 
 Name:           gnome-shell-extension-per-monitor-wallpaper
-Version:        1.0.2
+Version:        2.0.0
 Release:        1%{?dist}
 Summary:        GNOME Shell extension that paints each monitor its own wallpaper
 BuildArch:      noarch
 
 License:        GPL-3.0-or-later
 URL:            https://github.com/raro28/%{srcname}
-Source0:        %{url}/archive/refs/tags/%{version}.tar.gz#/%{name}-%{version}.tar.gz
+Source0:        %{url}/releases/download/v%{version}/per-monitor-wallpaper-%{version}.tar.gz
 
-# Pure GJS; nothing is compiled, so there are no BuildRequires.
+# Authored in TypeScript, built by CI into the release tarball; the RPM
+# compiles nothing and needs no BuildRequires.
 
 # The extension declares shell-version ["50"] and shell extensions break across
 # GNOME major versions, so pin to the 50.x series.
@@ -29,14 +30,14 @@ Installed system-wide. Enable it per user with:
     gnome-extensions enable %{uuid}
 
 %prep
-%autosetup -n %{srcname}-%{version}
+%autosetup -n %{uuid}
 
 %build
 # Nothing to build.
 
 %install
 install -d %{buildroot}%{_datadir}/gnome-shell/extensions/%{uuid}
-install -pm 0644 src/metadata.json src/extension.js \
+install -pm 0644 metadata.json extension.js \
     %{buildroot}%{_datadir}/gnome-shell/extensions/%{uuid}/
 
 %files
@@ -45,6 +46,9 @@ install -pm 0644 src/metadata.json src/extension.js \
 %{_datadir}/gnome-shell/extensions/%{uuid}/
 
 %changelog
+* Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 2.0.0-1
+- Port to TypeScript/esbuild; Source0 is now the CI-built release tarball (no behavior change)
+
 * Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 1.0.2-1
 - Fix secondary monitors going unpainted (windows smear): assert the
   background actor is visible whenever the extension paints it
