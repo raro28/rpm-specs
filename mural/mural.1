@@ -1,0 +1,25 @@
+.TH MURAL 1 "June 2026" "mural 1.0.0" "User Commands"
+.SH NAME
+mural \- per-monitor wallpaper editor
+.SH SYNOPSIS
+.B mural
+.SH DESCRIPTION
+.B mural
+is a GTK4/libadwaita application that assigns a wallpaper and fit mode to each
+connected monitor, writing
+.IR ~/.config/per-monitor-wallpaper/config.json .
+It shows a to-scale arrangement of the connected displays; pick an image per
+monitor and a fit mode (zoom, fill, fit, or center). Changes are written
+immediately.
+.SH FILES
+.TP
+.I ~/.config/per-monitor-wallpaper/config.json
+Per-monitor wallpaper assignments written by
+.B mural
+and read by the per-monitor-wallpaper GNOME Shell extension.
+.SH SEE ALSO
+The per-monitor-wallpaper GNOME Shell extension, which reads the config that
+.B mural
+writes.
+.SH AUTHOR
+Hector Diaz
