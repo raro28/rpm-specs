@@ -14,7 +14,7 @@ Each subdirectory is one source package.
 | llama.cpp | `0^b9544-1` | LLM inference, Vulkan backend + embedded web UI ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](looking-glass-kvmfr-kmod/README.md) |
-| mural | `1.0.1-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
+| mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
 | orchis-theme | `20250425-6` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches |
 | qogir-icon-theme | `20250215-3` | Icon theme ([vinceliuice/Qogir-icon-theme](https://github.com/vinceliuice/Qogir-icon-theme)) |
 | qogir-theme | `20250817-5` | GTK theme ([vinceliuice/Qogir-theme](https://github.com/vinceliuice/Qogir-theme)), GNOME 50 patches |
@@ -73,6 +73,7 @@ sudo dnf install /var/lib/mock/fedora-44-x86_64/result/*.rpm
 `Source0` (GitHub tarball) only; canonical 4 steps, nothing to copy:
 
 - `gnome-shell-extension-per-monitor-wallpaper`
+- `mural`
 - `qogir-icon-theme`
 - `tela-circle-icon-theme`
 - `tela-icon-theme`
@@ -88,13 +89,12 @@ mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-3.fc44.src.r
 
 ### mural
 
-Standalone GTK4/libadwaita editor for the config the `gnome-shell-extension-per-monitor-wallpaper` reader paints from. Authored in TypeScript, built by CI into the release tarball (`Source0`); the RPM compiles nothing. One **local source** — the downstream man page `mural.1` (`Source1`; upstream ships none), staged before `spectool`. Carries a `%check` (`desktop-file-validate` + `appstreamcli validate`; `BuildRequires: desktop-file-utils appstream`, auto-installed in the chroot). Runtime `Requires`: `gjs`, `gtk4`, `libadwaita`, `glycin-libs`, `glycin-gtk4-libs`, `glycin-loaders`, `hicolor-icon-theme`.
+Standalone GTK4/libadwaita editor for the config the `gnome-shell-extension-per-monitor-wallpaper` reader paints from. Authored in TypeScript, built by CI into the release tarball (`Source0`, which also bundles the man page and `LICENSE`); the RPM compiles nothing and has no local sources. Carries a `%check` (`desktop-file-validate` + `appstreamcli validate`; `BuildRequires: desktop-file-utils appstream`, auto-installed in the chroot). Runtime `Requires`: `gjs`, `gtk4`, `libadwaita`, `glycin-libs`, `glycin-gtk4-libs`, `glycin-loaders`, `hicolor-icon-theme`.
 
 ```bash
-cp mural/mural.1 ~/rpmbuild/SOURCES/
 spectool -g -R mural/mural.spec
 rpmbuild -bs mural/mural.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/mural-1.0.1-1.fc44.src.rpm
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/mural-1.0.2-1.fc44.src.rpm
 ```
 
 ### vinceliuice GTK themes (GNOME 50 patches)
@@ -211,7 +211,7 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 | 4 vinceliuice icon themes | No | Source0 only |
 | gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
 | llama.cpp | No | Source0 + Source1 (web-UI bundle) |
-| mural | **Yes** — 1 man page | Source0 only |
+| mural | No | Source0 only |
 | 5 vinceliuice GTK themes | **Yes** — 2–4 patches | Source0 only |
 | looking-glass-client | **Yes** — 4 files | Source0 + 6 submodule URLs |
 | looking-glass-kvmfr-kmod | **Yes** — 5 files + 1 patch | Source0 only |
