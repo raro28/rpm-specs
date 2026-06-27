@@ -1,5 +1,5 @@
 Name:           mural
-Version:        1.0.0
+Version:        1.0.1
 Release:        1%{?dist}
 Summary:        Per-monitor wallpaper editor (GTK4/libadwaita)
 BuildArch:      noarch
@@ -55,6 +55,7 @@ desktop-file-validate %{buildroot}%{_datadir}/applications/dev.muy.Mural.desktop
 appstreamcli validate --no-net %{buildroot}%{_metainfodir}/dev.muy.Mural.metainfo.xml
 
 %files
+%license LICENSE
 %doc README.md
 %{_bindir}/%{name}
 %{_datadir}/%{name}/
@@ -64,5 +65,8 @@ appstreamcli validate --no-net %{buildroot}%{_metainfodir}/dev.muy.Mural.metainf
 %{_mandir}/man1/%{name}.1*
 
 %changelog
+* Sat Jun 27 2026 Hector Diaz <hdiazc@live.com> - 1.0.1-1
+- Ship the GPL-3.0 license text (now bundled in the release tarball)
+
 * Sat Jun 27 2026 Hector Diaz <hdiazc@live.com> - 1.0.0-1
 - Initial package

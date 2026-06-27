@@ -14,7 +14,7 @@ Each subdirectory is one source package.
 | llama.cpp | `0^b9544-1` | LLM inference, Vulkan backend + embedded web UI ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](looking-glass-kvmfr-kmod/README.md) |
-| mural | `1.0.0-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
+| mural | `1.0.1-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
 | orchis-theme | `20250425-6` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches |
 | qogir-icon-theme | `20250215-3` | Icon theme ([vinceliuice/Qogir-icon-theme](https://github.com/vinceliuice/Qogir-icon-theme)) |
 | qogir-theme | `20250817-5` | GTK theme ([vinceliuice/Qogir-theme](https://github.com/vinceliuice/Qogir-theme)), GNOME 50 patches |
@@ -94,7 +94,7 @@ Standalone GTK4/libadwaita editor for the config the `gnome-shell-extension-per-
 cp mural/mural.1 ~/rpmbuild/SOURCES/
 spectool -g -R mural/mural.spec
 rpmbuild -bs mural/mural.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/mural-1.0.0-1.fc44.src.rpm
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/mural-1.0.1-1.fc44.src.rpm
 ```
 
 ### vinceliuice GTK themes (GNOME 50 patches)
