@@ -11,7 +11,15 @@
 # spelling-error json/ekthor: false positives in the per-monitor-wallpaper
 # extension description -- "json" is part of config.json and "ekthor" is the
 # author tag in the extension UUID. Both are correct, not misspellings.
+#
+# explicit-lib-dependency (mural): mural is a noarch GJS app -- it links nothing,
+# so RPM generates no automatic dependencies. Its runtime GObject-Introspection
+# deps (libadwaita -> Adw typelib; glycin-libs/glycin-gtk4-libs -> Gly/GlyGtk4
+# typelibs, loaded by name at runtime) must therefore be explicit, and none of
+# these packages expose a typelib() provide to depend on instead. The check is a
+# false positive here.
 Filters = [
     "no-%check-section",
     "spelling-error.*'(json|ekthor)'",
+    "explicit-lib-dependency (libadwaita|glycin-libs|glycin-gtk4-libs)",
 ]

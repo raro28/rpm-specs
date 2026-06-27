@@ -10,10 +10,11 @@ Each subdirectory is one source package.
 |---|---|---|
 | colloid-gtk-theme | `20250731-5` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches |
 | fluent-gtk-theme-compact | `20250417-7` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches |
-| gnome-shell-extension-per-monitor-wallpaper | `2.1.0-1` | GNOME Shell extension, per-monitor wallpapers + preferences UI ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
+| gnome-shell-extension-per-monitor-wallpaper | `2.2.0-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
 | llama.cpp | `0^b9544-1` | LLM inference, Vulkan backend + embedded web UI ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](looking-glass-kvmfr-kmod/README.md) |
+| mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
 | orchis-theme | `20250425-6` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches |
 | qogir-icon-theme | `20250215-3` | Icon theme ([vinceliuice/Qogir-icon-theme](https://github.com/vinceliuice/Qogir-icon-theme)) |
 | qogir-theme | `20250817-5` | GTK theme ([vinceliuice/Qogir-theme](https://github.com/vinceliuice/Qogir-theme)), GNOME 50 patches |
@@ -72,6 +73,7 @@ sudo dnf install /var/lib/mock/fedora-44-x86_64/result/*.rpm
 `Source0` (GitHub tarball) only; canonical 4 steps, nothing to copy:
 
 - `gnome-shell-extension-per-monitor-wallpaper`
+- `mural`
 - `qogir-icon-theme`
 - `tela-circle-icon-theme`
 - `tela-icon-theme`
@@ -84,6 +86,16 @@ mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-3.fc44.src.r
 ```
 
 `gnome-shell-extension-per-monitor-wallpaper` installs system-wide; each user enables it with `gnome-extensions enable per-monitor-wallpaper@ekthor`. Requires GNOME Shell 50.x (versioned `Requires`). Authored in TypeScript, built by CI into the release tarball (Source0); the RPM compiles nothing and has no `BuildRequires`.
+
+### mural
+
+Standalone GTK4/libadwaita editor for the config the `gnome-shell-extension-per-monitor-wallpaper` reader paints from. Authored in TypeScript, built by CI into the release tarball (`Source0`, which also bundles the man page and `LICENSE`); the RPM compiles nothing and has no local sources. Carries a `%check` (`desktop-file-validate` + `appstreamcli validate`; `BuildRequires: desktop-file-utils appstream`, auto-installed in the chroot). Runtime `Requires`: `gjs`, `gtk4`, `libadwaita`, `glycin-libs`, `glycin-gtk4-libs`, `glycin-loaders`, `hicolor-icon-theme`.
+
+```bash
+spectool -g -R mural/mural.spec
+rpmbuild -bs mural/mural.spec
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/mural-1.0.2-1.fc44.src.rpm
+```
 
 ### vinceliuice GTK themes (GNOME 50 patches)
 
@@ -199,6 +211,7 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 | 4 vinceliuice icon themes | No | Source0 only |
 | gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
 | llama.cpp | No | Source0 + Source1 (web-UI bundle) |
+| mural | No | Source0 only |
 | 5 vinceliuice GTK themes | **Yes** — 2–4 patches | Source0 only |
 | looking-glass-client | **Yes** — 4 files | Source0 + 6 submodule URLs |
 | looking-glass-kvmfr-kmod | **Yes** — 5 files + 1 patch | Source0 only |
@@ -216,13 +229,17 @@ rpmlint -c rpmlint.toml */*.spec
 # expect: 0 errors, 0 warnings, 0 badness
 ```
 
-`-c rpmlint.toml` adds two repo-local filters on top of Fedora's defaults:
+`-c rpmlint.toml` adds three repo-local filters on top of Fedora's defaults:
 
 - `no-%check-section` — suppressed for the 6 specs with no test to run (the 4
   icon themes, the kvmfr akmod, the GJS extension). The 5 vinceliuice GTK themes,
-  llama.cpp, and looking-glass-client carry a real `%check`.
+  llama.cpp, looking-glass-client, and mural carry a real `%check`.
 - `spelling-error '(json|ekthor)'` — `json` (part of `config.json`) and `ekthor`
   (the extension's UUID author tag) are correct, not misspellings.
+- `explicit-lib-dependency (libadwaita|glycin-libs|glycin-gtk4-libs)` — mural is a
+  noarch GJS app, so RPM generates no automatic dependencies; its runtime
+  GObject-Introspection deps must be explicit, and none of these packages expose a
+  `typelib()` provide to depend on instead. False positive for this package.
 
 The GTK-theme `%check` parses the compiled `gtk-4.0` CSS through the real GTK 4
 engine (`GtkCssProvider`) and asserts the GNOME 50 selectors compiled into
