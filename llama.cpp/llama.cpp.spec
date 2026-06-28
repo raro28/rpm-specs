@@ -1,4 +1,4 @@
-%global build_num     9544
+%global build_num     9828
 %global upstream_tag  b%{build_num}
 
 Name:           llama.cpp
@@ -28,6 +28,8 @@ BuildRequires:  glslc
 BuildRequires:  glslang
 BuildRequires:  spirv-headers-devel
 BuildRequires:  libcurl-devel
+# Activates LLAMA_OPENSSL (default ON): HTTPS support in the server's httplib client.
+BuildRequires:  openssl-devel
 
 Requires:       vulkan-loader
 # Runtime needs a Vulkan ICD. On AMD/Intel that's Mesa's RADV/ANV
@@ -62,12 +64,18 @@ tar xf %{SOURCE1} --strip-components=1 -C tools/ui/dist
     -DLLAMA_USE_PREBUILT_UI=ON \
     -DLLAMA_BUILD_NUMBER=%{build_num} \
     -DLLAMA_CURL=ON \
+    -DLLAMA_OPENSSL=ON \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_LIBDIR=%{_lib}
 %cmake_build
 
 %install
 %cmake_install
+# Runtime-only package: drop dev artifacts (headers, bare .so symlinks, pkgconfig,
+# cmake). Versioned sonames and the private impl libs stay.
+rm -rf %{buildroot}%{_includedir} %{buildroot}%{_libdir}/cmake
+rm -f  %{buildroot}%{_libdir}/pkgconfig/*.pc
+find %{buildroot}%{_libdir} -maxdepth 1 -type l -name '*.so' -delete
 
 %check
 test -x %{buildroot}%{_bindir}/llama-cli
@@ -82,15 +90,26 @@ test -x %{buildroot}%{_bindir}/llama-bench
 # Backend libs land in _bindir (not _libdir) with GGML_BACKEND_DL=ON so the
 # main binaries can dlopen them via $ORIGIN-relative search.
 %{_bindir}/libggml-*.so
-%{_libdir}/libllama*.so*
-%{_libdir}/libggml*.so*
-%{_libdir}/libmtmd.so*
-%{_includedir}/*.h
-%{_libdir}/cmake/ggml/
-%{_libdir}/cmake/llama/
-%{_libdir}/pkgconfig/*.pc
+%{_libdir}/libllama*.so.*
+%{_libdir}/libggml*.so.*
+%{_libdir}/libmtmd.so.*
+# Private impl libs (sonameless regular files, runtime-NEEDED by the launchers).
+%{_libdir}/libllama-*-impl.so
 
 %changelog
+* Sat Jun 27 2026 Hector Diaz <hdiazc@live.com> - 0^b9828-1
+- Rebase to upstream tag b9828 (284 commits from b9544). Pure version bump;
+  build flags verified unchanged against the b9828 CMake source.
+- Add BuildRequires: openssl-devel and pass -DLLAMA_OPENSSL=ON to compile HTTPS
+  into the server's httplib client (default-ON option, previously inert without
+  openssl headers). Client-only; no certificate required.
+- Drop link-time dev artifacts (headers, bare .so symlinks, pkgconfig, cmake):
+  runtime-only inference package, nothing builds against libllama. Clears the
+  devel-file-in-non-devel-package warnings without a -devel subpackage. Versioned
+  sonames and the private impl libs are retained. Binary RPM now lints 0/0 (the
+  unfixable upstream invalid-soname/no-manual-page/cli items are filtered with
+  documented rationale in rpmlint.toml).
+
 * Sat Jun 06 2026 Hector Diaz <hdiazc@live.com> - 0^b9544-1
 - Rebase to upstream tag b9544 (239 commits from b9305). Pure version bump:
   verified against the b9305..b9544 diff that no spec logic changes are needed.

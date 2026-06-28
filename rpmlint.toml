@@ -18,8 +18,22 @@
 # typelibs, loaded by name at runtime) must therefore be explicit, and none of
 # these packages expose a typelib() provide to depend on instead. The check is a
 # false positive here.
+#
+# spelling-error cli: false positive -- the llama-cli tool name in llama.cpp's
+# %description (rpmlint wants "CLI").
+#
+# invalid-soname (llama.cpp): upstream's unified-binary private impl libs
+# (libllama-*-impl.so) are runtime-NEEDED regular files that carry no SONAME, and
+# the launchers reach them with no RPATH, so they can't be versioned or relocated.
+# Not public ABI.
+#
+# no-manual-page (llama.cpp): upstream ships no man pages for its 40+ llama-* tools
+# or the dlopen backend libs (libggml-*.so); authoring them is impractical. Scoped
+# by binary-name prefix so it does not suppress the check repo-wide.
 Filters = [
     "no-%check-section",
-    "spelling-error.*'(json|ekthor)'",
+    "spelling-error.*'(json|ekthor|cli)'",
     "explicit-lib-dependency (libadwaita|glycin-libs|glycin-gtk4-libs)",
+    "invalid-soname .*libllama-.*-impl\\.so",
+    "no-manual-page-for-binary (llama|libggml-)",
 ]
