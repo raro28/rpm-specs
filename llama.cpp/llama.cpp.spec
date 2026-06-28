@@ -71,6 +71,11 @@ tar xf %{SOURCE1} --strip-components=1 -C tools/ui/dist
 
 %install
 %cmake_install
+# Runtime-only package: drop dev artifacts (headers, bare .so symlinks, pkgconfig,
+# cmake). Versioned sonames and the private impl libs stay.
+rm -rf %{buildroot}%{_includedir} %{buildroot}%{_libdir}/cmake
+rm -f  %{buildroot}%{_libdir}/pkgconfig/*.pc
+find %{buildroot}%{_libdir} -maxdepth 1 -type l -name '*.so' -delete
 
 %check
 test -x %{buildroot}%{_bindir}/llama-cli
@@ -85,13 +90,11 @@ test -x %{buildroot}%{_bindir}/llama-bench
 # Backend libs land in _bindir (not _libdir) with GGML_BACKEND_DL=ON so the
 # main binaries can dlopen them via $ORIGIN-relative search.
 %{_bindir}/libggml-*.so
-%{_libdir}/libllama*.so*
-%{_libdir}/libggml*.so*
-%{_libdir}/libmtmd.so*
-%{_includedir}/*.h
-%{_libdir}/cmake/ggml/
-%{_libdir}/cmake/llama/
-%{_libdir}/pkgconfig/*.pc
+%{_libdir}/libllama*.so.*
+%{_libdir}/libggml*.so.*
+%{_libdir}/libmtmd.so.*
+# Private impl libs (sonameless regular files, runtime-NEEDED by the launchers).
+%{_libdir}/libllama-*-impl.so
 
 %changelog
 * Sat Jun 27 2026 Hector Diaz <hdiazc@live.com> - 0^b9828-1
@@ -100,6 +103,12 @@ test -x %{buildroot}%{_bindir}/llama-bench
 - Add BuildRequires: openssl-devel and pass -DLLAMA_OPENSSL=ON to compile HTTPS
   into the server's httplib client (default-ON option, previously inert without
   openssl headers). Client-only; no certificate required.
+- Drop link-time dev artifacts (headers, bare .so symlinks, pkgconfig, cmake):
+  runtime-only inference package, nothing builds against libllama. Clears the
+  devel-file-in-non-devel-package warnings without a -devel subpackage. Versioned
+  sonames and the private impl libs are retained. Binary RPM now lints 0/0 (the
+  unfixable upstream invalid-soname/no-manual-page/cli items are filtered with
+  documented rationale in rpmlint.toml).
 
 * Sat Jun 06 2026 Hector Diaz <hdiazc@live.com> - 0^b9544-1
 - Rebase to upstream tag b9544 (239 commits from b9305). Pure version bump:
