@@ -1,4 +1,4 @@
-%global build_num     9544
+%global build_num     9828
 %global upstream_tag  b%{build_num}
 
 Name:           llama.cpp
@@ -28,6 +28,8 @@ BuildRequires:  glslc
 BuildRequires:  glslang
 BuildRequires:  spirv-headers-devel
 BuildRequires:  libcurl-devel
+# Activates LLAMA_OPENSSL (default ON): HTTPS support in the server's httplib client.
+BuildRequires:  openssl-devel
 
 Requires:       vulkan-loader
 # Runtime needs a Vulkan ICD. On AMD/Intel that's Mesa's RADV/ANV
@@ -62,6 +64,7 @@ tar xf %{SOURCE1} --strip-components=1 -C tools/ui/dist
     -DLLAMA_USE_PREBUILT_UI=ON \
     -DLLAMA_BUILD_NUMBER=%{build_num} \
     -DLLAMA_CURL=ON \
+    -DLLAMA_OPENSSL=ON \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_LIBDIR=%{_lib}
 %cmake_build
@@ -91,6 +94,13 @@ test -x %{buildroot}%{_bindir}/llama-bench
 %{_libdir}/pkgconfig/*.pc
 
 %changelog
+* Sat Jun 27 2026 Hector Diaz <hdiazc@live.com> - 0^b9828-1
+- Rebase to upstream tag b9828 (284 commits from b9544). Pure version bump;
+  build flags verified unchanged against the b9828 CMake source.
+- Add BuildRequires: openssl-devel and pass -DLLAMA_OPENSSL=ON to compile HTTPS
+  into the server's httplib client (default-ON option, previously inert without
+  openssl headers). Client-only; no certificate required.
+
 * Sat Jun 06 2026 Hector Diaz <hdiazc@live.com> - 0^b9544-1
 - Rebase to upstream tag b9544 (239 commits from b9305). Pure version bump:
   verified against the b9305..b9544 diff that no spec logic changes are needed.
