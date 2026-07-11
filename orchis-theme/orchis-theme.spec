@@ -1,15 +1,15 @@
 Name:           orchis-theme
-Version:        20250425
-Release:        6%{?dist}
+Version:        20260707
+Release:        1%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
 License:        GPL-3.0-or-later
 
 %define dname Orchis-theme
-%define dversion 2025-04-25
+%define dversion 2026-07-07
 URL:            https://github.com/vinceliuice/%{dname}
-Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
+Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz#/%{dname}-%{dversion}.tar.gz
 Patch0:         gnome50-selectors.patch
 Patch1:         gnome50-appearance.patch
 Patch2:         fix-gtk4-define-color.patch
@@ -77,6 +77,20 @@ echo "shell node-gate: OK"
 %{_datarootdir}/themes
 
 %changelog
+* Sat Jul 11 2026 Hector Diaz <hdiazc@live.com> - 20260707-1
+- Bump to upstream 2026-07-07. All four downstream patches still apply and remain
+  necessary against the new source: upstream still tops out at widgets-48-0 (no
+  native GNOME 49/50 sheet), still lacks .a11y-button / the
+  .login-dialog-bottom-button-group / the .message-list-clear-button coverage
+  (Patch0/Patch1), and still carries the GTK4 @define-color var() parse bug
+  (Patch2) and the keyword #panelActivities background-position (Patch3).
+  install.sh flags unchanged (-t grey -c dark -i gnome --libadwaita). Patches
+  apply with line-offset only; %%check (GTK4 CSS engine parse + shell node-gate)
+  passes.
+- Source0: add a #/%%{dname}-%%{dversion}.tar.gz download rename. The bare
+  archive name collided with whitesur-icon-theme (both now carry the 2026-07-07
+  tag), so a shared ~/rpmbuild/SOURCES/ served the wrong tarball to %%prep.
+
 * Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20250425-6
 - Patch3 (fix-shell-bg-position): the upstream #panelActivities rule sets
   "background-position: center center", a keyword St's CSS engine cannot parse —
