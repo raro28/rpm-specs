@@ -21,7 +21,7 @@ Each subdirectory is one source package.
 | tela-circle-icon-theme | `20260707-1` | Icon theme ([vinceliuice/Tela-circle-icon-theme](https://github.com/vinceliuice/Tela-circle-icon-theme)) |
 | tela-icon-theme | `20260707-1` | Icon theme ([vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme)) |
 | whitesur-gtk-theme | `20260606-3` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 master snapshot + patches |
-| whitesur-icon-theme | `20251227-1` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)) |
+| whitesur-icon-theme | `20260707-1` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)) |
 
 ## Host setup (once)
 
