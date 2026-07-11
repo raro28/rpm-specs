@@ -18,7 +18,7 @@ Each subdirectory is one source package.
 | orchis-theme | `20250425-6` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches |
 | qogir-icon-theme | `20250215-3` | Icon theme ([vinceliuice/Qogir-icon-theme](https://github.com/vinceliuice/Qogir-icon-theme)) |
 | qogir-theme | `20250817-5` | GTK theme ([vinceliuice/Qogir-theme](https://github.com/vinceliuice/Qogir-theme)), GNOME 50 patches |
-| tela-circle-icon-theme | `20250210-3` | Icon theme ([vinceliuice/Tela-circle-icon-theme](https://github.com/vinceliuice/Tela-circle-icon-theme)) |
+| tela-circle-icon-theme | `20260707-1` | Icon theme ([vinceliuice/Tela-circle-icon-theme](https://github.com/vinceliuice/Tela-circle-icon-theme)) |
 | tela-icon-theme | `20260707-1` | Icon theme ([vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme)) |
 | whitesur-gtk-theme | `20260606-3` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 master snapshot + patches |
 | whitesur-icon-theme | `20251227-1` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)) |
