@@ -1,25 +1,21 @@
-# Upstream's last tag (2025-07-24) predates GNOME 49/50. We build from a pinned
-# master snapshot that carries upstream's own "Fixed gnome 50 issues" work
-# (the $GNOME_SHELL version-gating mechanism + quick-settings fix), plus a
-# downstream patch for the new GNOME 50 login selectors. Refresh %%commit to
-# advance; switch back to a tag once upstream cuts a release with 49/50 support.
-%global commit       a83f467e4c16b1ed1c960f3d89e2472d9639477c
-%global shortcommit  %(c=%{commit}; echo ${c:0:7})
-
+# Upstream tag 2026-07-07 supersedes the previously-pinned master snapshot
+# (commit a83f467, 2026-05-25) — it is 12 commits newer and carries the same
+# "Fixed gnome 50 issues" work (the $GNOME_SHELL version-gating mechanism +
+# quick-settings fix) that originally forced the commit pin. It still tops out
+# at the widgets-48-0 shell stylesheet (no native GNOME 49/50 sheet), so the
+# downstream GNOME 50 login / notification patches below remain necessary.
 Name:           whitesur-gtk-theme
-# Date-versioned to supersede the installed 20250724 build. Today's date sorts
-# below any future upstream YYYYMMDD tag (all dated after today), so real
-# upstream updates still win. dname-shortcommit identifies the actual source.
-Version:        20260606
-Release:        3%{?dist}
+Version:        20260707
+Release:        1%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
 License:        GPL-3.0-or-later
 
 %define dname WhiteSur-gtk-theme
+%define dversion 2026-07-07
 URL:            https://github.com/vinceliuice/%{dname}
-Source0:        https://github.com/vinceliuice/%{dname}/archive/%{commit}.tar.gz#/%{dname}-%{shortcommit}.tar.gz
+Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz#/%{dname}-%{dversion}.tar.gz
 # Downstream GNOME 50 styling, split into the uniform two-patch model shared with
 # the other vinceliuice themes. Patch0 (selectors) carries theme-native node
 # coverage: .a11y-button gains WhiteSur's login system-button look, and the
@@ -48,7 +44,7 @@ BuildRequires:  python3-gobject-base
 A macOS like theme for Linux GTK Desktops
 
 %prep
-%autosetup -p1 -n %{dname}-%{commit}
+%autosetup -p1 -n %{dname}-%{dversion}
 
 %build
 # Prebuilt assets; nothing to compile (install.sh handles SASS).
@@ -95,6 +91,21 @@ echo "shell node-gate: OK"
 %{_datarootdir}/themes
 
 %changelog
+* Sat Jul 11 2026 Hector Diaz <hdiazc@live.com> - 20260707-1
+- Switch from the pinned master commit (a83f467, 2026-05-25) to upstream tag
+  2026-07-07 (12 commits newer; carries the same $GNOME_SHELL version-gating and
+  quick-settings fixes that forced the pin). Drop the %%commit/%%shortcommit
+  machinery and the date-versioning rationale; Source0 is now the tag archive
+  with a #/%%{dname}-%%{dversion}.tar.gz download rename.
+- All four downstream patches re-verified against the new source and kept: the
+  release still tops out at widgets-48-0 (no native GNOME 49/50 sheet) and still
+  lacks .a11y-button / .login-dialog-bottom-button-group / the widgets-48-0
+  .message-list-clear-button coverage (Patch0/Patch1); the FSF postal address in
+  gnome-shell _common.scss is still the old form (Patch2); %%apple_activites
+  still uses the keyword background-position (Patch3). install.sh flags unchanged
+  (-t grey -N mojave -l --shell -i gnome; mojave/gnome still valid variants).
+  Patches apply with line-offset only; %%check passes.
+
 * Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20260606-3
 - Patch3 (fix-shell-bg-position): the upstream #panelActivities rule sets
   "background-position: center center", a keyword St's CSS engine cannot parse —

@@ -20,7 +20,7 @@ Each subdirectory is one source package.
 | qogir-theme | `20250817-5` | GTK theme ([vinceliuice/Qogir-theme](https://github.com/vinceliuice/Qogir-theme)), GNOME 50 patches |
 | tela-circle-icon-theme | `20260707-1` | Icon theme ([vinceliuice/Tela-circle-icon-theme](https://github.com/vinceliuice/Tela-circle-icon-theme)) |
 | tela-icon-theme | `20260707-1` | Icon theme ([vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme)) |
-| whitesur-gtk-theme | `20260606-3` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 master snapshot + patches |
+| whitesur-gtk-theme | `20260707-1` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 patches |
 | whitesur-icon-theme | `20260707-1` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)) |
 
 ## Host setup (once)
@@ -125,8 +125,6 @@ Patch reference:
 - `fix-fsf-address.patch` (colloid, whitesur) — replaces the outdated FSF postal address in the upstream `gnome-shell.css` GPL header with the canonical URL form (clears rpmlint `incorrect-fsf-address`).
 - `fix-gtk4-define-color.patch` (orchis) — the libadwaita build emitted `@define-color theme_{,unfocused_}selected_bg_color var(--accent-bg-color)`, which GTK's `@define-color` rejects; references the defined `@accent_color` in the libadwaita case only (the GTK3 literal is untouched).
 - `fix-shell-bg-position.patch` (fluent, orchis, whitesur) — the upstream `#panelActivities` rule sets `background-position: center center`, a keyword St's shell CSS engine cannot parse (logged at runtime as `Ignoring length property that isn't a number`); St drops it and falls back to `0 0`, so setting `0 0` explicitly is pixel-identical and silences the warning.
-
-`whitesur-gtk-theme` additionally builds from a pinned `master` snapshot (`%global commit`) rather than the last tag (`20250724`, predates GNOME 49/50), date-versioned `20260606` so a future upstream `YYYYMMDD` tag supersedes it. Advance via `%global commit`.
 
 ### llama.cpp
 
