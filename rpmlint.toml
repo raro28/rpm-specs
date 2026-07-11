@@ -19,8 +19,9 @@
 # these packages expose a typelib() provide to depend on instead. The check is a
 # false positive here.
 #
-# spelling-error cli: false positive -- the llama-cli tool name in llama.cpp's
-# %description (rpmlint wants "CLI").
+# spelling-error cli/ggml/vulkan/rocm/...: false positives -- the llama-cli tool
+# name plus the backend/GPU technical terms in llama.cpp's %description(s)
+# (ggml, libggml, vulkan, rocm, rocBLAS, hipBLAS, Radeon). All correct spellings.
 #
 # invalid-soname (llama.cpp): upstream's unified-binary private impl libs
 # (libllama-*-impl.so) are runtime-NEEDED regular files that carry no SONAME, and
@@ -30,10 +31,15 @@
 # no-manual-page (llama.cpp): upstream ships no man pages for its 40+ llama-* tools
 # or the dlopen backend libs (libggml-*.so); authoring them is impractical. Scoped
 # by binary-name prefix so it does not suppress the check repo-wide.
+#
+# no-documentation (llama.cpp-vulkan/-rocm): the GPU backend subpackages ship a
+# single dlopen module (libggml-vulkan.so / libggml-hip.so) and Require the base
+# package, where README/LICENSE live. No own docs by design. Scoped to those two.
 Filters = [
     "no-%check-section",
-    "spelling-error.*'(json|ekthor|cli)'",
+    "spelling-error.*'(json|ekthor|cli|ggml|libggml|vulkan|rocm|rocBLAS|hipBLAS|Radeon)'",
     "explicit-lib-dependency (libadwaita|glycin-libs|glycin-gtk4-libs)",
     "invalid-soname .*libllama-.*-impl\\.so",
     "no-manual-page-for-binary (llama|libggml-)",
+    "llama\\.cpp-(vulkan|rocm).*no-documentation",
 ]

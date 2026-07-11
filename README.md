@@ -11,7 +11,7 @@ Each subdirectory is one source package.
 | colloid-gtk-theme | `20250731-5` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches |
 | fluent-gtk-theme-compact | `20250417-7` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches |
 | gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
-| llama.cpp | `0^b9544-1` | LLM inference, Vulkan backend + embedded web UI ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
+| llama.cpp | `0^b9965-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](looking-glass-kvmfr-kmod/README.md) |
 | mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
@@ -128,12 +128,20 @@ Patch reference:
 
 ### llama.cpp
 
-No local sources, but two URL sources: `Source0` (the source tarball) and `Source1` (the prebuilt `llama-bNNNN-ui.tar.gz` web-UI bundle from the matching GitHub release, extracted into `tools/ui/dist` during `%prep` so the server embeds the SvelteKit UI without pulling in nodejs/npm at build time). `spectool -g -R` fetches both. Ships `llama-cli`, `llama-server` (with the web UI), `llama-bench`, `llama-quantize` etc. with the Vulkan backend enabled. Runtime needs a Vulkan ICD (`mesa-vulkan-drivers` for AMD/Intel; NVIDIA's proprietary driver provides one).
+No local sources, but two URL sources: `Source0` (the source tarball) and `Source1` (the prebuilt `llama-bNNNN-ui.tar.gz` web-UI bundle from the matching GitHub release, extracted into `tools/ui/dist` during `%prep` so the server embeds the SvelteKit UI without pulling in nodejs/npm at build time). `spectool -g -R` fetches both.
+
+One SRPM builds three coexisting binary RPMs off the `GGML_BACKEND_DL` module layout (`-DGGML_VULKAN=ON -DGGML_HIP=ON` in a single pass):
+
+- **`llama.cpp`** (base) — `llama-cli`, `llama-server` (with web UI), `llama-bench`, `llama-quantize` etc. plus the CPU backend (all x86-64 variants, runtime-dispatched). No GPU dependency; `Recommends: llama.cpp-vulkan` so a bare install stays GPU-accelerated.
+- **`llama.cpp-vulkan`** — the `libggml-vulkan.so` dlopen module; `Recommends: mesa-vulkan-drivers` (RADV/ANV for AMD/Intel, NVIDIA proprietary). Portable across vendors.
+- **`llama.cpp-rocm`** — the `libggml-hip.so` dlopen module built for `AMDGPU_TARGETS=gfx1030` (RDNA2, RX 6800/6900 XT); auto-pulls rocBLAS/hipBLAS. The gfx1030 kernels compile ahead-of-time from the ISA string, so no GPU is needed to build (or in COPR).
+
+ggml loads whichever backend modules are installed and enumerates all their devices; the backends coexist, and RPM's soname-based dep generation isolates each GPU stack to its own subpackage. The `-rocm` gfx target is a one-line `%global amdgpu_targets` macro.
 
 ```bash
 spectool -g -R llama.cpp/llama.cpp.spec
 rpmbuild -bs llama.cpp/llama.cpp.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/llama.cpp-0\^b9544-1.fc44.src.rpm
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/llama.cpp-0\^b9965-1.fc44.src.rpm
 ```
 
 **Note the `\^` shell-escape** when typing the SRPM filename — `^` is the Fedora-standard post-release snapshot marker (upstream tags are `bNNNN` build numbers, no semver), and the literal caret appears in the filename.
