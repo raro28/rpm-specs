@@ -1,10 +1,14 @@
-%global build_num     9828
-%global upstream_tag  b%{build_num}
+%global build_num       9965
+%global upstream_tag    b%{build_num}
+# AMD GPU ISA target(s) for the ROCm/HIP backend. gfx1030 = RDNA2 (RX 6800/6900
+# XT); Fedora's rocBLAS ships Tensile kernels for it. Add space-separated targets
+# here to widen -rocm coverage (each adds build time).
+%global amdgpu_targets  gfx1030
 
 Name:           llama.cpp
 Version:        0^b%{build_num}
 Release:        1%{?dist}
-Summary:        LLM inference in C/C++ (Vulkan-accelerated build)
+Summary:        LLM inference in C/C++ (CPU engine; GPU backends packaged separately)
 
 # Upstream is MIT. Bundled third-party code under the same or compatible
 # permissive terms (see LICENSE and ggml/ for details).
@@ -22,28 +26,65 @@ BuildRequires:  gcc
 BuildRequires:  gcc-c++
 BuildRequires:  git
 BuildRequires:  pkgconf-pkg-config
+# Vulkan backend
 BuildRequires:  vulkan-loader-devel
 BuildRequires:  vulkan-headers
 BuildRequires:  glslc
 BuildRequires:  glslang
 BuildRequires:  spirv-headers-devel
+# ROCm/HIP backend (compiles the gfx1030 device kernels; no GPU needed to build)
+BuildRequires:  rocm-hip-devel
+BuildRequires:  hipblas-devel
+BuildRequires:  rocblas-devel
+BuildRequires:  rocm-comgr-devel
+BuildRequires:  rocm-cmake
+BuildRequires:  clang
+BuildRequires:  llvm
+# common
 BuildRequires:  libcurl-devel
 # Activates LLAMA_OPENSSL (default ON): HTTPS support in the server's httplib client.
 BuildRequires:  openssl-devel
 
-Requires:       vulkan-loader
+# Base is the CPU engine + shared binaries; GPU acceleration is delivered by the
+# -vulkan / -rocm backend subpackages, each a single dlopen module ggml discovers
+# at runtime. Recommend the portable Vulkan backend so a bare `dnf install
+# llama.cpp` stays GPU-accelerated by default (weak dep: droppable on CPU-only hosts).
+Recommends:     %{name}-vulkan = %{version}-%{release}
+
+%description
+llama.cpp is a plain-C/C++ implementation of LLM inference with minimal
+dependencies, supporting GGUF model files. This base package provides the CPU
+inference engine (every x86-64 micro-architecture variant, runtime-dispatched)
+and the shared binaries: llama-cli, llama-server, llama-bench, llama-quantize,
+llama-tokenize, and friends.
+
+GPU acceleration is optional and delivered by separate backend packages that
+ggml loads at runtime when installed:
+  * llama.cpp-vulkan -- portable Vulkan backend (Mesa RADV/ANV, NVIDIA)
+  * llama.cpp-rocm   -- AMD ROCm/HIP backend (gfx1030 / RDNA2)
+
+%package vulkan
+Summary:        Vulkan GPU backend for llama.cpp
+Requires:       %{name} = %{version}-%{release}
 # Runtime needs a Vulkan ICD. On AMD/Intel that's Mesa's RADV/ANV
 # (mesa-vulkan-drivers); on NVIDIA the proprietary driver provides one.
 Recommends:     mesa-vulkan-drivers
 
-%description
-llama.cpp is a plain-C/C++ implementation of LLM inference with minimal
-dependencies, supporting GGUF model files. This package ships the
-Vulkan-accelerated build, which runs on any GPU with a Vulkan driver
-(Mesa RADV for AMD/Intel, NVIDIA's proprietary driver).
+%description vulkan
+Vulkan compute backend for llama.cpp (libggml-vulkan.so). Runs on any GPU with a
+Vulkan driver -- Mesa RADV/ANV for AMD/Intel, NVIDIA's proprietary driver. ggml
+discovers and loads it at runtime; install alongside the llama.cpp base package.
+Portable across GPU vendors.
 
-Includes the standard binaries: llama-cli, llama-server, llama-bench,
-llama-quantize, llama-tokenize, and friends.
+%package rocm
+Summary:        ROCm/HIP GPU backend for llama.cpp (AMD gfx1030)
+Requires:       %{name} = %{version}-%{release}
+
+%description rocm
+ROCm/HIP compute backend for llama.cpp (libggml-hip.so), compiled for AMD
+gfx1030 (RDNA2 -- e.g. Radeon RX 6800/6800 XT/6900 XT). Pulls in rocBLAS and
+hipBLAS. ggml discovers and loads it at runtime; install alongside the llama.cpp
+base package. AMD-only and specific to the gfx1030 target.
 
 %prep
 %autosetup -n llama.cpp-%{upstream_tag}
@@ -53,8 +94,12 @@ mkdir -p tools/ui/dist
 tar xf %{SOURCE1} --strip-components=1 -C tools/ui/dist
 
 %build
+# One pass builds all three backends as GGML_BACKEND_DL dlopen modules:
+# libggml-cpu-*.so (base), libggml-vulkan.so (-vulkan), libggml-hip.so (-rocm).
 %cmake \
     -DGGML_VULKAN=ON \
+    -DGGML_HIP=ON \
+    -DAMDGPU_TARGETS=%{amdgpu_targets} \
     -DGGML_NATIVE=OFF \
     -DGGML_LTO=ON \
     -DGGML_BACKEND_DL=ON \
@@ -81,22 +126,62 @@ find %{buildroot}%{_libdir} -maxdepth 1 -type l -name '*.so' -delete
 test -x %{buildroot}%{_bindir}/llama-cli
 test -x %{buildroot}%{_bindir}/llama-server
 test -x %{buildroot}%{_bindir}/llama-bench
+# All three backends must have built as their own dlopen modules:
+test -f %{buildroot}%{_bindir}/libggml-vulkan.so
+test -f %{buildroot}%{_bindir}/libggml-hip.so
+ls %{buildroot}%{_bindir}/libggml-cpu-*.so >/dev/null
 
 %files
 %license LICENSE
 %doc README.md
 %{_bindir}/llama
 %{_bindir}/llama-*
-# Backend libs land in _bindir (not _libdir) with GGML_BACKEND_DL=ON so the
-# main binaries can dlopen them via $ORIGIN-relative search.
-%{_bindir}/libggml-*.so
+# CPU backend modules land in _bindir (not _libdir) with GGML_BACKEND_DL=ON so
+# the main binaries dlopen them via $ORIGIN-relative search. GPU backend modules
+# ship in the -vulkan / -rocm subpackages.
+%{_bindir}/libggml-cpu-*.so
 %{_libdir}/libllama*.so.*
 %{_libdir}/libggml*.so.*
 %{_libdir}/libmtmd.so.*
 # Private impl libs (sonameless regular files, runtime-NEEDED by the launchers).
 %{_libdir}/libllama-*-impl.so
 
+%files vulkan
+%license LICENSE
+%{_bindir}/libggml-vulkan.so
+
+%files rocm
+%license LICENSE
+%{_bindir}/libggml-hip.so
+
 %changelog
+* Sat Jul 11 2026 Hector Diaz <hdiazc@live.com> - 0^b9965-1
+- Rebase to upstream tag b9965 (137 builds from b9828). Build-option surface
+  verified unchanged against the b9828..b9965 CMake source: root CMakeLists has
+  no option diff; ggml only bumped its version and added the OFF-by-default
+  GGML_ET backend (unused). All existing flags behave the same.
+- Split into backend subpackages using the existing GGML_BACKEND_DL layout, built
+  in one pass (-DGGML_VULKAN=ON -DGGML_HIP=ON):
+  * llama.cpp (base): binaries + core libs + the CPU backend (all x86-64
+    variants). No GPU dependency. Recommends %%{name}-vulkan so a default install
+    stays GPU-accelerated.
+  * llama.cpp-vulkan: the libggml-vulkan.so dlopen module (NEEDED: libvulkan);
+    Recommends mesa-vulkan-drivers.
+  * llama.cpp-rocm: the libggml-hip.so dlopen module built for
+    AMDGPU_TARGETS=gfx1030 (NEEDED: rocblas/hipblas/amdhip64).
+  The three modules coexist; ggml loads whichever are installed and enumerates
+  all their devices. Verified from the built artifacts that each backend module
+  NEEDs only its own GPU stack and the core/binaries carry no GPU linkage, so
+  RPM's soname-based dep generation isolates rocBLAS to -rocm and Vulkan to
+  -vulkan automatically.
+- Add the ROCm/HIP build toolchain to BuildRequires (rocm-hip-devel,
+  hipblas-devel, rocblas-devel, rocm-comgr-devel, rocm-cmake, clang, llvm). The
+  gfx1030 kernels compile ahead-of-time from the ISA string; no GPU is needed at
+  build time (proven in a GPU-less mock chroot).
+- NOTE: -rocm is build-verified only. Its gfx1030 target (RX 6900 XT) is bound to
+  vfio-pci on the build host, so runtime performance is not yet measured;
+  Vulkan-vs-ROCm benchmarking is deferred until the card is available to the host.
+
 * Sat Jun 27 2026 Hector Diaz <hdiazc@live.com> - 0^b9828-1
 - Rebase to upstream tag b9828 (284 commits from b9544). Pure version bump;
   build flags verified unchanged against the b9828 CMake source.
