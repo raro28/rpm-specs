@@ -8,20 +8,20 @@ Each subdirectory is one source package.
 
 | Spec | Current build | What it ships |
 |---|---|---|
-| colloid-gtk-theme | `20250731-5` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches |
-| fluent-gtk-theme-compact | `20250417-7` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches |
-| gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
-| llama.cpp | `0^b10068-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
-| looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
-| looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](looking-glass-kvmfr-kmod/README.md) |
-| mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
-| orchis-theme | `20260707-1` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches |
-| qogir-icon-theme | `20250215-3` | Icon theme ([vinceliuice/Qogir-icon-theme](https://github.com/vinceliuice/Qogir-icon-theme)) |
-| qogir-theme | `20250817-5` | GTK theme ([vinceliuice/Qogir-theme](https://github.com/vinceliuice/Qogir-theme)), GNOME 50 patches |
-| tela-circle-icon-theme | `20260707-1` | Icon theme ([vinceliuice/Tela-circle-icon-theme](https://github.com/vinceliuice/Tela-circle-icon-theme)) |
-| tela-icon-theme | `20260707-1` | Icon theme ([vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme)) |
-| whitesur-gtk-theme | `20260707-1` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 patches |
-| whitesur-icon-theme | `20260707-1` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)) |
+| themes/colloid-gtk-theme | `20250731-5` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches |
+| themes/fluent-gtk-theme (fluent-gtk-theme-compact) | `20250417-7` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches |
+| apps/gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
+| apps/llama.cpp | `0^b10068-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
+| apps/looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
+| kernel/looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](kernel/looking-glass-kvmfr-kmod/README.md) |
+| apps/mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
+| themes/orchis-theme | `20260707-1` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches |
+| icons/qogir-icon-theme | `20250215-3` | Icon theme ([vinceliuice/Qogir-icon-theme](https://github.com/vinceliuice/Qogir-icon-theme)) |
+| themes/qogir-theme | `20250817-5` | GTK theme ([vinceliuice/Qogir-theme](https://github.com/vinceliuice/Qogir-theme)), GNOME 50 patches |
+| icons/tela-circle-icon-theme | `20260707-1` | Icon theme ([vinceliuice/Tela-circle-icon-theme](https://github.com/vinceliuice/Tela-circle-icon-theme)) |
+| icons/tela-icon-theme | `20260707-1` | Icon theme ([vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme)) |
+| themes/whitesur-gtk-theme | `20260707-1` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 patches |
+| icons/whitesur-icon-theme | `20260707-1` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)) |
 
 ## Host setup (once)
 
@@ -45,7 +45,7 @@ No spec in this repo needs additional BuildRequires on the host — mock auto-in
 Same four steps for every spec. From the repo root:
 
 ```bash
-SPEC=<spec-dir>/<spec-name>.spec     # e.g. qogir-theme/qogir-theme.spec
+SPEC=<category>/<spec-dir>/<spec-name>.spec     # e.g. themes/qogir-theme/qogir-theme.spec
 
 # 1. (only if the spec has LOCAL source files) copy them into SOURCES
 #    See the per-spec table below — most have none.
@@ -72,16 +72,16 @@ sudo dnf install /var/lib/mock/fedora-44-x86_64/result/*.rpm
 
 `Source0` (GitHub tarball) only; canonical 4 steps, nothing to copy:
 
-- `gnome-shell-extension-per-monitor-wallpaper`
-- `mural`
-- `qogir-icon-theme`
-- `tela-circle-icon-theme`
-- `tela-icon-theme`
-- `whitesur-icon-theme`
+- `apps/gnome-shell-extension-per-monitor-wallpaper`
+- `apps/mural`
+- `icons/qogir-icon-theme`
+- `icons/tela-circle-icon-theme`
+- `icons/tela-icon-theme`
+- `icons/whitesur-icon-theme`
 
 ```bash
-spectool -g -R qogir-icon-theme/qogir-icon-theme.spec
-rpmbuild -bs qogir-icon-theme/qogir-icon-theme.spec
+spectool -g -R icons/qogir-icon-theme/qogir-icon-theme.spec
+rpmbuild -bs icons/qogir-icon-theme/qogir-icon-theme.spec
 mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-3.fc44.src.rpm
 ```
 
@@ -92,29 +92,29 @@ mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-3.fc44.src.r
 Standalone GTK4/libadwaita editor for the config the `gnome-shell-extension-per-monitor-wallpaper` reader paints from. Authored in TypeScript, built by CI into the release tarball (`Source0`, which also bundles the man page and `LICENSE`); the RPM compiles nothing and has no local sources. Carries a `%check` (`desktop-file-validate` + `appstreamcli validate`; `BuildRequires: desktop-file-utils appstream`, auto-installed in the chroot). Runtime `Requires`: `gjs`, `gtk4`, `libadwaita`, `glycin-libs`, `glycin-gtk4-libs`, `glycin-loaders`, `hicolor-icon-theme`.
 
 ```bash
-spectool -g -R mural/mural.spec
-rpmbuild -bs mural/mural.spec
+spectool -g -R apps/mural/mural.spec
+rpmbuild -bs apps/mural/mural.spec
 mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/mural-1.0.2-1.fc44.src.rpm
 ```
 
 ### vinceliuice GTK themes (GNOME 50 patches)
 
-`colloid-gtk-theme`, `fluent-gtk-theme-compact`, `orchis-theme`, `qogir-theme`, `whitesur-gtk-theme`. Each carries downstream GNOME 50 patches (local files, stage in `SOURCES/`) and a `%check` (GTK 4 CSS engine parse via `GtkCssProvider` + shell selector node-gate; `BuildRequires: gtk4 python3-gobject-base`, auto-installed in the chroot).
+`themes/colloid-gtk-theme`, `themes/fluent-gtk-theme` (fluent-gtk-theme-compact), `themes/orchis-theme`, `themes/qogir-theme`, `themes/whitesur-gtk-theme`. Each carries downstream GNOME 50 patches (local files, stage in `SOURCES/`) and a `%check` (GTK 4 CSS engine parse via `GtkCssProvider` + shell selector node-gate; `BuildRequires: gtk4 python3-gobject-base`, auto-installed in the chroot).
 
 | Spec | Patches |
 |---|---|
-| colloid-gtk-theme | gnome50-selectors, gnome50-appearance, fix-fsf-address |
-| fluent-gtk-theme-compact | gnome50-selectors, gnome50-appearance, fix-shell-bg-position |
-| orchis-theme | gnome50-selectors, gnome50-appearance, fix-gtk4-define-color, fix-shell-bg-position |
-| qogir-theme | gnome50-selectors, gnome50-appearance |
-| whitesur-gtk-theme | gnome50-selectors, gnome50-appearance, fix-fsf-address, fix-shell-bg-position |
+| themes/colloid-gtk-theme | gnome50-selectors, gnome50-appearance, fix-fsf-address |
+| themes/fluent-gtk-theme | gnome50-selectors, gnome50-appearance, fix-shell-bg-position |
+| themes/orchis-theme | gnome50-selectors, gnome50-appearance, fix-gtk4-define-color, fix-shell-bg-position |
+| themes/qogir-theme | gnome50-selectors, gnome50-appearance |
+| themes/whitesur-gtk-theme | gnome50-selectors, gnome50-appearance, fix-fsf-address, fix-shell-bg-position |
 
-Stage the patches with the glob, then build. Example (`qogir-theme`):
+Stage the patches with the glob, then build. Example (`themes/qogir-theme`):
 
 ```bash
-cp qogir-theme/*.patch ~/rpmbuild/SOURCES/
-spectool -g -R qogir-theme/qogir-theme.spec
-rpmbuild -bs qogir-theme/qogir-theme.spec
+cp themes/qogir-theme/*.patch ~/rpmbuild/SOURCES/
+spectool -g -R themes/qogir-theme/qogir-theme.spec
+rpmbuild -bs themes/qogir-theme/qogir-theme.spec
 mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-theme-20250817-5.fc44.src.rpm
 ```
 
@@ -139,8 +139,8 @@ One SRPM builds three coexisting binary RPMs off the `GGML_BACKEND_DL` module la
 ggml loads whichever backend modules are installed and enumerates all their devices; the backends coexist, and RPM's soname-based dep generation isolates each GPU stack to its own subpackage. The `-rocm` gfx target is a one-line `%global amdgpu_targets` macro.
 
 ```bash
-spectool -g -R llama.cpp/llama.cpp.spec
-rpmbuild -bs llama.cpp/llama.cpp.spec
+spectool -g -R apps/llama.cpp/llama.cpp.spec
+rpmbuild -bs apps/llama.cpp/llama.cpp.spec
 mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/llama.cpp-0\^b10068-1.fc44.src.rpm
 ```
 
@@ -155,19 +155,19 @@ Builds two installable RPMs: `looking-glass-client` and `looking-glass-client-se
 **Local sources** to stage before `spectool`:
 
 ```
-looking-glass-client/10-looking-glass-client.conf
-looking-glass-client/looking-glass-client.desktop
-looking-glass-client/looking-glass-client.te
-looking-glass-client/looking-glass-client.fc
+apps/looking-glass-client/10-looking-glass-client.conf
+apps/looking-glass-client/looking-glass-client.desktop
+apps/looking-glass-client/looking-glass-client.te
+apps/looking-glass-client/looking-glass-client.fc
 ```
 
 **Upstream tarball gotcha**: GitHub's tag-archive of `gnif/LookingGlass` does not recurse into git submodules. The spec declares `Source10..15` for each submodule (LGMP, PureSpice, cimgui, imgui, nanosvg, wayland-protocols) pinned to its gitlink SHA. `spectool` fetches all of them.
 
 ```bash
-cp looking-glass-client/{10-looking-glass-client.conf,looking-glass-client.desktop,looking-glass-client.te,looking-glass-client.fc} \
+cp apps/looking-glass-client/{10-looking-glass-client.conf,looking-glass-client.desktop,looking-glass-client.te,looking-glass-client.fc} \
    ~/rpmbuild/SOURCES/
-spectool -g -R looking-glass-client/looking-glass-client.spec
-rpmbuild -bs looking-glass-client/looking-glass-client.spec
+spectool -g -R apps/looking-glass-client/looking-glass-client.spec
+rpmbuild -bs apps/looking-glass-client/looking-glass-client.spec
 mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-14.fc44.src.rpm
 ```
 
@@ -192,35 +192,35 @@ The `.ko` is **not** compiled at mock/COPR time — the akmods service rebuilds 
 **Local sources** to stage before `spectool`:
 
 ```
-looking-glass-kvmfr-kmod/kvmfr.conf
-looking-glass-kvmfr-kmod/99-kvmfr.rules
-looking-glass-kvmfr-kmod/kvmfr.te
-looking-glass-kvmfr-kmod/kvmfr.fc
-looking-glass-kvmfr-kmod/kvmfr-modules-load.conf
-looking-glass-kvmfr-kmod/0001-add-module-description.patch
+kernel/looking-glass-kvmfr-kmod/kvmfr.conf
+kernel/looking-glass-kvmfr-kmod/99-kvmfr.rules
+kernel/looking-glass-kvmfr-kmod/kvmfr.te
+kernel/looking-glass-kvmfr-kmod/kvmfr.fc
+kernel/looking-glass-kvmfr-kmod/kvmfr-modules-load.conf
+kernel/looking-glass-kvmfr-kmod/0001-add-module-description.patch
 ```
 
 ```bash
-cp looking-glass-kvmfr-kmod/{kvmfr.conf,99-kvmfr.rules,kvmfr.te,kvmfr.fc,kvmfr-modules-load.conf,0001-add-module-description.patch} \
+cp kernel/looking-glass-kvmfr-kmod/{kvmfr.conf,99-kvmfr.rules,kvmfr.te,kvmfr.fc,kvmfr-modules-load.conf,0001-add-module-description.patch} \
    ~/rpmbuild/SOURCES/
-spectool -g -R looking-glass-kvmfr-kmod/looking-glass-kvmfr-kmod.spec
-rpmbuild -bs looking-glass-kvmfr-kmod/looking-glass-kvmfr-kmod.spec
+spectool -g -R kernel/looking-glass-kvmfr-kmod/looking-glass-kvmfr-kmod.spec
+rpmbuild -bs kernel/looking-glass-kvmfr-kmod/looking-glass-kvmfr-kmod.spec
 mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-kvmfr-kmod-0.0.12-7.fc44.src.rpm
 ```
 
-After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (libvirt cgroup ACL + VM XML cutover) the package cannot do for you — see [looking-glass-kvmfr-kmod/README.md](looking-glass-kvmfr-kmod/README.md) for the full setup, verification, rollback, and SELinux details.
+After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (libvirt cgroup ACL + VM XML cutover) the package cannot do for you — see [kernel/looking-glass-kvmfr-kmod/README.md](kernel/looking-glass-kvmfr-kmod/README.md) for the full setup, verification, rollback, and SELinux details.
 
 ## Quick reference: which specs need local sources?
 
 | Spec | Local sources? | URL sources? |
 |---|---|---|
-| 4 vinceliuice icon themes | No | Source0 only |
-| gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
-| llama.cpp | No | Source0 + Source1 (web-UI bundle) |
-| mural | No | Source0 only |
-| 5 vinceliuice GTK themes | **Yes** — 2–4 patches | Source0 only |
-| looking-glass-client | **Yes** — 4 files | Source0 + 6 submodule URLs |
-| looking-glass-kvmfr-kmod | **Yes** — 5 files + 1 patch | Source0 only |
+| 4 vinceliuice icon themes (`icons/`) | No | Source0 only |
+| apps/gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
+| apps/llama.cpp | No | Source0 + Source1 (web-UI bundle) |
+| apps/mural | No | Source0 only |
+| 5 vinceliuice GTK themes (`themes/`) | **Yes** — 2–4 patches | Source0 only |
+| apps/looking-glass-client | **Yes** — 4 files | Source0 + 6 submodule URLs |
+| kernel/looking-glass-kvmfr-kmod | **Yes** — 5 files + 1 patch | Source0 only |
 
 When sources drift between the spec directory and `~/rpmbuild/SOURCES/`, the build silently uses the stale copies. Re-copying before `rpmbuild -bs` is cheap insurance.
 
@@ -231,7 +231,7 @@ bundled config:
 
 ```bash
 sudo dnf install rpmlint        # once
-rpmlint -c rpmlint.toml */*.spec
+rpmlint -c rpmlint.toml */*/*.spec
 # expect: 0 errors, 0 warnings, 0 badness
 ```
 
@@ -251,7 +251,7 @@ The GTK-theme `%check` parses the compiled `gtk-4.0` CSS through the real GTK 4
 engine (`GtkCssProvider`) and asserts the GNOME 50 selectors compiled into
 `gnome-shell.css`. Every other warning class is fixed in the specs
 (`%setup -q`/`%autosetup`, an explicit `%build`, `%%`-escaped `%changelog`
-macros), so a plain `rpmlint */*.spec` only surfaces the filtered
+macros), so a plain `rpmlint */*/*.spec` only surfaces the filtered
 `no-%check-section` (6 specs).
 
 ## COPR
@@ -264,11 +264,18 @@ The `raro28/wdm` COPR builds these from SRPMs uploaded via `copr-cli`, or via th
 .
 ├── README.md                              # this file
 ├── rpmlint.toml                           # repo-local rpmlint filter (see Linting)
-├── <spec-dir>/
-│   ├── <spec-name>.spec
-│   ├── README.md                          # only where extra runtime/cutover docs apply
-│   └── [local source files referenced as SourceN]
+├── themes/                                # GTK themes (colloid, fluent, orchis, qogir, whitesur)
+│   └── <spec-dir>/
+├── icons/                                 # icon themes (qogir, tela, tela-circle, whitesur)
+│   └── <spec-dir>/
+├── apps/                                  # standalone apps (mural, per-monitor-wallpaper,
+│   └── <spec-dir>/                        # looking-glass-client, llama.cpp)
+├── kernel/                                # kernel modules (looking-glass-kvmfr-kmod)
+│   └── <spec-dir>/
+│       ├── <spec-name>.spec
+│       ├── README.md                      # only where extra runtime/cutover docs apply
+│       └── [local source files referenced as SourceN]
 └── ...
 ```
 
-Each subdirectory is self-contained: the spec plus the local source files it references.
+Each spec directory (`<category>/<spec-dir>/`) is self-contained: the spec plus the local source files it references.
