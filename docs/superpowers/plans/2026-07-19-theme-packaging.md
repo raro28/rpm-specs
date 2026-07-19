@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Convert 9 vinceliuice theme/icon source packages into 35 colour/size
+**Goal:** Convert 9 vinceliuice theme/icon source packages into 35 color/size
 variant subpackages, standardize three package names, and group the repo by
 category.
 
@@ -40,7 +40,7 @@ variant is pointless. Per-source counts:
 ## Global Constraints
 
 - Target is Fedora 44, GNOME 50.2, GTK 4.22. Build in a clean chroot only.
-- Colours are exactly **blue, red, grey**. Upstream spells blue `default` in
+- Colors are exactly **blue, red, grey**. Upstream spells blue `default` in
   Colloid, Fluent, Orchis, Qogir and WhiteSur-icon; the subpackage is still
   named `-blue`. Qogir has no accent axis and ships its default as one package.
 - **Never ship `-hdpi`/`-xhdpi`.** They contain only `xfwm4/` — no `gtk-4.0`, no
@@ -97,7 +97,7 @@ README.md                     paths + tables (Tasks 1 and 11)
 ```
 
 Each spec is self-contained: one `install.sh` call, one `%install` cleanup
-block, one `%check`, one `%package`/`%files` pair per colour-size combination.
+block, one `%check`, one `%package`/`%files` pair per color-size combination.
 
 ---
 
@@ -240,9 +240,9 @@ BuildRequires:  python3-gobject-base
 
 %description
 Fluent is a Fluent design theme for GNOME/GTK based desktop environments.
-This package ships the license only; install a colour package for the theme.
+This package ships the license only; install a color package for the theme.
 
-# Upstream spells the blue accent "default"; packages are named for the colour.
+# Upstream spells the blue accent "default"; packages are named for the color.
 %package blue
 Summary:        Fluent GTK theme, blue accent
 %description blue
@@ -374,8 +374,8 @@ echo "strip gate: OK"
   source package. Fedora expresses variants as subpackages
   (numix-icon-theme-circle, papirus-icon-theme-dark), never as separate source
   packages. Clean break, no Obsoletes/Provides.
-- Split into colour/size packages (blue, red, grey x standard, compact). Blue is
-  upstream's "default" accent; the package is named for the colour.
+- Split into color/size packages (blue, red, grey x standard, compact). Blue is
+  upstream's "default" accent; the package is named for the color.
 - Drop -l/--libadwaita. Verified byte-identical buildroots with and without it:
   it only writes $HOME/.config/gtk-4.0 and adds no files to the RPM. The
   20250417-3 changelog claim that it enabled GTK4/libadwaita theming was wrong
@@ -414,7 +414,7 @@ rtk proxy ls -1 $R | rtk proxy grep 'noarch.rpm'
 rpm -qlp $R/fluent-gtk-theme-blue-20250417-9.fc44.noarch.rpm | \
   rtk proxy grep -oE '/themes/[^/]+/[^/]+$' | sed 's|.*/||' | sort -u
 ```
-Expected: 7 noarch RPMs (1 main + 6 colour/size). Second command lists exactly
+Expected: 7 noarch RPMs (1 main + 6 color/size). Second command lists exactly
 `gnome-shell`, `gtk-2.0`, `gtk-3.0`, `gtk-4.0`, `index.theme`, `metacity-1`.
 
 - [ ] **Step 6: Run both lint gates**
@@ -439,14 +439,14 @@ Expected: `fluent-gtk-theme-compact` absent from the list.
 ```bash
 cd /home/ekthor/Projects/rpm-specs
 git add rpmlint.toml themes/fluent-gtk-theme/
-git commit -m "fluent-gtk-theme: rename from -compact, split into colour/size packages
+git commit -m "fluent-gtk-theme: rename from -compact, split into color/size packages
 
 'compact' was a size variant promoted to a source package name, and the
 directory disagreed with Name:. Fedora ships variants as subpackages
 (numix-icon-theme-circle, papirus-icon-theme-dark). Clean break, no
 Obsoletes/Provides; the old COPR package is deleted.
 
-6 colour/size packages (blue, red, grey x standard, compact), main package
+6 color/size packages (blue, red, grey x standard, compact), main package
 ships %license only. Drops -l (verified no-op) and strips non-GNOME payload.
 
 Verified: mock exit 0, 36 CSS files 0 errors, node-gate and strip gate OK,
@@ -493,9 +493,9 @@ mock -r fedora-44-x86_64 --rebuild ~/rpmbuild/SRPMS/colloid-gtk-theme-20250731-6
 rtk proxy grep 'dpi gate' /var/lib/mock/fedora-44-x86_64/result/build.log
 ```
 Expected: build FAILS with `dpi gate FAIL: 18 hdpi dir(s) remain` (the current
-spec ships one colour, producing 18 DPI dirs).
+spec ships one color, producing 18 DPI dirs).
 
-- [ ] **Step 2: Rewrite `%install` to constrain colours and delete DPI/foreign payload**
+- [ ] **Step 2: Rewrite `%install` to constrain colors and delete DPI/foreign payload**
 
 Replace the `%install` body with:
 
@@ -602,8 +602,8 @@ Add the changelog entry:
 
 ```spec
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250731-7
-- Split into colour/size packages (blue, red, grey x standard, compact). Blue is
-  upstream's "default" accent; packages are named for the colour.
+- Split into color/size packages (blue, red, grey x standard, compact). Blue is
+  upstream's "default" accent; packages are named for the color.
 - Drop -hdpi/-xhdpi: those directories hold only xfwm4 assets (no gtk-4.0, no
   gnome-shell, no index.theme) and are unusable on GNOME. Gated in %%check.
 - Strip cinnamon/xfwm4/plank/unity; keep gtk-2.0 and metacity-1.
@@ -636,7 +636,7 @@ Expected: both `0 errors, 0 warnings`.
 ```bash
 cd /home/ekthor/Projects/rpm-specs
 git add themes/colloid-gtk-theme/
-git commit -m "colloid-gtk-theme: split into colour/size packages, drop DPI variants
+git commit -m "colloid-gtk-theme: split into color/size packages, drop DPI variants
 
 6 packages (blue, red, grey x standard, compact). -hdpi/-xhdpi are deleted in
 %install: they contain only xfwm4 assets and are unusable on GNOME. A %check
@@ -781,7 +781,7 @@ Add the changelog entry:
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-3
 - Rename to orchis-gtk-theme: -gtk-theme is the Fedora plurality for GTK themes
   and makes this repo internally consistent. Clean break, no Obsoletes/Provides.
-- Split into colour/size packages (blue, red, grey x standard, compact).
+- Split into color/size packages (blue, red, grey x standard, compact).
 - Drop -hdpi/-xhdpi (xfwm4-only, unusable on GNOME); gated in %%check.
 - Strip cinnamon/xfwm4/plank/unity; keep gtk-2.0 and metacity-1.
 - Drop -l/--libadwaita: verified byte-identical buildroot without it.
@@ -808,12 +808,12 @@ rpmlint -c rpmlint.toml */*/*.spec 2>&1 | tail -2
 rpmlint -c rpmlint.toml /var/lib/mock/fedora-44-x86_64/result/*.noarch.rpm 2>&1 | tail -2
 copr-cli delete-package wdm --name orchis-theme
 git add -A themes/orchis-gtk-theme
-git commit -m "orchis-gtk-theme: rename from orchis-theme, split into colour/size packages
+git commit -m "orchis-gtk-theme: rename from orchis-theme, split into color/size packages
 
 -gtk-theme is the Fedora plurality for GTK themes and makes the repo
 internally consistent. Clean break; old COPR package deleted.
 
-6 colour/size packages, DPI variants dropped, non-GNOME payload stripped.
+6 color/size packages, DPI variants dropped, non-GNOME payload stripped.
 Verified: mock exit 0, all gates OK, both lint gates 0/0.
 
 Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
@@ -821,11 +821,11 @@ Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>"
 
 ---
 
-### Task 5: Rename qogir-theme to qogir-gtk-theme, one colour package
+### Task 5: Rename qogir-theme to qogir-gtk-theme, one color package
 
 Qogir has **no accent axis** — `-t` selects distro branding (`default`,
-`manjaro`, `ubuntu`), not colours. It therefore ships a single package with no
-colour suffix. This is the intended asymmetry, not an oversight.
+`manjaro`, `ubuntu`), not colors. It therefore ships a single package with no
+color suffix. This is the intended asymmetry, not an oversight.
 
 **Files:**
 - Move: `themes/qogir-theme/` → `themes/qogir-gtk-theme/`
@@ -846,7 +846,7 @@ Set `Name: qogir-gtk-theme`, `Release: 7%{?dist}`, and replace `%install`:
 ```spec
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-# -t selects distro branding, not accent colour, so only the default ships.
+# -t selects distro branding, not accent color, so only the default ships.
 # -l omitted: verified no-op for the buildroot.
 ./install.sh --dest %{buildroot}%{_datarootdir}/themes \
   --icon gnome --tweaks round -t default
@@ -887,8 +887,8 @@ Add the changelog entry:
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250817-7
 - Rename to qogir-gtk-theme: -gtk-theme is the Fedora plurality for GTK themes.
   Clean break, no Obsoletes/Provides.
-- No colour split: Qogir's -t selects distro branding (default|manjaro|ubuntu),
-  not accent colour, so only the default variant ships.
+- No color split: Qogir's -t selects distro branding (default|manjaro|ubuntu),
+  not accent color, so only the default variant ships.
 - Drop -hdpi/-xhdpi (xfwm4-only, unusable on GNOME); gated in %%check.
 - Strip cinnamon/xfwm4/plank/unity; keep gtk-2.0 and metacity-1.
 - Drop -l/--libadwaita: verified byte-identical buildroot without it.
@@ -912,7 +912,7 @@ git commit -m "qogir-gtk-theme: rename from qogir-theme, drop DPI variants
 
 -gtk-theme is the Fedora plurality. Clean break; old COPR package deleted.
 
-No colour split: Qogir's -t selects distro branding, not accent colour, so it
+No color split: Qogir's -t selects distro branding, not accent color, so it
 ships one package. DPI variants dropped, non-GNOME payload stripped.
 
 Verified: mock exit 0, all gates OK, both lint gates 0/0.
@@ -924,7 +924,7 @@ Expected: `mock exit=0`, all four gates OK, both lint gates `0 errors, 0 warning
 
 ---
 
-### Task 6: whitesur-gtk-theme — 6 subpackages across colour and opacity
+### Task 6: whitesur-gtk-theme — 6 subpackages across color and opacity
 
 WhiteSur has no size axis; its second axis is opacity (`normal`/`solid`), and it
 spells blue explicitly. It emits Light/Dark rather than a base triple.
@@ -1035,7 +1035,7 @@ Add the changelog entry:
 
 ```spec
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-3
-- Split into colour/opacity packages (blue, red, grey x normal, solid). WhiteSur
+- Split into color/opacity packages (blue, red, grey x normal, solid). WhiteSur
   has no size axis; its second axis is panel opacity.
 - Drop -hdpi/-xhdpi (xfwm4-only, unusable on GNOME); gated in %%check.
 - Strip cinnamon/xfwm4/plank/unity; keep gtk-2.0 and metacity-1.
@@ -1056,7 +1056,7 @@ rtk proxy grep -E 'GTK4 CSS parse|node-gate|strip gate|dpi gate' /var/lib/mock/f
 rpmlint -c rpmlint.toml */*/*.spec 2>&1 | tail -2
 rpmlint -c rpmlint.toml /var/lib/mock/fedora-44-x86_64/result/*.noarch.rpm 2>&1 | tail -2
 git add themes/whitesur-gtk-theme/
-git commit -m "whitesur-gtk-theme: split into colour/opacity packages
+git commit -m "whitesur-gtk-theme: split into color/opacity packages
 
 6 packages (blue, red, grey x normal, solid). WhiteSur has no size axis; its
 second axis is panel opacity. DPI variants dropped, non-GNOME payload stripped.
@@ -1071,7 +1071,7 @@ Expected: `mock exit=0`, all four gates OK, `7` noarch RPMs, both lint gates
 
 ---
 
-### Task 7: qogir-icon-theme — one colour package
+### Task 7: qogir-icon-theme — one color package
 
 Like the GTK theme, Qogir's icon `-t` is distro branding, so one package ships.
 Icon themes have no `gtk-4.0` CSS and no `gnome-shell.css`, so their `%check`
@@ -1087,7 +1087,7 @@ Set `Release: 5%{?dist}` and replace `%install`:
 ```spec
 %install
 mkdir -p %{buildroot}%{_datarootdir}/icons
-# -t selects distro branding, not accent colour, so only the default ships.
+# -t selects distro branding, not accent color, so only the default ships.
 ./install.sh --theme default --color all --dest "%{buildroot}%{_datarootdir}/icons"
 ```
 
@@ -1127,8 +1127,8 @@ Add the changelog entry:
 
 ```spec
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250215-5
-- No colour split: Qogir's -t selects distro branding (default|manjaro|ubuntu),
-  not accent colour, so only the default variant ships.
+- No color split: Qogir's -t selects distro branding (default|manjaro|ubuntu),
+  not accent color, so only the default variant ships.
 - Add a %%check: index.theme gate and a zero-dangling-symlink gate.
 ```
 
@@ -1145,7 +1145,7 @@ rpmlint -c rpmlint.toml */*/*.spec 2>&1 | tail -2
 git add icons/qogir-icon-theme/
 git commit -m "qogir-icon-theme: add %check, ship default branding only
 
-Qogir's -t selects distro branding, not accent colour, so no colour split
+Qogir's -t selects distro branding, not accent color, so no color split
 applies. Adds an index.theme gate and a zero-dangling-symlink gate.
 
 Verified: mock exit 0, both gates OK, spec lint 0/0.
@@ -1158,10 +1158,10 @@ Expected: `mock exit=0`, `index.theme gate: OK (3 themes)`,
 
 ---
 
-### Task 8: whitesur-icon-theme — 3 colour packages
+### Task 8: whitesur-icon-theme — 3 color packages
 
 Already carries `fix-dangling-symlinks.patch` and the two `%check` gates from
-the committed work; this task only constrains colours and splits packages.
+the committed work; this task only constrains colors and splits packages.
 
 **Files:**
 - Modify: `icons/whitesur-icon-theme/whitesur-icon-theme.spec`
@@ -1223,8 +1223,8 @@ Add the changelog entry:
 
 ```spec
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-4
-- Split into colour packages (blue, red, grey). Blue is upstream's "default"
-  accent; packages are named for the colour.
+- Split into color packages (blue, red, grey). Blue is upstream's "default"
+  accent; packages are named for the color.
 ```
 
 - [ ] **Step 4: Build, lint, commit**
@@ -1239,10 +1239,10 @@ echo "mock exit=$?"
 rtk proxy grep -E 'index.theme gate|dangling-symlink gate' /var/lib/mock/fedora-44-x86_64/result/build.log
 rpmlint -c rpmlint.toml */*/*.spec 2>&1 | tail -2
 git add icons/whitesur-icon-theme/
-git commit -m "whitesur-icon-theme: split into colour packages
+git commit -m "whitesur-icon-theme: split into color packages
 
-3 colour packages (blue, red, grey). Blue is upstream's 'default' accent;
-packages are named for the colour.
+3 color packages (blue, red, grey). Blue is upstream's 'default' accent;
+packages are named for the color.
 
 Verified: mock exit 0, index.theme and dangling-symlink gates OK, spec lint 0/0.
 
@@ -1254,9 +1254,9 @@ Expected: `mock exit=0`, `index.theme gate: OK (9 themes)`,
 
 ---
 
-### Task 9: tela-icon-theme — 3 colour packages
+### Task 9: tela-icon-theme — 3 color packages
 
-Tela takes colours as **positional arguments**, not flags. It has no `-t`.
+Tela takes colors as **positional arguments**, not flags. It has no `-t`.
 
 **Files:**
 - Modify: `icons/tela-icon-theme/tela-icon-theme.spec`
@@ -1266,7 +1266,7 @@ Tela takes colours as **positional arguments**, not flags. It has no `-t`.
 Set `Release: 4%{?dist}` and replace the `install.sh` line:
 
 ```spec
-# Tela takes colours as positional arguments; it has no -t flag.
+# Tela takes colors as positional arguments; it has no -t flag.
 ./install.sh -d "%{buildroot}%{_datarootdir}/icons" blue red grey
 ```
 
@@ -1318,7 +1318,7 @@ Add the changelog entry:
 
 ```spec
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-4
-- Split into colour packages (blue, red, grey). Tela takes colours as positional
+- Split into color packages (blue, red, grey). Tela takes colors as positional
   arguments, not flags.
 ```
 
@@ -1334,9 +1334,9 @@ echo "mock exit=$?"
 rtk proxy grep -E 'index.theme gate|dangling-symlink gate' /var/lib/mock/fedora-44-x86_64/result/build.log
 rpmlint -c rpmlint.toml */*/*.spec 2>&1 | tail -2
 git add icons/tela-icon-theme/
-git commit -m "tela-icon-theme: split into colour packages
+git commit -m "tela-icon-theme: split into color packages
 
-3 colour packages (blue, red, grey). Tela takes colours as positional
+3 color packages (blue, red, grey). Tela takes colors as positional
 arguments, not flags.
 
 Verified: mock exit 0, index.theme and dangling-symlink gates OK, spec lint 0/0.
@@ -1349,11 +1349,11 @@ Expected: `mock exit=0`, `index.theme gate: OK (9 themes)`,
 
 ---
 
-### Task 10: tela-circle-icon-theme — 3 colour packages
+### Task 10: tela-circle-icon-theme — 3 color packages
 
 Tela-circle's `-c` means **circular folder version and takes no argument**; the
-colour that follows it is positional. The current spec's `-c standard` therefore
-means "circular, colour standard", not "colour=standard".
+color that follows it is positional. The current spec's `-c standard` therefore
+means "circular, color standard", not "color=standard".
 
 **Files:**
 - Modify: `icons/tela-circle-icon-theme/tela-circle-icon-theme.spec`
@@ -1363,7 +1363,7 @@ means "circular, colour standard", not "colour=standard".
 Set `Release: 4%{?dist}` and replace the `install.sh` line:
 
 ```spec
-# -c enables the circular folder version and takes no argument; the colours
+# -c enables the circular folder version and takes no argument; the colors
 # that follow are positional.
 ./install.sh -d "%{buildroot}%{_datarootdir}/icons" -c blue red grey
 ```
@@ -1416,9 +1416,9 @@ Add the changelog entry:
 
 ```spec
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-4
-- Split into colour packages (blue, red, grey). Note -c enables the circular
-  folder version and takes no argument; colours are positional, so the previous
-  "-c standard" meant "circular, colour standard".
+- Split into color packages (blue, red, grey). Note -c enables the circular
+  folder version and takes no argument; colors are positional, so the previous
+  "-c standard" meant "circular, color standard".
 ```
 
 - [ ] **Step 4: Build, lint, commit**
@@ -1433,11 +1433,11 @@ echo "mock exit=$?"
 rtk proxy grep -E 'index.theme gate|dangling-symlink gate' /var/lib/mock/fedora-44-x86_64/result/build.log
 rpmlint -c rpmlint.toml */*/*.spec 2>&1 | tail -2
 git add icons/tela-circle-icon-theme/
-git commit -m "tela-circle-icon-theme: split into colour packages
+git commit -m "tela-circle-icon-theme: split into color packages
 
-3 colour packages (blue, red, grey). -c enables circular folders and takes no
-argument; colours are positional, so the previous '-c standard' meant
-'circular, colour standard'.
+3 color packages (blue, red, grey). -c enables circular folders and takes no
+argument; colors are positional, so the previous '-c standard' meant
+'circular, color standard'.
 
 Verified: mock exit 0, index.theme and dangling-symlink gates OK, spec lint 0/0.
 
@@ -1458,7 +1458,7 @@ Expected: `mock exit=0`, `index.theme gate: OK (9 themes)`,
 - [ ] **Step 1: Update the specs table**
 
 For each of the 9 theme/icon rows, set the new `Version-Release` and describe
-what it now ships — the colour packages by name, not "a theme". Rename the three
+what it now ships — the color packages by name, not "a theme". Rename the three
 renamed rows. Confirm the current values first:
 
 ```bash
@@ -1505,10 +1505,10 @@ Expected: 14 specs; lint `0 errors, 0 warnings`; the COPR list contains
 ```bash
 cd /home/ekthor/Projects/rpm-specs
 git add README.md docs/
-git commit -m "README: sync with category layout and colour packages
+git commit -m "README: sync with category layout and color packages
 
 Paths move to <category>/<pkg>/<pkg>.spec and the lint gate becomes
-*/*/*.spec. Specs table records the new Version-Release and the colour
+*/*/*.spec. Specs table records the new Version-Release and the color
 packages each source now produces. Notes that patches must be staged one spec
 at a time because basenames collide.
 

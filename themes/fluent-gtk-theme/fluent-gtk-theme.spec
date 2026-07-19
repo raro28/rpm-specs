@@ -26,9 +26,9 @@ BuildRequires:  python3-gobject-base
 
 %description
 Fluent is a Fluent design theme for GNOME/GTK based desktop environments.
-This package ships the license only; install a colour package for the theme.
+This package ships the license only; install a color package for the theme.
 
-# Upstream spells the blue accent "default"; packages are named for the colour.
+# Upstream spells the blue accent "default"; packages are named for the color.
 %package blue
 Summary:        Fluent GTK theme, blue accent
 %description blue
@@ -160,8 +160,8 @@ echo "strip gate: OK"
   source package. Fedora expresses variants as subpackages
   (numix-icon-theme-circle, papirus-icon-theme-dark), never as separate source
   packages. Clean break, no Obsoletes/Provides.
-- Split into colour/size packages (blue, red, grey x standard, compact). Blue is
-  upstream's "default" accent; the package is named for the colour.
+- Split into color/size packages (blue, red, grey x standard, compact). Blue is
+  upstream's "default" accent; the package is named for the color.
 - Drop -l/--libadwaita. Verified byte-identical buildroots with and without it:
   it only writes $HOME/.config/gtk-4.0 and adds no files to the RPM. The
   20250417-3 changelog claim that it enabled GTK4/libadwaita theming was wrong
