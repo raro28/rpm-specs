@@ -45,6 +45,12 @@
 # the license. rpmlint's documentation check doesn't accept %license as
 # satisfying it. Scoped to the vinceliuice theme family.
 #
+# dangling-relative-symlink (whitesur-icon-theme, the -light/-dark variants):
+# same false positive as qogir-icon below. All 30 flagged links were resolved on
+# disk from the reassembled package tree -- every one resolves; find -xtype l over
+# the same tree reports 0 broken. The %check gate independently asserts 0 dangling
+# symlinks in the buildroot, so a genuine break would still fail the build.
+#
 # dangling-relative-symlink (qogir-icon-theme, Qogir-Light/Qogir-Dark): false
 # positive. install.sh aliases whole subdirectories via directory symlinks (e.g.
 # Qogir-Light/16/actions -> ../../Qogir/16/actions), and real files in sibling
@@ -61,4 +67,5 @@ Filters = [
     "llama\\.cpp-(vulkan|rocm).*no-documentation",
     "(colloid|fluent|orchis|qogir|whitesur)-(gtk|icon)-theme.*no-documentation",
     "qogir-icon-theme.*dangling-relative-symlink /usr/share/icons/Qogir-(Light|Dark)/",
+    "whitesur-icon-theme.*dangling-relative-symlink /usr/share/icons/WhiteSur-(red-|grey-)?(light|dark)/",
 ]

@@ -1,6 +1,6 @@
 Name:           whitesur-icon-theme
 Version:        20260707
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A macOS BigSur-like icon theme for Linux desktops
 BuildArch:      noarch
 
@@ -17,6 +17,21 @@ BuildRequires:  gtk-update-icon-cache
 %description
 A macOS BigSur-like icon theme for Linux desktops.
 
+%package blue
+Summary:        WhiteSur icon theme, blue accent
+%description blue
+Blue accent. Ships light, dark and auto variants.
+
+%package red
+Summary:        WhiteSur icon theme, red accent
+%description red
+Red accent. Ships light, dark and auto variants.
+
+%package grey
+Summary:        WhiteSur icon theme, grey accent
+%description grey
+Grey accent. Ships light, dark and auto variants.
+
 %prep
 %autosetup -p1 -n %{dname}-%{dversion}
 
@@ -25,7 +40,8 @@ A macOS BigSur-like icon theme for Linux desktops.
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/icons
-./install.sh --theme default --alternative --dest "%{buildroot}%{_datarootdir}/icons"
+./install.sh --theme default --theme red --theme grey \
+  --alternative --dest "%{buildroot}%{_datarootdir}/icons"
 
 %check
 # Every installed theme must carry an index.theme.
@@ -46,9 +62,31 @@ dangling=$(find %{buildroot}%{_datadir}/icons -xtype l | wc -l)
 echo "dangling-symlink gate: OK (0 across $n themes)"
 
 %files
-%{_datarootdir}/icons/*
+%license COPYING
+
+%files blue
+%license COPYING
+%{_datarootdir}/icons/WhiteSur
+%{_datarootdir}/icons/WhiteSur-light
+%{_datarootdir}/icons/WhiteSur-dark
+
+%files red
+%license COPYING
+%{_datarootdir}/icons/WhiteSur-red
+%{_datarootdir}/icons/WhiteSur-red-light
+%{_datarootdir}/icons/WhiteSur-red-dark
+
+%files grey
+%license COPYING
+%{_datarootdir}/icons/WhiteSur-grey
+%{_datarootdir}/icons/WhiteSur-grey-light
+%{_datarootdir}/icons/WhiteSur-grey-dark
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-4
+- Split into color packages (blue, red, grey). Blue is upstream's "default"
+  accent; packages are named for the color.
+
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-3
 - Own only the installed theme directories, not %%{_datarootdir}/icons itself:
   that directory belongs to the filesystem package, and co-owning it is the
