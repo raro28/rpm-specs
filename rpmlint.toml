@@ -37,7 +37,7 @@
 # package, where README/LICENSE live. No own docs by design. Scoped to those two.
 #
 # no-documentation (colloid|fluent|orchis|qogir|whitesur -gtk|icon-theme): theme
-# colour/size subpackages ship %license only, by design -- no README/docs beyond
+# color/size subpackages ship %license only, by design -- no README/docs beyond
 # the license. rpmlint's documentation check doesn't accept %license as
 # satisfying it. Scoped to the vinceliuice theme family.
 Filters = [
