@@ -1,4 +1,4 @@
-%global build_num       9965
+%global build_num       10068
 %global upstream_tag    b%{build_num}
 # AMD GPU ISA target(s) for the ROCm/HIP backend. gfx1030 = RDNA2 (RX 6800/6900
 # XT); Fedora's rocBLAS ships Tensile kernels for it. Add space-separated targets
@@ -99,13 +99,14 @@ tar xf %{SOURCE1} --strip-components=1 -C tools/ui/dist
 %cmake \
     -DGGML_VULKAN=ON \
     -DGGML_HIP=ON \
-    -DAMDGPU_TARGETS=%{amdgpu_targets} \
+    -DGPU_TARGETS=%{amdgpu_targets} \
     -DGGML_NATIVE=OFF \
     -DGGML_LTO=ON \
     -DGGML_BACKEND_DL=ON \
     -DGGML_CPU_ALL_VARIANTS=ON \
     -DLLAMA_BUILD_TESTS=OFF \
     -DLLAMA_BUILD_SERVER=ON \
+    -DLLAMA_BUILD_UI=ON \
     -DLLAMA_USE_PREBUILT_UI=ON \
     -DLLAMA_BUILD_NUMBER=%{build_num} \
     -DLLAMA_CURL=ON \
@@ -155,6 +156,26 @@ ls %{buildroot}%{_bindir}/libggml-cpu-*.so >/dev/null
 %{_bindir}/libggml-hip.so
 
 %changelog
+* Sat Jul 18 2026 Hector Diaz <hdiazc@live.com> - 0^b10068-1
+- Rebase to upstream tag b10068 (103 commits from b9965). Pure version bump;
+  build-option surface verified unchanged against the b9965..b10068 CMake source:
+  root CMakeLists.txt has no diff at all, ggml/CMakeLists.txt only bumps
+  GGML_VERSION_MINOR 16->17, and scripts/ui-assets.cmake + tools/ui/CMakeLists.txt
+  are unchanged (UI staging path intact). Commit volume is concentrated in
+  backends we do not build (opencl, sycl, cuda, metal, hexagon).
+- Switch -DAMDGPU_TARGETS to -DGPU_TARGETS: upstream no longer declares an
+  option() for AMDGPU_TARGETS; it survives only as a back-compat forward in
+  ggml/src/ggml-hip/CMakeLists.txt (AMDGPU_TARGETS -> GPU_TARGETS ->
+  CMAKE_HIP_ARCHITECTURES). GPU_TARGETS is the canonical spelling; same gfx1030
+  result without depending on the shim.
+- Pin -DLLAMA_BUILD_UI=ON. LLAMA_USE_PREBUILT_UI is documented upstream as
+  "requires LLAMA_BUILD_UI=ON"; that prerequisite defaults ON but was unpinned,
+  leaving the embedded-UI path one default-flip away from the silent 404 server
+  regression fixed in 0^b9305-3. Both halves are now explicit.
+- New upstream Vulkan glslc capability probes (GL_EXT_float_e2m1 / _e4m3) are
+  auto-detected, not user options: unsupported glslc simply leaves the defines
+  unset. No spec change needed.
+
 * Sat Jul 11 2026 Hector Diaz <hdiazc@live.com> - 0^b9965-1
 - Rebase to upstream tag b9965 (137 builds from b9828). Build-option surface
   verified unchanged against the b9828..b9965 CMake source: root CMakeLists has
