@@ -1,0 +1,44 @@
+--- a/install.sh
++++ b/install.sh
+@@ -63,6 +63,10 @@
+     mkdir -p                                                                                 "${THEME_DIR}"/status
+     cp -r "${SRC_DIR}"/src/{actions,animations,apps,categories,devices,emotes,emblems,mimes,places,preferences} "${THEME_DIR}"
+     cp -r "${SRC_DIR}"/src/status/{16,22,24,32,symbolic}                                     "${THEME_DIR}"/status
++    # Downstream: src/status/22 ships no weather-clear-night.svg, yet
++    # links/status/22 holds 36 aliases pointing at it. Supply it from the 32px
++    # source so those aliases resolve instead of dangling.
++    cp -n "${SRC_DIR}"/src/status/32/weather-clear-night.svg                                "${THEME_DIR}"/status/22/
+ 
+     if [[ ${black:-} == 'true' ]]; then
+       sed -i "s/#f2f2f2/#363636/g" "${THEME_DIR}"/status/{16,22,24}/*
+@@ -90,12 +94,18 @@
+ 
+     rm -rf "${THEME_DIR}"/places/scalable/user-trash{'','-full'}-dark.svg
+ 
+-    cp -r "${SRC_DIR}"/links/{actions,apps,categories,devices,emotes,emblems,mimes,places,status,preferences} "${THEME_DIR}"
++    # Downstream: -n so an alias never overwrites the real icon it names
++    # (cp -r turns e.g. lm_studio.svg into a symlink pointing at itself).
++    cp -rn "${SRC_DIR}"/links/{actions,apps,categories,devices,emotes,emblems,mimes,places,status,preferences} "${THEME_DIR}"
+   fi
+ 
+   if [[ ${color} == '-light' ]]; then
+     mkdir -p                                                                                 "${THEME_DIR}"/status
+     cp -r ${SRC_DIR}/src/status/{16,22,24,32}                                                "${THEME_DIR}"/status
++    # Downstream: src/status/22 ships no weather-clear-night.svg, yet
++    # links/status/22 holds 36 aliases pointing at it. Supply it from the 32px
++    # source so those aliases resolve instead of dangling.
++    cp -n "${SRC_DIR}"/src/status/32/weather-clear-night.svg                                "${THEME_DIR}"/status/22/
+ 
+     if [[ ${bold:-} == 'true' ]]; then
+       cp -r "${SRC_DIR}"/bold/status/{16,22,24}                                              "${THEME_DIR}"/status
+@@ -103,7 +113,9 @@
+ 
+     # Change icon color for light theme
+     sed -i "s/#f2f2f2/#363636/g" "${THEME_DIR}"/status/{16,22,24,32}/*
+-    cp -r "${SRC_DIR}"/links/status/{16,22,24,32}                                            "${THEME_DIR}"/status
++    # Downstream: -n so an alias never overwrites the real icon it names
++    # (cp -r turns e.g. lm_studio.svg into a symlink pointing at itself).
++    cp -rn "${SRC_DIR}"/links/status/{16,22,24,32}                                            "${THEME_DIR}"/status
+ 
+     cd ${dest}
+     ln -s ../${name}${theme}/actions ${name}${theme}-light/actions
