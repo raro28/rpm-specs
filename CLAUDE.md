@@ -30,12 +30,12 @@ source package. See README.md for per-spec build details.
   `mock -r fedora-44-x86_64 <srpm>`. Output in `/var/lib/mock/fedora-44-x86_64/result/`.
 - Patch basenames collide across specs: five specs each ship `gnome50-selectors.patch`,
   three ship `fix-dangling-symlinks.patch`. `~/rpmbuild/SOURCES/` is flat, so
-  `cp */*.patch ~/rpmbuild/SOURCES/` silently overwrites and a spec builds against
+  `cp */*/*.patch ~/rpmbuild/SOURCES/` silently overwrites and a spec builds against
   another's patch — it fails as a bogus "hunk FAILED", not as a staging error.
   Stage and build **one spec at a time**.
 - mock reads `~/rpmbuild/SOURCES/` (the `spectool` step populates URL sources); stage
   local patches there first (`cp <dir>/*.patch ~/rpmbuild/SOURCES/`).
-- Lint gate: `rpmlint -c rpmlint.toml */*.spec` must report `0 errors, 0 warnings`
+- Lint gate: `rpmlint -c rpmlint.toml */*/*.spec` must report `0 errors, 0 warnings`
   before work is done.
 
 ## Spec conventions
