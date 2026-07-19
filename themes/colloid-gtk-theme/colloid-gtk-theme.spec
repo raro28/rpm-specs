@@ -1,6 +1,6 @@
 Name:           colloid-gtk-theme
 Version:        20250731
-Release:        6%{?dist}
+Release:        7%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -22,6 +22,38 @@ BuildRequires:  python3-gobject-base
 
 %description
 Theme for GNOME/GTK based desktop environments.
+This package ships the license only; install a color package for the theme.
+
+# Upstream spells the blue accent "default"; packages are named for the color.
+%package blue
+Summary:        Colloid GTK theme, blue accent
+%description blue
+Blue accent, standard size. Ships light, dark and auto variants.
+
+%package blue-compact
+Summary:        Colloid GTK theme, blue accent, compact
+%description blue-compact
+Blue accent, compact size. Ships light, dark and auto variants.
+
+%package red
+Summary:        Colloid GTK theme, red accent
+%description red
+Red accent, standard size. Ships light, dark and auto variants.
+
+%package red-compact
+Summary:        Colloid GTK theme, red accent, compact
+%description red-compact
+Red accent, compact size. Ships light, dark and auto variants.
+
+%package grey
+Summary:        Colloid GTK theme, grey accent
+%description grey
+Grey accent, standard size. Ships light, dark and auto variants.
+
+%package grey-compact
+Summary:        Colloid GTK theme, grey accent, compact
+%description grey-compact
+Grey accent, compact size. Ships light, dark and auto variants.
 
 %prep
 %autosetup -p1 -n %{dname}-%{dversion}
@@ -31,7 +63,23 @@ Theme for GNOME/GTK based desktop environments.
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh -t grey --libadwaita --dest %{buildroot}%{_datarootdir}/themes
+# -s takes one value per call and defaults to standard, so run it twice.
+# -l omitted: verified no-op for the buildroot (note: -l fixed is NOT a no-op,
+# but is not used here).
+./install.sh --dest %{buildroot}%{_datarootdir}/themes \
+  -t default -t red -t grey -s standard
+./install.sh --dest %{buildroot}%{_datarootdir}/themes \
+  -t default -t red -t grey -s compact
+# -hdpi/-xhdpi contain only xfwm4 assets: no gtk-4.0, no gnome-shell, not even
+# an index.theme. They are unusable on GNOME.
+rm -rf %{buildroot}%{_datarootdir}/themes/*-hdpi
+rm -rf %{buildroot}%{_datarootdir}/themes/*-xhdpi
+find %{buildroot}%{_datarootdir}/themes -maxdepth 2 -type d \
+  \( -name cinnamon -o -name xfwm4 -o -name plank -o -name unity \) \
+  -exec rm -rf {} +
+# Unlike Fluent, install.sh here never drops a COPYING/LICENSE copy into theme
+# dirs (verified: no COPYING/LICENSE reference in install.sh), so there is no
+# in-tree duplicate to strip.
 
 %check
 # GTK 4.x build-time test: parse every installed gtk-4.0 stylesheet through the
@@ -66,11 +114,64 @@ for css in %{buildroot}%{_datadir}/themes/*/gnome-shell/gnome-shell.css; do
   grep -q 'message-list-clear-button' "$css" || { echo "node-gate FAIL: .message-list-clear-button missing in $css"; exit 1; }
 done
 echo "shell node-gate: OK"
+for d in cinnamon xfwm4 plank unity; do
+  found=$(find %{buildroot}%{_datadir}/themes -maxdepth 2 -type d -name "$d" | wc -l)
+  [ "$found" -eq 0 ] || { echo "strip FAIL: $found $d dirs remain"; exit 1; }
+done
+echo "strip gate: OK"
+hdpi=$(find %{buildroot}%{_datadir}/themes -maxdepth 1 -type d \
+  \( -name '*-hdpi' -o -name '*-xhdpi' \) | wc -l)
+[ "$hdpi" -eq 0 ] || { echo "dpi gate FAIL: $hdpi hdpi dir(s) remain"; exit 1; }
+echo "dpi gate: OK"
 
 %files
-%{_datarootdir}/themes/*
+%license LICENSE
+
+%files blue
+%license LICENSE
+%{_datarootdir}/themes/Colloid
+%{_datarootdir}/themes/Colloid-Light
+%{_datarootdir}/themes/Colloid-Dark
+
+%files blue-compact
+%license LICENSE
+%{_datarootdir}/themes/Colloid-Compact
+%{_datarootdir}/themes/Colloid-Light-Compact
+%{_datarootdir}/themes/Colloid-Dark-Compact
+
+%files red
+%license LICENSE
+%{_datarootdir}/themes/Colloid-Red
+%{_datarootdir}/themes/Colloid-Red-Light
+%{_datarootdir}/themes/Colloid-Red-Dark
+
+%files red-compact
+%license LICENSE
+%{_datarootdir}/themes/Colloid-Red-Compact
+%{_datarootdir}/themes/Colloid-Red-Light-Compact
+%{_datarootdir}/themes/Colloid-Red-Dark-Compact
+
+%files grey
+%license LICENSE
+%{_datarootdir}/themes/Colloid-Grey
+%{_datarootdir}/themes/Colloid-Grey-Light
+%{_datarootdir}/themes/Colloid-Grey-Dark
+
+%files grey-compact
+%license LICENSE
+%{_datarootdir}/themes/Colloid-Grey-Compact
+%{_datarootdir}/themes/Colloid-Grey-Light-Compact
+%{_datarootdir}/themes/Colloid-Grey-Dark-Compact
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250731-7
+- Split into color/size packages (blue, red, grey x standard, compact). Blue is
+  upstream's "default" accent; packages are named for the color.
+- Drop -hdpi/-xhdpi: those directories hold only xfwm4 assets (no gtk-4.0, no
+  gnome-shell, no index.theme) and are unusable on GNOME. Gated in %%check.
+- Strip cinnamon/xfwm4/plank/unity; keep gtk-2.0 and metacity-1.
+- Drop -l/--libadwaita: verified byte-identical buildroot without it.
+
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250731-6
 - Own only the installed theme directories, not %%{_datarootdir}/themes itself:
   that directory belongs to the filesystem package, and co-owning it is the
