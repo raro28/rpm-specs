@@ -44,6 +44,14 @@
 # color/size subpackages ship %license only, by design -- no README/docs beyond
 # the license. rpmlint's documentation check doesn't accept %license as
 # satisfying it. Scoped to the vinceliuice theme family.
+#
+# dangling-relative-symlink (qogir-icon-theme, Qogir-Light/Qogir-Dark): false
+# positive. install.sh aliases whole subdirectories via directory symlinks (e.g.
+# Qogir-Light/16/actions -> ../../Qogir/16/actions), and real files in sibling
+# dirs (panel/) reference them with one relative hop (../actions/foo.svg).
+# rpmlint's checker doesn't resolve through the intermediate directory symlink;
+# every flagged path was verified to resolve (readlink -f + test -e) against the
+# extracted built RPM. Scoped to qogir-icon-theme's Light/Dark aliasing only.
 Filters = [
     "no-%check-section",
     "spelling-error.*'(json|ekthor|cli|ggml|libggml|vulkan|rocm|rocBLAS|hipBLAS|Radeon|nana|materia)'",
@@ -52,4 +60,5 @@ Filters = [
     "no-manual-page-for-binary (llama|libggml-)",
     "llama\\.cpp-(vulkan|rocm).*no-documentation",
     "(colloid|fluent|orchis|qogir|whitesur)-(gtk|icon)-theme.*no-documentation",
+    "qogir-icon-theme.*dangling-relative-symlink /usr/share/icons/Qogir-(Light|Dark)/",
 ]

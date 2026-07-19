@@ -1,6 +1,6 @@
 Name:           qogir-icon-theme
 Version:        20250215
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A flat colorful design icon theme for linux desktops
 BuildArch:      noarch
 
@@ -24,12 +24,42 @@ A flat colorful design icon theme for linux desktops
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/icons
-./install.sh --theme default --dest "%{buildroot}%{_datarootdir}/icons"
+# -t selects distro branding, not accent color, so only the default ships.
+./install.sh --theme default --color all --dest "%{buildroot}%{_datarootdir}/icons"
+# install.sh copies COPYING into every theme dir; %%license COPYING already
+# ships it once, so drop the per-theme copies (files-duplicated-waste).
+find %{buildroot}%{_datarootdir}/icons -name COPYING -delete
+
+%check
+n=0
+for d in %{buildroot}%{_datadir}/icons/*/; do
+  n=$((n+1))
+  [ -f "$d/index.theme" ] || { echo "FAIL: no index.theme in $d"; exit 1; }
+done
+[ "$n" -gt 0 ] || { echo "FAIL: no icon themes installed"; exit 1; }
+echo "index.theme gate: OK ($n themes)"
+dangling=$(find %{buildroot}%{_datadir}/icons -xtype l | wc -l)
+[ "$dangling" -eq 0 ] || {
+  echo "FAIL: $dangling dangling symlink(s):"
+  find %{buildroot}%{_datadir}/icons -xtype l -printf '  %p -> %l\n' | head -20
+  exit 1
+}
+echo "dangling-symlink gate: OK (0 across $n themes)"
 
 %files
-%{_datarootdir}/icons/*
+%license COPYING
+%{_datarootdir}/icons/Qogir
+%{_datarootdir}/icons/Qogir-Light
+%{_datarootdir}/icons/Qogir-Dark
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250215-5
+- No color split: Qogir's -t selects distro branding (default|manjaro|ubuntu),
+  not accent color, so only the default variant ships.
+- Add a %%check: index.theme gate and a zero-dangling-symlink gate.
+- Drop per-theme COPYING copies install.sh creates in Qogir/Qogir-Light/
+  Qogir-Dark: %%license COPYING already ships it once (files-duplicated-waste).
+
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250215-4
 - Own only the installed theme directories, not %%{_datarootdir}/icons itself:
   that directory belongs to the filesystem package, and co-owning it is the
