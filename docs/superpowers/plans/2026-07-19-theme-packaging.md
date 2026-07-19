@@ -66,8 +66,10 @@ variant is pointless. Per-source counts:
   `$(grep ...)` substitution.
 - This shell is zsh: unquoted parameter expansion does not word-split, and an
   unmatched glob aborts the whole command.
-- Gate for every task: `mock` exit 0 **and**
-  `rpmlint -c rpmlint.toml */*.spec` reporting `0 errors, 0 warnings`.
+- Gate for every task: `mock` exit 0 **and** `rpmlint -c rpmlint.toml` over all
+  specs reporting `0 errors, 0 warnings`. The glob depth changes in Task 1:
+  before it, `*/*.spec`; from Task 1 onward, `*/*/*.spec`. Every task from 2
+  onward uses `*/*/*.spec`.
 - Working branch is `develop`. Commit per task.
 
 ---
