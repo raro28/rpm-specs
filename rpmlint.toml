@@ -23,6 +23,10 @@
 # name plus the backend/GPU technical terms in llama.cpp's %description(s)
 # (ggml, libggml, vulkan, rocm, rocBLAS, hipBLAS, Radeon). All correct spellings.
 #
+# spelling-error nana/materia: false positives -- orchis-gtk-theme's
+# %description credits the upstream projects it is based on (nana-4,
+# materia-theme). Proper nouns, not misspellings.
+#
 # invalid-soname (llama.cpp): upstream's unified-binary private impl libs
 # (libllama-*-impl.so) are runtime-NEEDED regular files that carry no SONAME, and
 # the launchers reach them with no RPATH, so they can't be versioned or relocated.
@@ -42,7 +46,7 @@
 # satisfying it. Scoped to the vinceliuice theme family.
 Filters = [
     "no-%check-section",
-    "spelling-error.*'(json|ekthor|cli|ggml|libggml|vulkan|rocm|rocBLAS|hipBLAS|Radeon)'",
+    "spelling-error.*'(json|ekthor|cli|ggml|libggml|vulkan|rocm|rocBLAS|hipBLAS|Radeon|nana|materia)'",
     "explicit-lib-dependency (libadwaita|glycin-libs|glycin-gtk4-libs)",
     "invalid-soname .*libllama-.*-impl\\.so",
     "no-manual-page-for-binary (llama|libggml-)",

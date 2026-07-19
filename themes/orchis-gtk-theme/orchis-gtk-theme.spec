@@ -1,6 +1,6 @@
-Name:           orchis-theme
+Name:           orchis-gtk-theme
 Version:        20260707
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -28,6 +28,38 @@ BuildRequires:  python3-gobject-base
 %description
 Orchis is a Material Design theme for GNOME/GTK based desktop environments.
 Based on nana-4 -- materia-theme
+This package ships the license only; install a color package for the theme.
+
+# Upstream spells the blue accent "default"; packages are named for the color.
+%package blue
+Summary:        Orchis GTK theme, blue accent
+%description blue
+Blue accent, standard size. Ships light, dark and auto variants.
+
+%package blue-compact
+Summary:        Orchis GTK theme, blue accent, compact
+%description blue-compact
+Blue accent, compact size. Ships light, dark and auto variants.
+
+%package red
+Summary:        Orchis GTK theme, red accent
+%description red
+Red accent, standard size. Ships light, dark and auto variants.
+
+%package red-compact
+Summary:        Orchis GTK theme, red accent, compact
+%description red-compact
+Red accent, compact size. Ships light, dark and auto variants.
+
+%package grey
+Summary:        Orchis GTK theme, grey accent
+%description grey
+Grey accent, standard size. Ships light, dark and auto variants.
+
+%package grey-compact
+Summary:        Orchis GTK theme, grey accent, compact
+%description grey-compact
+Grey accent, compact size. Ships light, dark and auto variants.
 
 %prep
 %autosetup -p1 -n %{dname}-%{dversion}
@@ -37,7 +69,15 @@ Based on nana-4 -- materia-theme
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh --icon gnome -t grey -c dark --libadwaita --dest %{buildroot}%{_datarootdir}/themes
+# One call emits both sizes. -l omitted: verified no-op for the buildroot.
+./install.sh --dest %{buildroot}%{_datarootdir}/themes \
+  --icon gnome -t default -t red -t grey
+rm -rf %{buildroot}%{_datarootdir}/themes/*-hdpi
+rm -rf %{buildroot}%{_datarootdir}/themes/*-xhdpi
+find %{buildroot}%{_datarootdir}/themes -maxdepth 2 -type d \
+  \( -name cinnamon -o -name xfwm4 -o -name plank -o -name unity \) \
+  -exec rm -rf {} +
+find %{buildroot}%{_datarootdir}/themes -name COPYING -delete
 
 %check
 # GTK 4.x build-time test: parse every installed gtk-4.0 stylesheet through the
@@ -72,11 +112,64 @@ for css in %{buildroot}%{_datadir}/themes/*/gnome-shell/gnome-shell.css; do
   grep -q 'message-list-clear-button' "$css" || { echo "node-gate FAIL: .message-list-clear-button missing in $css"; exit 1; }
 done
 echo "shell node-gate: OK"
+for d in cinnamon xfwm4 plank unity; do
+  found=$(find %{buildroot}%{_datadir}/themes -maxdepth 2 -type d -name "$d" | wc -l)
+  [ "$found" -eq 0 ] || { echo "strip FAIL: $found $d dirs remain"; exit 1; }
+done
+echo "strip gate: OK"
+hdpi=$(find %{buildroot}%{_datadir}/themes -maxdepth 1 -type d \
+  \( -name '*-hdpi' -o -name '*-xhdpi' \) | wc -l)
+[ "$hdpi" -eq 0 ] || { echo "dpi gate FAIL: $hdpi hdpi dir(s) remain"; exit 1; }
+echo "dpi gate: OK"
 
 %files
-%{_datarootdir}/themes/*
+%license COPYING
+
+%files blue
+%license COPYING
+%{_datarootdir}/themes/Orchis
+%{_datarootdir}/themes/Orchis-Light
+%{_datarootdir}/themes/Orchis-Dark
+
+%files blue-compact
+%license COPYING
+%{_datarootdir}/themes/Orchis-Compact
+%{_datarootdir}/themes/Orchis-Light-Compact
+%{_datarootdir}/themes/Orchis-Dark-Compact
+
+%files red
+%license COPYING
+%{_datarootdir}/themes/Orchis-Red
+%{_datarootdir}/themes/Orchis-Red-Light
+%{_datarootdir}/themes/Orchis-Red-Dark
+
+%files red-compact
+%license COPYING
+%{_datarootdir}/themes/Orchis-Red-Compact
+%{_datarootdir}/themes/Orchis-Red-Light-Compact
+%{_datarootdir}/themes/Orchis-Red-Dark-Compact
+
+%files grey
+%license COPYING
+%{_datarootdir}/themes/Orchis-Grey
+%{_datarootdir}/themes/Orchis-Grey-Light
+%{_datarootdir}/themes/Orchis-Grey-Dark
+
+%files grey-compact
+%license COPYING
+%{_datarootdir}/themes/Orchis-Grey-Compact
+%{_datarootdir}/themes/Orchis-Grey-Light-Compact
+%{_datarootdir}/themes/Orchis-Grey-Dark-Compact
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-3
+- Rename to orchis-gtk-theme: -gtk-theme is the Fedora plurality for GTK themes
+  and makes this repo internally consistent. Clean break, no Obsoletes/Provides.
+- Split into color/size packages (blue, red, grey x standard, compact).
+- Drop -hdpi/-xhdpi (xfwm4-only, unusable on GNOME); gated in %%check.
+- Strip cinnamon/xfwm4/plank/unity; keep gtk-2.0 and metacity-1.
+- Drop -l/--libadwaita: verified byte-identical buildroot without it.
+
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-2
 - Own only the installed theme directories, not %%{_datarootdir}/themes itself:
   that directory belongs to the filesystem package, and co-owning it is the
