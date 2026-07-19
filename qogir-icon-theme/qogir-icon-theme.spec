@@ -1,6 +1,6 @@
 Name:           qogir-icon-theme
 Version:        20250215
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A flat colorful design icon theme for linux desktops
 BuildArch:      noarch
 
@@ -27,9 +27,14 @@ mkdir -p %{buildroot}%{_datarootdir}/icons
 ./install.sh --theme default --dest "%{buildroot}%{_datarootdir}/icons"
 
 %files
-%{_datarootdir}/icons
+%{_datarootdir}/icons/*
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250215-4
+- Own only the installed theme directories, not %%{_datarootdir}/icons itself:
+  that directory belongs to the filesystem package, and co-owning it is the
+  standard-dir-owned-by-package defect.
+
 * Sat May 02 2026 Hector Diaz <hdiazc@live.com> - 20250215-3
 - Modernize: SPDX license tag (GPLv3+ → GPL-3.0-or-later)
 

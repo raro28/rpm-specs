@@ -1,6 +1,6 @@
 Name:           orchis-theme
 Version:        20260707
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -74,9 +74,14 @@ done
 echo "shell node-gate: OK"
 
 %files
-%{_datarootdir}/themes
+%{_datarootdir}/themes/*
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-2
+- Own only the installed theme directories, not %%{_datarootdir}/themes itself:
+  that directory belongs to the filesystem package, and co-owning it is the
+  standard-dir-owned-by-package defect.
+
 * Sat Jul 11 2026 Hector Diaz <hdiazc@live.com> - 20260707-1
 - Bump to upstream 2026-07-07. All four downstream patches still apply and remain
   necessary against the new source: upstream still tops out at widgets-48-0 (no

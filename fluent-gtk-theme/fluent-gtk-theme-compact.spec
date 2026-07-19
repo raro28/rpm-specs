@@ -1,6 +1,6 @@
 Name:           fluent-gtk-theme-compact
 Version:        20250417
-Release:        7%{?dist}
+Release:        8%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -72,9 +72,14 @@ done
 echo "shell node-gate: OK"
 
 %files
-%{_datarootdir}/themes
+%{_datarootdir}/themes/*
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250417-8
+- Own only the installed theme directories, not %%{_datarootdir}/themes itself:
+  that directory belongs to the filesystem package, and co-owning it is the
+  standard-dir-owned-by-package defect.
+
 * Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20250417-7
 - Patch2 (fix-shell-bg-position): the upstream #panelActivities rule sets
   "background-position: center center", a keyword St's CSS engine cannot parse —

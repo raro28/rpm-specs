@@ -1,6 +1,6 @@
 Name:           qogir-theme
 Version:        20250817
-Release:        5%{?dist}
+Release:        6%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -70,9 +70,14 @@ done
 echo "shell node-gate: OK"
 
 %files
-%{_datarootdir}/themes
+%{_datarootdir}/themes/*
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250817-6
+- Own only the installed theme directories, not %%{_datarootdir}/themes itself:
+  that directory belongs to the filesystem package, and co-owning it is the
+  standard-dir-owned-by-package defect.
+
 * Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20250817-5
 - Patch0 (gnome50-selectors): style the GNOME 50 login .a11y-button and
   notification .message-list-clear-button using the theme's own existing

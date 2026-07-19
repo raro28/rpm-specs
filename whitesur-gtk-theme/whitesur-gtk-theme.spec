@@ -6,7 +6,7 @@
 # downstream GNOME 50 login / notification patches below remain necessary.
 Name:           whitesur-gtk-theme
 Version:        20260707
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -88,9 +88,14 @@ done
 echo "shell node-gate: OK"
 
 %files
-%{_datarootdir}/themes
+%{_datarootdir}/themes/*
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-2
+- Own only the installed theme directories, not %%{_datarootdir}/themes itself:
+  that directory belongs to the filesystem package, and co-owning it is the
+  standard-dir-owned-by-package defect.
+
 * Sat Jul 11 2026 Hector Diaz <hdiazc@live.com> - 20260707-1
 - Switch from the pinned master commit (a83f467, 2026-05-25) to upstream tag
   2026-07-07 (12 commits newer; carries the same $GNOME_SHELL version-gating and
