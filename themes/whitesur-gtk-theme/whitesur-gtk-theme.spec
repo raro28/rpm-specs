@@ -6,7 +6,7 @@
 # downstream GNOME 50 login / notification patches below remain necessary.
 Name:           whitesur-gtk-theme
 Version:        20260707
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -42,6 +42,37 @@ BuildRequires:  python3-gobject-base
 
 %description
 A macOS like theme for Linux GTK Desktops
+This package ships the license only; install a color package for the theme.
+
+%package blue
+Summary:        WhiteSur GTK theme, blue accent
+%description blue
+Blue accent, translucent panel. Ships light and dark variants.
+
+%package blue-solid
+Summary:        WhiteSur GTK theme, blue accent, opaque
+%description blue-solid
+Blue accent, opaque panel. Ships light and dark variants.
+
+%package red
+Summary:        WhiteSur GTK theme, red accent
+%description red
+Red accent, translucent panel. Ships light and dark variants.
+
+%package red-solid
+Summary:        WhiteSur GTK theme, red accent, opaque
+%description red-solid
+Red accent, opaque panel. Ships light and dark variants.
+
+%package grey
+Summary:        WhiteSur GTK theme, grey accent
+%description grey
+Grey accent, translucent panel. Ships light and dark variants.
+
+%package grey-solid
+Summary:        WhiteSur GTK theme, grey accent, opaque
+%description grey-solid
+Grey accent, opaque panel. Ships light and dark variants.
 
 %prep
 %autosetup -p1 -n %{dname}-%{dversion}
@@ -51,7 +82,16 @@ A macOS like theme for Linux GTK Desktops
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh -t grey -N mojave -l --shell -i gnome --dest %{buildroot}%{_datarootdir}/themes
+# WhiteSur spells blue explicitly. -l omitted: verified no-op for the buildroot,
+# including alongside --shell.
+./install.sh -d %{buildroot}%{_datarootdir}/themes \
+  -t blue -t red -t grey -N mojave --shell -i gnome
+rm -rf %{buildroot}%{_datarootdir}/themes/*-hdpi
+rm -rf %{buildroot}%{_datarootdir}/themes/*-xhdpi
+find %{buildroot}%{_datarootdir}/themes -maxdepth 2 -type d \
+  \( -name cinnamon -o -name xfwm4 -o -name plank -o -name unity \) \
+  -exec rm -rf {} +
+find %{buildroot}%{_datarootdir}/themes -name COPYING -delete
 
 %check
 # GTK 4.x build-time test: parse every installed gtk-4.0 stylesheet through the
@@ -86,11 +126,58 @@ for css in %{buildroot}%{_datadir}/themes/*/gnome-shell/gnome-shell.css; do
   grep -q 'message-list-clear-button' "$css" || { echo "node-gate FAIL: .message-list-clear-button missing in $css"; exit 1; }
 done
 echo "shell node-gate: OK"
+for d in cinnamon xfwm4 plank unity; do
+  found=$(find %{buildroot}%{_datadir}/themes -maxdepth 2 -type d -name "$d" | wc -l)
+  [ "$found" -eq 0 ] || { echo "strip FAIL: $found $d dirs remain"; exit 1; }
+done
+echo "strip gate: OK"
+hdpi=$(find %{buildroot}%{_datadir}/themes -maxdepth 1 -type d \
+  \( -name '*-hdpi' -o -name '*-xhdpi' \) | wc -l)
+[ "$hdpi" -eq 0 ] || { echo "dpi gate FAIL: $hdpi hdpi dir(s) remain"; exit 1; }
+echo "dpi gate: OK"
 
 %files
-%{_datarootdir}/themes/*
+%license COPYING
+
+%files blue
+%license COPYING
+%{_datarootdir}/themes/WhiteSur-Light-blue
+%{_datarootdir}/themes/WhiteSur-Dark-blue
+
+%files blue-solid
+%license COPYING
+%{_datarootdir}/themes/WhiteSur-Light-solid-blue
+%{_datarootdir}/themes/WhiteSur-Dark-solid-blue
+
+%files red
+%license COPYING
+%{_datarootdir}/themes/WhiteSur-Light-red
+%{_datarootdir}/themes/WhiteSur-Dark-red
+
+%files red-solid
+%license COPYING
+%{_datarootdir}/themes/WhiteSur-Light-solid-red
+%{_datarootdir}/themes/WhiteSur-Dark-solid-red
+
+%files grey
+%license COPYING
+%{_datarootdir}/themes/WhiteSur-Light-grey
+%{_datarootdir}/themes/WhiteSur-Dark-grey
+
+%files grey-solid
+%license COPYING
+%{_datarootdir}/themes/WhiteSur-Light-solid-grey
+%{_datarootdir}/themes/WhiteSur-Dark-solid-grey
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-3
+- Split into color/opacity packages (blue, red, grey x normal, solid). WhiteSur
+  has no size axis; its second axis is panel opacity.
+- Drop -hdpi/-xhdpi (xfwm4-only, unusable on GNOME); gated in %%check.
+- Strip cinnamon/xfwm4/plank/unity; keep gtk-2.0 and metacity-1.
+- Drop -l/--libadwaita: verified byte-identical buildroot without it, including
+  alongside --shell.
+
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-2
 - Own only the installed theme directories, not %%{_datarootdir}/themes itself:
   that directory belongs to the filesystem package, and co-owning it is the
