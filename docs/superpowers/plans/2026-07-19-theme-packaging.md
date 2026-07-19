@@ -492,7 +492,7 @@ rpmbuild -bs themes/colloid-gtk-theme/colloid-gtk-theme.spec
 mock -r fedora-44-x86_64 --rebuild ~/rpmbuild/SRPMS/colloid-gtk-theme-20250731-6.fc44.src.rpm
 rtk proxy grep 'dpi gate' /var/lib/mock/fedora-44-x86_64/result/build.log
 ```
-Expected: build FAILS with `dpi gate FAIL: 18 hdpi dir(s) remain` (the current
+Expected: build FAILS with `dpi gate FAIL: 6 hdpi dir(s) remain` (the current
 spec ships one color, producing 18 DPI dirs).
 
 - [ ] **Step 2: Rewrite `%install` to constrain colors and delete DPI/foreign payload**
@@ -516,7 +516,8 @@ rm -rf %{buildroot}%{_datarootdir}/themes/*-xhdpi
 find %{buildroot}%{_datarootdir}/themes -maxdepth 2 -type d \
   \( -name cinnamon -o -name xfwm4 -o -name plank -o -name unity \) \
   -exec rm -rf {} +
-find %{buildroot}%{_datarootdir}/themes -name COPYING -delete
+# Colloid ships LICENSE, not COPYING, and install.sh does not copy it into the
+# theme dirs, so there is nothing to de-duplicate here.
 ```
 
 - [ ] **Step 3: Bump Release, add the subpackages and `%files`**
@@ -559,40 +560,40 @@ Replace `%files` with (directory names verified by a real build):
 
 ```spec
 %files
-%license COPYING
+%license LICENSE
 
 %files blue
-%license COPYING
+%license LICENSE
 %{_datarootdir}/themes/Colloid
 %{_datarootdir}/themes/Colloid-Light
 %{_datarootdir}/themes/Colloid-Dark
 
 %files blue-compact
-%license COPYING
+%license LICENSE
 %{_datarootdir}/themes/Colloid-Compact
 %{_datarootdir}/themes/Colloid-Light-Compact
 %{_datarootdir}/themes/Colloid-Dark-Compact
 
 %files red
-%license COPYING
+%license LICENSE
 %{_datarootdir}/themes/Colloid-Red
 %{_datarootdir}/themes/Colloid-Red-Light
 %{_datarootdir}/themes/Colloid-Red-Dark
 
 %files red-compact
-%license COPYING
+%license LICENSE
 %{_datarootdir}/themes/Colloid-Red-Compact
 %{_datarootdir}/themes/Colloid-Red-Light-Compact
 %{_datarootdir}/themes/Colloid-Red-Dark-Compact
 
 %files grey
-%license COPYING
+%license LICENSE
 %{_datarootdir}/themes/Colloid-Grey
 %{_datarootdir}/themes/Colloid-Grey-Light
 %{_datarootdir}/themes/Colloid-Grey-Dark
 
 %files grey-compact
-%license COPYING
+%license LICENSE
 %{_datarootdir}/themes/Colloid-Grey-Compact
 %{_datarootdir}/themes/Colloid-Grey-Light-Compact
 %{_datarootdir}/themes/Colloid-Grey-Dark-Compact
@@ -1390,23 +1391,21 @@ Grey accent, circular folders. Ships light, dark and auto variants.
 - [ ] **Step 3: Write `%files` (names verified by a real build)**
 
 ```spec
+# Tela-circle upstream ships no license file and its README makes no license
+# statement, so there is no %license to install. The License: tag is inherited
+# from the sibling Tela-icon-theme; verifying it with upstream is a separate task.
 %files
-%license COPYING
-
 %files blue
-%license COPYING
 %{_datarootdir}/icons/Tela-circle-blue
 %{_datarootdir}/icons/Tela-circle-blue-light
 %{_datarootdir}/icons/Tela-circle-blue-dark
 
 %files red
-%license COPYING
 %{_datarootdir}/icons/Tela-circle-red
 %{_datarootdir}/icons/Tela-circle-red-light
 %{_datarootdir}/icons/Tela-circle-red-dark
 
 %files grey
-%license COPYING
 %{_datarootdir}/icons/Tela-circle-grey
 %{_datarootdir}/icons/Tela-circle-grey-light
 %{_datarootdir}/icons/Tela-circle-grey-dark
