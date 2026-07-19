@@ -872,14 +872,15 @@ echo "dpi gate: OK"
 
 - [ ] **Step 4: Write `%files` (names verified by a real build)**
 
-No subpackages: this package ships its three directories directly.
+No subpackages: this package ships its three directories directly. Note the
+`--tweaks round` flag in %install puts "Round" in every directory name.
 
 ```spec
 %files
 %license COPYING
-%{_datarootdir}/themes/Qogir
-%{_datarootdir}/themes/Qogir-Light
-%{_datarootdir}/themes/Qogir-Dark
+%{_datarootdir}/themes/Qogir-Round
+%{_datarootdir}/themes/Qogir-Round-Light
+%{_datarootdir}/themes/Qogir-Round-Dark
 ```
 
 Add the changelog entry:
