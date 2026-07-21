@@ -143,7 +143,8 @@ Actual runs with the decisions above applied:
 | **total** | | | **99** | **35** |
 
 **35 subpackages**, down from 200 — the colour constraint and the DPI drop each
-account for roughly half the reduction.
+account for roughly half the reduction. (Superseded: 33 subpackages / 42 binary
+packages as built — qogir-gtk and qogir-icon ship no subpackages; see section 8.)
 
 ## 2. Naming
 
@@ -407,7 +408,8 @@ colour set, then run through the same two gates:
 Colloid 235 KB, Orchis 467 KB, Qogir 1122 KB, WhiteSur 430 KB.
 
 Total binary RPMs across the repo will be **44**: 35 subpackages plus one main
-package per source package.
+package per source package. (Superseded: 33 subpackages / 42 binary packages as
+built — see section 8.)
 
 ### 7.6 Repodata and dnf cost
 

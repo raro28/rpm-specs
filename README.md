@@ -96,7 +96,7 @@ mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/mural-1.0.2-1.fc44.src.rpm
 
 ### vinceliuice GTK themes (GNOME 50 patches, color subpackages)
 
-`themes/colloid-gtk-theme`, `themes/fluent-gtk-theme`, `themes/orchis-gtk-theme`, `themes/qogir-gtk-theme`, `themes/whitesur-gtk-theme`. Each carries downstream GNOME 50 patches (local files, stage in `SOURCES/`) and a `%check` (`BuildRequires: gtk4 python3-gobject-base`, auto-installed in the chroot) — see Linting below for the 4 gates. Four of the five split into color subpackages (`colloid`/`fluent`/`orchis`: blue, blue-compact, red, red-compact, grey, grey-compact; `whitesur-gtk`: blue, blue-solid, red, red-solid, grey, grey-solid); `qogir-gtk-theme` ships a single package — its `-t` flag selects distro branding, not an accent color.
+`themes/colloid-gtk-theme`, `themes/fluent-gtk-theme`, `themes/orchis-gtk-theme`, `themes/qogir-gtk-theme`, `themes/whitesur-gtk-theme`. Each carries downstream GNOME 50 patches (local files, stage in `SOURCES/`) and a `%check` (`BuildRequires: gtk4 python3-gobject-base`, auto-installed in the chroot) — see Linting below for the gate counts (4, except fluent-gtk-theme's 3). Four of the five split into color subpackages (`colloid`/`fluent`/`orchis`: blue, blue-compact, red, red-compact, grey, grey-compact; `whitesur-gtk`: blue, blue-solid, red, red-solid, grey, grey-solid); `qogir-gtk-theme` ships a single package — its `-t` flag selects distro branding, not an accent color.
 
 | Spec | Patches |
 |---|---|
@@ -269,10 +269,11 @@ these added in the theme/icon color-subpackage split:
   GObject-Introspection deps must be explicit, and none of these packages expose a
   `typelib()` provide to depend on instead. False positive for this package.
 
-The `%check` gates: the 5 GTK themes (colloid, fluent, orchis, qogir-gtk,
-whitesur-gtk) each run 4 — GTK4 CSS parse through the real engine
+The `%check` gates: four of the 5 GTK themes (colloid, orchis, qogir-gtk,
+whitesur-gtk) run 4 — GTK4 CSS parse through the real engine
 (`GtkCssProvider`), a GNOME 50 shell-selector node-gate, a component-strip gate,
-and a DPI-directory gate. The 4 icon themes (qogir-icon, tela, tela-circle,
+and a DPI-directory gate. `fluent-gtk-theme` runs 3: it has no DPI axis (no
+`-hdpi`/`-xhdpi` output), so no DPI gate. The 4 icon themes (qogir-icon, tela, tela-circle,
 whitesur-icon) each run 2 — an `index.theme`-presence gate and a
 zero-dangling-symlink gate. Every other warning class is fixed in the specs
 (`%setup -q`/`%autosetup`, an explicit `%build`, `%%`-escaped `%changelog`

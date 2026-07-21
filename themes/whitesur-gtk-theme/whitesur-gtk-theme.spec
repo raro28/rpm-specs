@@ -91,7 +91,9 @@ rm -rf %{buildroot}%{_datarootdir}/themes/*-xhdpi
 find %{buildroot}%{_datarootdir}/themes -maxdepth 2 -type d \
   \( -name cinnamon -o -name xfwm4 -o -name plank -o -name unity \) \
   -exec rm -rf {} +
-find %{buildroot}%{_datarootdir}/themes -name COPYING -delete
+# Unlike Fluent, install.sh here never drops a COPYING/LICENSE copy into theme
+# dirs (verified: no COPYING reference anywhere in the source tree), so there
+# is no in-tree duplicate to strip.
 
 %check
 # GTK 4.x build-time test: parse every installed gtk-4.0 stylesheet through the
