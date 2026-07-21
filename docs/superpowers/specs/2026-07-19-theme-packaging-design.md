@@ -531,6 +531,16 @@ decision — was measured, and the command and its output are recorded above.
 Implementation has not started beyond the pilot prototypes and the three
 dangling-symlink patches, which are already in the repo.
 
+**Update (2026-07-20): implementation complete.** All 9 theme/icon sources in
+this design are converted: 5 GTK themes and 4 icon themes, each with the
+`%check` gates and rpmlint filters described above. The 9 sources produce 42
+binary packages (9 main + 33 color/size subpackages: colloid, fluent, orchis
+and whitesur-gtk at 6 each = 24; tela, tela-circle and whitesur-icon at 3 each
+= 9; qogir-gtk and qogir-icon ship no subpackages). `rpmlint -c rpmlint.toml
+*/*/*.spec` reports 0 errors, 0 warnings. The three named exclusions above
+(COPR-side behaviour, the appendix survey, the two arithmetic figures) remain
+unverified — implementation did not touch them.
+
 ## Appendix: non-vinceliuice alternatives
 
 Full report with citations: `docs/theme-research-2026-07.md`.
