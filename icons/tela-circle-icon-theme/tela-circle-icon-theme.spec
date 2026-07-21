@@ -1,6 +1,6 @@
 Name:           tela-circle-icon-theme
 Version:        20260707
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A flat colorful Design icon theme
 
 BuildArch:      noarch
@@ -18,6 +18,21 @@ BuildRequires:  gtk-update-icon-cache
 %description
 A flat colorful Design icon theme
 
+%package blue
+Summary:        Tela-circle icon theme, blue accent
+%description blue
+Blue accent, circular folders. Ships light, dark and auto variants.
+
+%package red
+Summary:        Tela-circle icon theme, red accent
+%description red
+Red accent, circular folders. Ships light, dark and auto variants.
+
+%package grey
+Summary:        Tela-circle icon theme, grey accent
+%description grey
+Grey accent, circular folders. Ships light, dark and auto variants.
+
 %prep
 %autosetup -p1 -n %{dname}-%{dversion}
 
@@ -26,7 +41,9 @@ A flat colorful Design icon theme
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/icons
-./install.sh -d "%{buildroot}%{_datarootdir}/icons" -c standard
+# -c enables the circular folder version and takes no argument; the colors
+# that follow are positional.
+./install.sh -d "%{buildroot}%{_datarootdir}/icons" -c blue red grey
 
 %check
 # Every installed theme must carry an index.theme.
@@ -46,10 +63,31 @@ dangling=$(find %{buildroot}%{_datadir}/icons -xtype l | wc -l)
 }
 echo "dangling-symlink gate: OK (0 across $n themes)"
 
+# Tela-circle upstream ships no license file and its README makes no license
+# statement, so there is no %%license to install. The License: tag is inherited
+# from the sibling Tela-icon-theme; verifying it with upstream is a separate task.
 %files
-%{_datarootdir}/icons/*
+%files blue
+%{_datarootdir}/icons/Tela-circle-blue
+%{_datarootdir}/icons/Tela-circle-blue-light
+%{_datarootdir}/icons/Tela-circle-blue-dark
+
+%files red
+%{_datarootdir}/icons/Tela-circle-red
+%{_datarootdir}/icons/Tela-circle-red-light
+%{_datarootdir}/icons/Tela-circle-red-dark
+
+%files grey
+%{_datarootdir}/icons/Tela-circle-grey
+%{_datarootdir}/icons/Tela-circle-grey-light
+%{_datarootdir}/icons/Tela-circle-grey-dark
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-4
+- Split into color packages (blue, red, grey). Note -c enables the circular
+  folder version and takes no argument; colors are positional, so the previous
+  "-c standard" meant "circular, color standard".
+
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-3
 - Own only the installed theme directories, not %%{_datarootdir}/icons itself:
   that directory belongs to the filesystem package, and co-owning it is the
