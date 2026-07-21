@@ -1,0 +1,32 @@
+--- a/install.sh
++++ b/install.sh
+@@ -178,6 +178,19 @@
+ 
+     cp -r "${SRC_DIR}"/links/{16,22,24,32,scalable,symbolic}                     "${THEME_DIR}"
+ 
++    # Downstream symlink repairs (all upstream defects):
++    #  1. xsi-addon-symbolic targets a sibling, but application-x-addon-symbolic
++    #     lives in symbolic/mimetypes.
++    #  2. links/scalable/apps/CherryStudio.svg has a literal trailing newline in
++    #     its target string ("cherrystudio.svg\n"), so it never resolves.
++    #  3. org.xfce.appfinder.svg targets edit-find.svg as a sibling, but that
++    #     icon exists only under 16/22/24/actions -- no scalable equivalent, so
++    #     the dead alias is dropped and icon lookup falls through as usual.
++    ln -sf ../mimetypes/application-x-addon-symbolic.svg                         "${THEME_DIR}/symbolic/apps/xsi-addon-symbolic.svg"
++    [[ -e "${THEME_DIR}/scalable/apps/cherrystudio.svg" ]] && \
++      ln -sf cherrystudio.svg                                                    "${THEME_DIR}/scalable/apps/CherryStudio.svg"
++    rm -f                                                                        "${THEME_DIR}/scalable/apps/org.xfce.appfinder.svg"
++
+     if [[ "${ICON_VERSION}" == 'elementary' || "$DESKTOP_SESSION" == 'xfce' ]]; then
+       cp -r "${SRC_DIR}/elementary/"*                                            "${THEME_DIR}"
+     fi
+@@ -248,6 +261,9 @@
+     cp -r "${SRC_DIR}"/links/24/{actions,devices,places}                         "${THEME_DIR}/24"
+     cp -r "${SRC_DIR}"/links/symbolic/*                                          "${THEME_DIR}/symbolic"
+ 
++    # See note above: xsi-addon-symbolic targets the wrong directory.
++    ln -sf ../mimetypes/application-x-addon-symbolic.svg                         "${THEME_DIR}/symbolic/apps/xsi-addon-symbolic.svg"
++
+     # Link the common icons
+     ln -sr "${STD_THEME_DIR}/scalable"                                           "${THEME_DIR}/scalable"
+     ln -sr "${STD_THEME_DIR}/32"                                                 "${THEME_DIR}/32"

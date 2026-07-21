@@ -1,6 +1,6 @@
-Name:           qogir-theme
+Name:           qogir-gtk-theme
 Version:        20250817
-Release:        5%{?dist}
+Release:        7%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
@@ -33,7 +33,16 @@ Cinnamon Pantheon, XFCE, Mate, etc
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/themes
-./install.sh --icon gnome --tweaks round --libadwaita --dest %{buildroot}%{_datarootdir}/themes
+# -t selects distro branding, not accent color, so only the default ships.
+# -l omitted: verified no-op for the buildroot.
+./install.sh --dest %{buildroot}%{_datarootdir}/themes \
+  --icon gnome --tweaks round -t default
+rm -rf %{buildroot}%{_datarootdir}/themes/*-hdpi
+rm -rf %{buildroot}%{_datarootdir}/themes/*-xhdpi
+find %{buildroot}%{_datarootdir}/themes -maxdepth 2 -type d \
+  \( -name cinnamon -o -name xfwm4 -o -name plank -o -name unity \) \
+  -exec rm -rf {} +
+find %{buildroot}%{_datarootdir}/themes -name COPYING -delete
 
 %check
 # GTK 4.x build-time test: parse every installed gtk-4.0 stylesheet through the
@@ -68,11 +77,37 @@ for css in %{buildroot}%{_datadir}/themes/*/gnome-shell/gnome-shell.css; do
   grep -q 'message-list-clear-button' "$css" || { echo "node-gate FAIL: .message-list-clear-button missing in $css"; exit 1; }
 done
 echo "shell node-gate: OK"
+for d in cinnamon xfwm4 plank unity; do
+  found=$(find %{buildroot}%{_datadir}/themes -maxdepth 2 -type d -name "$d" | wc -l)
+  [ "$found" -eq 0 ] || { echo "strip FAIL: $found $d dirs remain"; exit 1; }
+done
+echo "strip gate: OK"
+hdpi=$(find %{buildroot}%{_datadir}/themes -maxdepth 1 -type d \
+  \( -name '*-hdpi' -o -name '*-xhdpi' \) | wc -l)
+[ "$hdpi" -eq 0 ] || { echo "dpi gate FAIL: $hdpi hdpi dir(s) remain"; exit 1; }
+echo "dpi gate: OK"
 
 %files
-%{_datarootdir}/themes
+%license COPYING
+%{_datarootdir}/themes/Qogir-Round
+%{_datarootdir}/themes/Qogir-Round-Light
+%{_datarootdir}/themes/Qogir-Round-Dark
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250817-7
+- Rename to qogir-gtk-theme: -gtk-theme is the Fedora plurality for GTK themes.
+  Clean break, no Obsoletes/Provides.
+- No color split: Qogir's -t selects distro branding (default|manjaro|ubuntu),
+  not accent color, so only the default variant ships.
+- Drop -hdpi/-xhdpi (xfwm4-only, unusable on GNOME); gated in %%check.
+- Strip cinnamon/xfwm4/plank/unity; keep gtk-2.0 and metacity-1.
+- Drop -l/--libadwaita: verified byte-identical buildroot without it.
+
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250817-6
+- Own only the installed theme directories, not %%{_datarootdir}/themes itself:
+  that directory belongs to the filesystem package, and co-owning it is the
+  standard-dir-owned-by-package defect.
+
 * Sun Jun 21 2026 Hector Diaz <hdiazc@live.com> - 20250817-5
 - Patch0 (gnome50-selectors): style the GNOME 50 login .a11y-button and
   notification .message-list-clear-button using the theme's own existing

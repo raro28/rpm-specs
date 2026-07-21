@@ -1,0 +1,26 @@
+--- a/install.sh
++++ b/install.sh
+@@ -191,6 +191,11 @@
+ 
+     cp -r "${SRC_DIR}"/links/{16,22,24,32,scalable,symbolic}                     "${THEME_DIR}"
+ 
++    # Downstream: links/symbolic/apps/xsi-addon-symbolic.svg targets
++    # application-x-addon-symbolic.svg as a sibling, but that icon lives in
++    # symbolic/mimetypes. Repoint it so the alias resolves.
++    ln -sf ../mimetypes/application-x-addon-symbolic.svg                         "${THEME_DIR}/symbolic/apps/xsi-addon-symbolic.svg"
++
+     if [[ "${ICON_VERSION}" == 'elementary' || "$DESKTOP_SESSION" == 'xfce' ]]; then
+       cp -r "${SRC_DIR}/elementary/"*                                            "${THEME_DIR}"
+     fi
+@@ -261,6 +266,11 @@
+     cp -r "${SRC_DIR}"/links/24/{actions,devices,places}                         "${THEME_DIR}/24"
+     cp -r "${SRC_DIR}"/links/symbolic/*                                          "${THEME_DIR}/symbolic"
+ 
++    # Downstream: links/symbolic/apps/xsi-addon-symbolic.svg targets
++    # application-x-addon-symbolic.svg as a sibling, but that icon lives in
++    # symbolic/mimetypes. Repoint it so the alias resolves.
++    ln -sf ../mimetypes/application-x-addon-symbolic.svg                         "${THEME_DIR}/symbolic/apps/xsi-addon-symbolic.svg"
++
+     # Link the common icons
+     ln -sr "${STD_THEME_DIR}/scalable"                                           "${THEME_DIR}/scalable"
+     ln -sr "${STD_THEME_DIR}/32"                                                 "${THEME_DIR}/32"
