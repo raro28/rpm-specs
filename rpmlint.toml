@@ -40,9 +40,9 @@
 # single dlopen module (libggml-vulkan.so / libggml-hip.so) and Require the base
 # package, where README/LICENSE live. No own docs by design. Scoped to those two.
 #
-# no-documentation (colloid|fluent|orchis|qogir|whitesur -gtk|icon-theme): theme
-# color/size subpackages ship %license only, by design -- no README/docs beyond
-# the license. rpmlint's documentation check doesn't accept %license as
+# no-documentation (colloid|fluent|orchis|qogir|tela|tela-circle|whitesur -gtk|icon-theme):
+# theme color/size subpackages ship %license only, by design -- no README/docs
+# beyond the license. rpmlint's documentation check doesn't accept %license as
 # satisfying it. Scoped to the vinceliuice theme family.
 #
 # dangling-relative-symlink (whitesur-icon-theme, the -light/-dark variants):
@@ -65,7 +65,7 @@ Filters = [
     "invalid-soname .*libllama-.*-impl\\.so",
     "no-manual-page-for-binary (llama|libggml-)",
     "llama\\.cpp-(vulkan|rocm).*no-documentation",
-    "(colloid|fluent|orchis|qogir|whitesur)-(gtk|icon)-theme.*no-documentation",
+    "(colloid|fluent|orchis|qogir|tela|tela-circle|whitesur)-(gtk|icon)-theme.*no-documentation",
     "qogir-icon-theme.*dangling-relative-symlink /usr/share/icons/Qogir-(Light|Dark)/",
     "whitesur-icon-theme.*dangling-relative-symlink /usr/share/icons/WhiteSur-(red-|grey-)?(light|dark)/",
 ]

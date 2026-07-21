@@ -1,6 +1,6 @@
 Name:           tela-icon-theme
 Version:        20260707
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A flat colorful Design icon theme
 BuildArch:      noarch
 
@@ -17,6 +17,21 @@ BuildRequires:  gtk-update-icon-cache
 %description
 A flat colorful Design icon theme.
 
+%package blue
+Summary:        Tela icon theme, blue accent
+%description blue
+Blue accent. Ships light, dark and auto variants.
+
+%package red
+Summary:        Tela icon theme, red accent
+%description red
+Red accent. Ships light, dark and auto variants.
+
+%package grey
+Summary:        Tela icon theme, grey accent
+%description grey
+Grey accent. Ships light, dark and auto variants.
+
 %prep
 %autosetup -p1 -n %{dname}-%{dversion}
 
@@ -25,7 +40,8 @@ A flat colorful Design icon theme.
 
 %install
 mkdir -p %{buildroot}%{_datarootdir}/icons
-./install.sh -d "%{buildroot}%{_datarootdir}/icons" standard
+# Tela takes colors as positional arguments; it has no -t flag.
+./install.sh -d "%{buildroot}%{_datarootdir}/icons" blue red grey
 
 %check
 # Every installed theme must carry an index.theme.
@@ -46,9 +62,31 @@ dangling=$(find %{buildroot}%{_datadir}/icons -xtype l | wc -l)
 echo "dangling-symlink gate: OK (0 across $n themes)"
 
 %files
-%{_datarootdir}/icons/*
+%license COPYING
+
+%files blue
+%license COPYING
+%{_datarootdir}/icons/Tela-blue
+%{_datarootdir}/icons/Tela-blue-light
+%{_datarootdir}/icons/Tela-blue-dark
+
+%files red
+%license COPYING
+%{_datarootdir}/icons/Tela-red
+%{_datarootdir}/icons/Tela-red-light
+%{_datarootdir}/icons/Tela-red-dark
+
+%files grey
+%license COPYING
+%{_datarootdir}/icons/Tela-grey
+%{_datarootdir}/icons/Tela-grey-light
+%{_datarootdir}/icons/Tela-grey-dark
 
 %changelog
+* Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-4
+- Split into color packages (blue, red, grey). Tela takes colors as positional
+  arguments, not flags.
+
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-3
 - Own only the installed theme directories, not %%{_datarootdir}/icons itself:
   that directory belongs to the filesystem package, and co-owning it is the
