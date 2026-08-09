@@ -1,19 +1,16 @@
-# Upstream tag 2026-07-07 supersedes the previously-pinned master snapshot
-# (commit a83f467, 2026-05-25) — it is 12 commits newer and carries the same
-# "Fixed gnome 50 issues" work (the $GNOME_SHELL version-gating mechanism +
-# quick-settings fix) that originally forced the commit pin. It still tops out
-# at the widgets-48-0 shell stylesheet (no native GNOME 49/50 sheet), so the
-# downstream GNOME 50 login / notification patches below remain necessary.
+# Upstream still clamps GNOME shells >= 48 to the widgets-48-0 stylesheet
+# (libs/lib-core.sh; no native GNOME 49/50 sheet), so the downstream GNOME 50
+# login / notification patches below remain necessary.
 Name:           whitesur-gtk-theme
-Version:        20260707
-Release:        3%{?dist}
+Version:        20260808
+Release:        1%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
 License:        GPL-3.0-or-later
 
 %define dname WhiteSur-gtk-theme
-%define dversion 2026-07-07
+%define dversion 2026-08-08
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz#/%{dname}-%{dversion}.tar.gz
 # Downstream GNOME 50 styling, split into the uniform two-patch model shared with
@@ -172,6 +169,18 @@ echo "dpi gate: OK"
 %{_datarootdir}/themes/WhiteSur-Dark-solid-grey
 
 %changelog
+* Sun Aug 09 2026 Hector Diaz <hdiazc@live.com> - 20260808-1
+- Bump to upstream tag 2026-08-08.
+- All four downstream patches re-verified against the new source: each applies
+  clean and is still needed. Upstream still clamps shells >= 48 to widgets-48-0
+  (no native GNOME 49/50 sheet), so .a11y-button,
+  .login-dialog-bottom-button-group and the widgets-48-0 .message-list-clear-button
+  coverage remain absent (Patch0/Patch1); the FSF postal address in gnome-shell
+  _common.scss is still the old form (Patch2); %%apple_activites still uses the
+  keyword background-position (Patch3). A new common/_message-list.scss carries
+  only a commented-out .message-list-clear-button rule (inert), so the downstream
+  coverage stays the sole source; no new patch needed.
+
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-3
 - Split into color/opacity packages (blue, red, grey x normal, solid). WhiteSur
   has no size axis; its second axis is panel opacity.

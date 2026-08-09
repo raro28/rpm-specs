@@ -9,10 +9,10 @@ package lives in `<category>/<spec-dir>/`.
 
 | Spec | Current build | What it ships |
 |---|---|---|
-| themes/colloid-gtk-theme | `20250731-7` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
+| themes/colloid-gtk-theme | `20260808-1` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | themes/fluent-gtk-theme | `20250417-9` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | apps/gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
-| apps/llama.cpp | `0^b10068-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
+| apps/llama.cpp | `0^b10333-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | apps/looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | kernel/looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](kernel/looking-glass-kvmfr-kmod/README.md) |
 | apps/mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
@@ -21,7 +21,7 @@ package lives in `<category>/<spec-dir>/`.
 | icons/qogir-icon-theme | `20250215-5` | Icon theme ([vinceliuice/Qogir-icon-theme](https://github.com/vinceliuice/Qogir-icon-theme)); single package, no color subpackages (same reason) |
 | icons/tela-circle-icon-theme | `20260707-4` | Icon theme ([vinceliuice/Tela-circle-icon-theme](https://github.com/vinceliuice/Tela-circle-icon-theme)); ships blue, red, grey |
 | icons/tela-icon-theme | `20260707-4` | Icon theme ([vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme)); ships blue, red, grey |
-| themes/whitesur-gtk-theme | `20260707-3` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 patches; ships blue, blue-solid, red, red-solid, grey, grey-solid |
+| themes/whitesur-gtk-theme | `20260808-1` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 patches; ships blue, blue-solid, red, red-solid, grey, grey-solid |
 | icons/whitesur-icon-theme | `20260707-4` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)); ships blue, red, grey |
 
 ## Host setup (once)
@@ -29,7 +29,7 @@ package lives in `<category>/<spec-dir>/`.
 Install the build toolchain and prepare `~/rpmbuild`:
 
 ```bash
-sudo dnf install rpm-build rpmdevtools mock
+sudo dnf install rpm-build rpmdevtools mock rpmlint createrepo_c
 sudo usermod -aG mock $USER
 # log out / back in (or `newgrp mock`) so the mock group is active
 rpmdev-setuptree            # creates ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
@@ -38,8 +38,15 @@ rpmdev-setuptree            # creates ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS
 - `rpm-build`  → `rpmbuild`
 - `rpmdevtools` → `spectool` (fetches `Source:` URLs), `rpmdev-setuptree`
 - `mock` → clean fedora-44-x86_64 chroot builder
+- `rpmlint` → the lint gate (`rpmlint -c rpmlint.toml */*/*.spec`, see Linting)
+- `createrepo_c` → optional, for local repodata checks
 
 No spec in this repo needs additional BuildRequires on the host — mock auto-installs them inside the chroot from Fedora's main repos.
+
+To upload/rebuild in the COPR (optional): `sudo dnf install copr-cli`, then save
+your API token from <https://copr.fedorainfracloud.org/api/> to `~/.config/copr`
+(there is no `copr-cli login`; the token file is the auth). Builds are SCM-based
+from this repo, so `copr-cli build-package wdm --name <pkg>` rebuilds from git.
 
 ## Common build workflow
 
@@ -152,7 +159,7 @@ ggml loads whichever backend modules are installed and enumerates all their devi
 ```bash
 spectool -g -R apps/llama.cpp/llama.cpp.spec
 rpmbuild -bs apps/llama.cpp/llama.cpp.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/llama.cpp-0\^b10068-1.fc44.src.rpm
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/llama.cpp-0\^b10333-1.fc44.src.rpm
 ```
 
 **Note the `\^` shell-escape** when typing the SRPM filename — `^` is the Fedora-standard post-release snapshot marker (upstream tags are `bNNNN` build numbers, no semver), and the literal caret appears in the filename.

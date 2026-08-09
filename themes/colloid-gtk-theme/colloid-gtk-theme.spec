@@ -1,13 +1,13 @@
 Name:           colloid-gtk-theme
-Version:        20250731
-Release:        7%{?dist}
+Version:        20260808
+Release:        1%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
 
 License:        GPL-3.0-or-later
 
 %define dname Colloid-gtk-theme
-%define dversion 2025-07-31
+%define dversion 2026-08-08
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 Patch0:         gnome50-selectors.patch
@@ -164,6 +164,15 @@ echo "dpi gate: OK"
 %{_datarootdir}/themes/Colloid-Grey-Dark-Compact
 
 %changelog
+* Sun Aug 09 2026 Hector Diaz <hdiazc@live.com> - 20260808-1
+- Bump to upstream tag 2026-08-08 (from 2025-07-31, ~13 months).
+- All three downstream patches re-verified against the new source: each applies
+  clean and is still needed. Upstream still clamps shells >= 48 to widgets-48-0
+  (install.sh; no native GNOME 49/50 sheet), so .a11y-button,
+  .login-dialog-bottom-button-group and the widgets-48-0 .message-list-clear-button
+  coverage remain absent (Patch0/Patch1); the FSF postal address in gnome-shell
+  _common.scss is still the old form (Patch2). No patch dropped, none added.
+
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20250731-7
 - Split into color/size packages (blue, red, grey x standard, compact). Blue is
   upstream's "default" accent; packages are named for the color.
