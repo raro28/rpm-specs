@@ -19,6 +19,28 @@ The `.ko` itself is **not built in COPR**. `akmod-kvmfr` ships source; the
 `akmods` service rebuilds it on your machine against your installed kernel
 and re-runs automatically after every `dnf update kernel`.
 
+## Installing
+
+```bash
+sudo dnf copr enable raro28/wdm
+sudo dnf install akmod-kvmfr
+sudo akmods --force            # build now; otherwise built on next boot
+```
+
+Install `akmod-kvmfr`, **not** `looking-glass-kvmfr-kmod` — the latter name
+matches only the source RPM (arch `src`) and installs nothing usable.
+`akmod-kvmfr` transitively pulls the entire build chain: `akmods` (whose
+`kernel-devel-matched` boolean dep installs the `kernel-devel` matching your
+running kernel), the toolchain (`gcc`, `make`, `elfutils-libelf-devel`,
+`kmodtool`), `selinux-policy-devel` (to compile `kvmfr.pp`), and
+`kvmfr-kmod-common`. It Recommends `kvmfr-kmod-selinux` and
+`looking-glass-client`, so both come along unless weak deps are disabled.
+Nothing else need be installed by hand.
+
+Requires `akmod-kvmfr >= 0.0.12-8`; earlier builds omit the
+`selinux-policy-devel` dependency, so `akmods` fails to build until it is
+installed manually.
+
 ## What's automated for you
 
 On `dnf install` / upgrade:
