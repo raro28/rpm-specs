@@ -1,4 +1,4 @@
-%global build_num       10068
+%global build_num       10333
 %global upstream_tag    b%{build_num}
 # AMD GPU ISA target(s) for the ROCm/HIP backend. gfx1030 = RDNA2 (RX 6800/6900
 # XT); Fedora's rocBLAS ships Tensile kernels for it. Add space-separated targets
@@ -156,6 +156,21 @@ ls %{buildroot}%{_bindir}/libggml-cpu-*.so >/dev/null
 %{_bindir}/libggml-hip.so
 
 %changelog
+* Sun Aug 09 2026 Hector Diaz <hdiazc@live.com> - 0^b10333-1
+- Rebase to upstream tag b10333 (265 builds from b10068). Pure version bump;
+  build-option surface verified unchanged against the b10068..b10333 CMake source:
+  every flag the spec sets still exists with the same semantics. Root CMakeLists
+  adds only LLAMA_SUBPROCESS (default ON on Linux, OFF only on iOS/Android/WASM;
+  inherited, no spec change). ggml adds no HIP/CUDA option and drops the
+  RDNA2-irrelevant GGML_HIP_ROCWMMA_FATTN. GPU_TARGETS still forwards to
+  CMAKE_HIP_ARCHITECTURES. UI staging intact: scripts/ui-assets.cmake Priority 1
+  emits pre-built assets from tools/ui/dist (SRC_DIST_DIR) and returns before any
+  npm/HF network path, so the %%prep Source1 extraction still wins offline;
+  Source1 (llama-b10333-ui.tar.gz) exists.
+- The -rocm gfx1030 (RX 6900 XT) runtime caveat from 0^b9965-1 is now stale: the
+  card is host-bound to amdgpu with /dev/kfd present, no longer vfio-pci. Runtime
+  benchmarking is now possible; -rocm remains build-verified in the mock chroot.
+
 * Sat Jul 18 2026 Hector Diaz <hdiazc@live.com> - 0^b10068-1
 - Rebase to upstream tag b10068 (103 commits from b9965). Pure version bump;
   build-option surface verified unchanged against the b9965..b10068 CMake source:
