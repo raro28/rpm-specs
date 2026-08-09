@@ -2,7 +2,8 @@
 
 RPM spec files for Fedora 44 packages I maintain in the COPR
 [raro28/wdm](https://copr.fedorainfracloud.org/coprs/raro28/wdm/).
-Each subdirectory is one source package.
+Specs are grouped by category (`themes/`, `icons/`, `apps/`, `kernel/`); each
+package lives in `<category>/<spec-dir>/`.
 
 ## Specs in this repo
 
@@ -301,7 +302,7 @@ The `raro28/wdm` COPR builds these from SRPMs uploaded via `copr-cli`, or via th
 │       ├── <spec-name>.spec
 │       ├── README.md                      # only where extra runtime/cutover docs apply
 │       └── [local source files referenced as SourceN]
-└── ...
+└── docs/                                   # design specs, plans, research (not packaged)
 ```
 
 Each spec directory (`<category>/<spec-dir>/`) is self-contained: the spec plus the local source files it references.
