@@ -29,7 +29,7 @@ package lives in `<category>/<spec-dir>/`.
 Install the build toolchain and prepare `~/rpmbuild`:
 
 ```bash
-sudo dnf install rpm-build rpmdevtools mock
+sudo dnf install rpm-build rpmdevtools mock rpmlint createrepo_c
 sudo usermod -aG mock $USER
 # log out / back in (or `newgrp mock`) so the mock group is active
 rpmdev-setuptree            # creates ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
@@ -38,8 +38,15 @@ rpmdev-setuptree            # creates ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS
 - `rpm-build`  → `rpmbuild`
 - `rpmdevtools` → `spectool` (fetches `Source:` URLs), `rpmdev-setuptree`
 - `mock` → clean fedora-44-x86_64 chroot builder
+- `rpmlint` → the lint gate (`rpmlint -c rpmlint.toml */*/*.spec`, see Linting)
+- `createrepo_c` → optional, for local repodata checks
 
 No spec in this repo needs additional BuildRequires on the host — mock auto-installs them inside the chroot from Fedora's main repos.
+
+To upload/rebuild in the COPR (optional): `sudo dnf install copr-cli`, then save
+your API token from <https://copr.fedorainfracloud.org/api/> to `~/.config/copr`
+(there is no `copr-cli login`; the token file is the auth). Builds are SCM-based
+from this repo, so `copr-cli build-package wdm --name <pkg>` rebuilds from git.
 
 ## Common build workflow
 
