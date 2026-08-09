@@ -3,7 +3,7 @@
 
 # Pulled in as Requires on akmod-<name> via kmodtool, so that akmodsbuild
 # on the user's machine has the same BR set as the COPR/mock build.
-%global AkmodsBuildRequires kernel-rpm-macros systemd-rpm-macros gcc make elfutils-libelf-devel
+%global AkmodsBuildRequires kernel-rpm-macros systemd-rpm-macros gcc make elfutils-libelf-devel selinux-policy-devel
 
 %global upstream_tag     B7
 %global kmod_name        kvmfr
@@ -12,7 +12,7 @@
 Name:           looking-glass-kvmfr-kmod
 Summary:        Looking Glass KVMFR shared-memory kernel module (akmod)
 Version:        0.0.12
-Release:        7%{?dist}
+Release:        8%{?dist}
 License:        GPL-2.0-or-later
 
 URL:            https://looking-glass.io/
@@ -150,6 +150,14 @@ fi
 %{_datadir}/selinux/packages/%{kmod_name}.pp
 
 %changelog
+* Sun Aug 09 2026 Hector Diaz <hdiazc@live.com> - 0.0.12-8
+- Add selinux-policy-devel to AkmodsBuildRequires. %%build compiles the SELinux
+  .pp unconditionally (make -f /usr/share/selinux/devel/Makefile), so akmodsbuild
+  on the user's machine needs it too. It was omitted when the SELinux subpackage
+  was added in -6, so akmods failed with "selinux-policy-devel is needed by
+  looking-glass-kvmfr-kmod" on hosts without it installed. akmod-kvmfr now pulls
+  it in alongside the other akmodsbuild deps.
+
 * Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 0.0.12-7
 - Ship %%{_modulesloaddir}/kvmfr.conf so systemd-modules-load.service
   auto-loads kvmfr at boot. VMs that depend on /dev/kvmfr0 no longer need

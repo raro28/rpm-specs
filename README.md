@@ -14,7 +14,7 @@ package lives in `<category>/<spec-dir>/`.
 | apps/gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
 | apps/llama.cpp | `0^b10333-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | apps/looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
-| kernel/looking-glass-kvmfr-kmod | `0.0.12-7` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](kernel/looking-glass-kvmfr-kmod/README.md) |
+| kernel/looking-glass-kvmfr-kmod | `0.0.12-8` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](kernel/looking-glass-kvmfr-kmod/README.md) |
 | apps/mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
 | themes/orchis-gtk-theme | `20260707-3` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | themes/qogir-gtk-theme | `20250817-7` | GTK theme ([vinceliuice/Qogir-theme](https://github.com/vinceliuice/Qogir-theme)), GNOME 50 patches; single package, no color subpackages (`-t` selects distro branding, not an accent) |
@@ -223,7 +223,7 @@ cp kernel/looking-glass-kvmfr-kmod/{kvmfr.conf,99-kvmfr.rules,kvmfr.te,kvmfr.fc,
    ~/rpmbuild/SOURCES/
 spectool -g -R kernel/looking-glass-kvmfr-kmod/looking-glass-kvmfr-kmod.spec
 rpmbuild -bs kernel/looking-glass-kvmfr-kmod/looking-glass-kvmfr-kmod.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-kvmfr-kmod-0.0.12-7.fc44.src.rpm
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-kvmfr-kmod-0.0.12-8.fc44.src.rpm
 ```
 
 After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (libvirt cgroup ACL + VM XML cutover) the package cannot do for you — see [kernel/looking-glass-kvmfr-kmod/README.md](kernel/looking-glass-kvmfr-kmod/README.md) for the full setup, verification, rollback, and SELinux details.
