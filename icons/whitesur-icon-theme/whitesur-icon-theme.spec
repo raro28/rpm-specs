@@ -1,13 +1,13 @@
 Name:           whitesur-icon-theme
-Version:        20260707
-Release:        4%{?dist}
+Version:        20260811
+Release:        1%{?dist}
 Summary:        A macOS BigSur-like icon theme for Linux desktops
 BuildArch:      noarch
 
 License:        GPL-3.0-or-later
 
 %define dname WhiteSur-icon-theme
-%define dversion 2026-07-07
+%define dversion 2026-08-11
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 Patch0:         fix-dangling-symlinks.patch
@@ -83,6 +83,15 @@ echo "dangling-symlink gate: OK (0 across $n themes)"
 %{_datarootdir}/icons/WhiteSur-grey-dark
 
 %changelog
+* Fri Aug 28 2026 Hector Diaz <hdiazc@live.com> - 20260811-1
+- Bump to upstream 2026-08-11. install.sh flags unchanged.
+- Patch0 (fix-dangling-symlinks): prior hunks still needed (install.sh keeps
+  cp -r over links/; src/status/22 still omits weather-clear-night.svg while 36
+  aliases point at it). Extend it for a new upstream defect: links/status/
+  symbolic/globe-symbolic.svg targets ../places/network-workgroup-symbolic.svg
+  -- one ../ too shallow and missing symbolic/ -- so it dangled in all six base
+  and dark themes. Repoint at the real icon. %%check (0 dangling) proves it.
+
 * Sun Jul 19 2026 Hector Diaz <hdiazc@live.com> - 20260707-4
 - Split into color packages (blue, red, grey). Blue is upstream's "default"
   accent; packages are named for the color.

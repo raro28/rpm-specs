@@ -22,7 +22,7 @@ package lives in `<category>/<spec-dir>/`.
 | icons/tela-circle-icon-theme | `20260707-4` | Icon theme ([vinceliuice/Tela-circle-icon-theme](https://github.com/vinceliuice/Tela-circle-icon-theme)); ships blue, red, grey |
 | icons/tela-icon-theme | `20260707-4` | Icon theme ([vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme)); ships blue, red, grey |
 | themes/whitesur-gtk-theme | `20260808-1` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 patches; ships blue, blue-solid, red, red-solid, grey, grey-solid |
-| icons/whitesur-icon-theme | `20260707-4` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)); ships blue, red, grey |
+| icons/whitesur-icon-theme | `20260811-1` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)); ships blue, red, grey |
 
 ## Host setup (once)
 

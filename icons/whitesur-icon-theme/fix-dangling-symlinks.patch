@@ -1,6 +1,8 @@
+diff --git a/install.sh b/install.sh
+index e75a7e4..f8a9f55 100755
 --- a/install.sh
 +++ b/install.sh
-@@ -63,6 +63,10 @@
+@@ -63,6 +63,10 @@ install() {
      mkdir -p                                                                                 "${THEME_DIR}"/status
      cp -r "${SRC_DIR}"/src/{actions,animations,apps,categories,devices,emotes,emblems,mimes,places,preferences} "${THEME_DIR}"
      cp -r "${SRC_DIR}"/src/status/{16,22,24,32,symbolic}                                     "${THEME_DIR}"/status
@@ -11,7 +13,7 @@
  
      if [[ ${black:-} == 'true' ]]; then
        sed -i "s/#f2f2f2/#363636/g" "${THEME_DIR}"/status/{16,22,24}/*
-@@ -90,12 +94,18 @@
+@@ -90,12 +94,22 @@ install() {
  
      rm -rf "${THEME_DIR}"/places/scalable/user-trash{'','-full'}-dark.svg
  
@@ -19,6 +21,10 @@
 +    # Downstream: -n so an alias never overwrites the real icon it names
 +    # (cp -r turns e.g. lm_studio.svg into a symlink pointing at itself).
 +    cp -rn "${SRC_DIR}"/links/{actions,apps,categories,devices,emotes,emblems,mimes,places,status,preferences} "${THEME_DIR}"
++    # Downstream: links/status/symbolic/globe-symbolic.svg targets
++    # ../places/network-workgroup-symbolic.svg -- one level too shallow and
++    # missing the symbolic/ dir, so it always dangles. Repoint at the real icon.
++    ln -sf ../../places/symbolic/network-workgroup-symbolic.svg "${THEME_DIR}"/status/symbolic/globe-symbolic.svg
    fi
  
    if [[ ${color} == '-light' ]]; then
@@ -31,7 +37,7 @@
  
      if [[ ${bold:-} == 'true' ]]; then
        cp -r "${SRC_DIR}"/bold/status/{16,22,24}                                              "${THEME_DIR}"/status
-@@ -103,7 +113,9 @@
+@@ -103,7 +117,9 @@ install() {
  
      # Change icon color for light theme
      sed -i "s/#f2f2f2/#363636/g" "${THEME_DIR}"/status/{16,22,24,32}/*
@@ -42,3 +48,12 @@
  
      cd ${dest}
      ln -s ../${name}${theme}/actions ${name}${theme}-light/actions
+@@ -173,6 +189,8 @@ install() {
+     cp -r "${SRC_DIR}"/links/emblems/symbolic                                                "${THEME_DIR}"/emblems
+     cp -r "${SRC_DIR}"/links/mimes/symbolic                                                  "${THEME_DIR}"/mimes
+     cp -r "${SRC_DIR}"/links/status/symbolic                                                 "${THEME_DIR}"/status
++    # Downstream: fix the dangling globe-symbolic alias (see base-theme note).
++    ln -sf ../../places/symbolic/network-workgroup-symbolic.svg "${THEME_DIR}"/status/symbolic/globe-symbolic.svg
+ 
+     cd ${dest}
+     ln -s ../${name}${theme}/animations ${name}${theme}-dark/animations
