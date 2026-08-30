@@ -12,7 +12,7 @@
 
 Name:           looking-glass-client
 Version:        7.0.0
-Release:        14%{?dist}
+Release:        15%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPL-2.0-only
@@ -151,6 +151,13 @@ fi
 %selinux_relabel_post -s targeted
 
 %changelog
+* Sat Aug 29 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-15
+- Desktop entry: drop win:jitRender=yes from all Exec lines. JIT render caused
+  idle-input frame-pacing stutter on GNOME/Wayland (smooth only while the pointer
+  moved); continuous render presents a steady 60 fps. Guest was verified healthy
+  during the stutter (perf kvm:kvm_exit, in-guest 60 fps), so the fault was
+  presentation-side, not the VM.
+
 * Sat May 16 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-14
 - Pin OPTIMIZE_FOR_NATIVE=x86-64-v3 instead of upstream's AUTO default.
   Upstream's cmake module would pick -march=native at AUTO, baking the

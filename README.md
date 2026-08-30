@@ -13,7 +13,7 @@ package lives in `<category>/<spec-dir>/`.
 | themes/fluent-gtk-theme | `20250417-9` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | apps/gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
 | apps/llama.cpp | `0^b10333-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
-| apps/looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
+| apps/looking-glass-client | `7.0.0-15` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | kernel/looking-glass-kvmfr-kmod | `0.0.12-8` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](kernel/looking-glass-kvmfr-kmod/README.md) |
 | apps/mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
 | themes/orchis-gtk-theme | `20260707-3` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
@@ -186,7 +186,7 @@ cp apps/looking-glass-client/{10-looking-glass-client.conf,looking-glass-client.
    ~/rpmbuild/SOURCES/
 spectool -g -R apps/looking-glass-client/looking-glass-client.spec
 rpmbuild -bs apps/looking-glass-client/looking-glass-client.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-14.fc44.src.rpm
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-15.fc44.src.rpm
 ```
 
 To bump the upstream version, update `%global upstream_tag` in the spec and refresh the six submodule SHAs via:
