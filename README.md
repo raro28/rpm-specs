@@ -9,6 +9,7 @@ package lives in `<category>/<spec-dir>/`.
 
 | Spec | Current build | What it ships |
 |---|---|---|
+| apps/amdgpu_top | `0.11.5-1` | AMD GPU monitor — TUI, SMI, GUI and JSON modes ([Umio-Yasuno/amdgpu_top](https://github.com/Umio-Yasuno/amdgpu_top)) |
 | themes/colloid-gtk-theme | `20260808-1` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | themes/fluent-gtk-theme | `20250417-9` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | apps/gnome-shell-extension-astra-monitor | `42-1` | GNOME Shell extension, top-bar CPU/GPU/memory/disk/network/sensor monitors ([AstraExt/astra-monitor](https://github.com/AstraExt/astra-monitor)) |
@@ -75,6 +76,8 @@ sudo dnf install /var/lib/mock/fedora-44-x86_64/result/*.rpm
 
 `mock` reads each `Source:` from `~/rpmbuild/SOURCES/`. URLs are NOT fetched at mock time — `spectool` is what populates the cache.
 
+One exception to step 4: `apps/amdgpu_top` builds its Rust dependencies from crates.io and needs `mock -r fedora-44-x86_64 --enable-network <srpm>`. See its section below.
+
 ## Per-spec build instructions
 
 ### Pure-upstream specs (no local sources)
@@ -92,6 +95,39 @@ mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-5.fc44.src.r
 ```
 
 `gnome-shell-extension-per-monitor-wallpaper` installs system-wide; each user enables it with `gnome-extensions enable per-monitor-wallpaper@ekthor`. Requires GNOME Shell 50.x (versioned `Requires`). Authored in TypeScript, built by CI into the release tarball (Source0); the RPM compiles nothing and has no `BuildRequires`.
+
+### amdgpu_top
+
+Rust, built from the `v0.11.5` source tag with upstream's own `package` feature
+(`libdrm_link,tui,gui,json`) — that feature exists for packagers: it is the
+default set minus `git_version`, which reads a `.git` a release tarball has not
+got. Licensed `MIT AND OFL-1.1`: the GUI front end embeds the BIZ UDGothic font,
+so both license files ship.
+
+**This is the only spec that needs network during the build.** Its crates are not
+vendored and cannot come from Fedora's `rust-*` packages, because
+`libdrm_amdgpu_sys` is pinned to a git revision rather than a crates.io release.
+`cargo build --locked` fetches them, held to the exact versions and checksums in
+`Cargo.lock`, so the build stays reproducible without being hermetic. Vendoring
+the alternative would mean carrying 523 crates (74 MB compressed) as a source.
+
+```bash
+spectool -g -R apps/amdgpu_top/amdgpu_top.spec
+rpmbuild -bs apps/amdgpu_top/amdgpu_top.spec
+mock -r fedora-44-x86_64 --enable-network ~/rpmbuild/SRPMS/amdgpu_top-0.11.5-1.fc44.src.rpm
+```
+
+Plain `mock` fails here: it sets `rpmbuild_networking` and `use_host_resolv` to
+`False` by default, so cargo cannot resolve crates.io. The COPR needs no change —
+`raro28/wdm` has `enable_net` set. Upstream's `[profile.release]` sets
+`strip = true`, but Fedora's `%build_rustflags` exports `-Cstrip=none`, which
+wins, so the normal debuginfo packages are produced and no `debug_package`
+override is needed.
+
+Ships both desktop entries — `amdgpu_top.desktop` (GUI) and
+`amdgpu_top-tui.desktop` (`Terminal=true`, with an SMI desktop action) — plus the
+man page and AppStream metainfo. Carries a `%check`: `desktop-file-validate` on
+both `.desktop` files and `appstreamcli validate` on the metainfo.
 
 ### gnome-shell-extension-astra-monitor
 
@@ -264,6 +300,7 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 
 | Spec | Local sources? | URL sources? |
 |---|---|---|
+| apps/amdgpu_top | No | Source0 only — **but needs `mock --enable-network`** |
 | icons/qogir-icon-theme | No | Source0 only |
 | apps/gnome-shell-extension-astra-monitor | No | Source0 + Source1 (upstream release zip, `%check` ground truth) |
 | apps/gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
@@ -292,11 +329,14 @@ these added in the theme/icon color-subpackage split:
 
 - `no-%check-section` — suppressed for the 2 specs with no test to run (the
   kvmfr akmod, the per-monitor-wallpaper extension). All 9 vinceliuice
-  theme/icon specs, plus llama.cpp, looking-glass-client, mural, and
-  gnome-shell-extension-astra-monitor, carry a real `%check`.
+  theme/icon specs, plus llama.cpp, looking-glass-client, mural,
+  gnome-shell-extension-astra-monitor and amdgpu_top, carry a real `%check`.
 - `spelling-error` — this branch adds `nana`/`materia` to the filtered word
   list: `orchis-gtk-theme`'s `%description` credits the upstream projects it's
-  based on (`nana-4`, `materia-theme`) — proper nouns, not misspellings.
+  based on (`nana-4`, `materia-theme`) — proper nouns, not misspellings. It also
+  adds `fdinfo`/`smi`/`gui` for `amdgpu_top`: the kernel `fdinfo` interface it
+  reads, plus the literal `--smi`/`--gui` flags its `%description` documents
+  (rpmlint strips the dashes and spell-checks what is left).
 - `no-documentation` for the vinceliuice theme family (`colloid|fluent|orchis|
   qogir|tela|tela-circle|whitesur` `-gtk|icon-theme`) — the color/size
   subpackages ship `%license` only (in `tela-circle`'s case, not even that);
@@ -317,7 +357,9 @@ whitesur-gtk) run 4 — GTK4 CSS parse through the real engine
 and a DPI-directory gate. `fluent-gtk-theme` runs 3: it has no DPI axis (no
 `-hdpi`/`-xhdpi` output), so no DPI gate. The 4 icon themes (qogir-icon, tela, tela-circle,
 whitesur-icon) each run 2 — an `index.theme`-presence gate and a
-zero-dangling-symlink gate. `gnome-shell-extension-astra-monitor` runs 3 — a
+zero-dangling-symlink gate. `amdgpu_top` runs 3 — `desktop-file-validate` on each of its two
+`.desktop` files and `appstreamcli validate` on its AppStream metainfo.
+`gnome-shell-extension-astra-monitor` runs 3 — a
 byte-identity gate on the 68 compiled `.js` files and one on the 7 `.mo`
 catalogs, both against upstream's release artifact (`Source1`), plus an assert
 that `metadata.json` still declares shell 50. Every other warning class is fixed in the specs
