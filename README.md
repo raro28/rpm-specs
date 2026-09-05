@@ -9,7 +9,7 @@ package lives in `<category>/<spec-dir>/`.
 
 | Spec | Current build | What it ships |
 |---|---|---|
-| apps/amdgpu_top | `0.11.5-1` | AMD GPU monitor — TUI, SMI, GUI and JSON modes ([Umio-Yasuno/amdgpu_top](https://github.com/Umio-Yasuno/amdgpu_top)) |
+| apps/amdgpu_top | `0.11.5-2` | AMD GPU monitor — TUI, SMI, GUI and JSON modes ([Umio-Yasuno/amdgpu_top](https://github.com/Umio-Yasuno/amdgpu_top)) |
 | themes/colloid-gtk-theme | `20260808-1` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | themes/fluent-gtk-theme | `20250417-9` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | apps/gnome-shell-extension-astra-monitor | `42-1` | GNOME Shell extension, top-bar CPU/GPU/memory/disk/network/sensor monitors ([AstraExt/astra-monitor](https://github.com/AstraExt/astra-monitor)) |
@@ -112,9 +112,10 @@ vendored and cannot come from Fedora's `rust-*` packages, because
 the alternative would mean carrying 523 crates (74 MB compressed) as a source.
 
 ```bash
+cp apps/amdgpu_top/amdgpu_top.desktop apps/amdgpu_top/*.patch ~/rpmbuild/SOURCES/
 spectool -g -R apps/amdgpu_top/amdgpu_top.spec
 rpmbuild -bs apps/amdgpu_top/amdgpu_top.spec
-mock -r fedora-44-x86_64 --enable-network ~/rpmbuild/SRPMS/amdgpu_top-0.11.5-1.fc44.src.rpm
+mock -r fedora-44-x86_64 --enable-network ~/rpmbuild/SRPMS/amdgpu_top-0.11.5-2.fc44.src.rpm
 ```
 
 Plain `mock` fails here: it sets `rpmbuild_networking` and `use_host_resolv` to
@@ -124,10 +125,17 @@ Plain `mock` fails here: it sets `rpmbuild_networking` and `use_host_resolv` to
 wins, so the normal debuginfo packages are produced and no `debug_package`
 override is needed.
 
-Ships both desktop entries — `amdgpu_top.desktop` (GUI) and
-`amdgpu_top-tui.desktop` (`Terminal=true`, with an SMI desktop action) — plus the
-man page and AppStream metainfo. Carries a `%check`: `desktop-file-validate` on
-both `.desktop` files and `appstreamcli validate` on the metainfo.
+Ships **one** desktop entry, the local `amdgpu_top.desktop` (`Source1`,
+installed with `desktop-file-install` like `looking-glass-client`'s). Upstream's
+two entries are `AMDGPU TOP (GUI)` and `AMDGPU TOP (TUI)` — 16 characters
+differing only in the token the GNOME app grid truncates, so both render as
+`AMDGPU TOP (...`. Ours is `AMD GPU`, with the terminal and SMI views as
+right-click actions. Those actions run through `xdg-terminal-exec` (a hard
+`Requires`) because `desktop-file-validate` rejects `Terminal=true` outside the
+`[Desktop Entry]` group. `metainfo-single-launchable.patch` drops the metainfo's
+launchable for the entry no longer shipped. Also ships the man page and the
+AppStream metainfo. Carries a `%check`: `desktop-file-validate` on the entry and
+`appstreamcli validate` on the metainfo.
 
 ### gnome-shell-extension-astra-monitor
 
@@ -300,7 +308,7 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 
 | Spec | Local sources? | URL sources? |
 |---|---|---|
-| apps/amdgpu_top | No | Source0 only — **but needs `mock --enable-network`** |
+| apps/amdgpu_top | **Yes** — 1 desktop entry + 1 patch | Source0 only — **but needs `mock --enable-network`** |
 | icons/qogir-icon-theme | No | Source0 only |
 | apps/gnome-shell-extension-astra-monitor | No | Source0 + Source1 (upstream release zip, `%check` ground truth) |
 | apps/gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
@@ -357,8 +365,8 @@ whitesur-gtk) run 4 — GTK4 CSS parse through the real engine
 and a DPI-directory gate. `fluent-gtk-theme` runs 3: it has no DPI axis (no
 `-hdpi`/`-xhdpi` output), so no DPI gate. The 4 icon themes (qogir-icon, tela, tela-circle,
 whitesur-icon) each run 2 — an `index.theme`-presence gate and a
-zero-dangling-symlink gate. `amdgpu_top` runs 3 — `desktop-file-validate` on each of its two
-`.desktop` files and `appstreamcli validate` on its AppStream metainfo.
+zero-dangling-symlink gate. `amdgpu_top` runs 2 — `desktop-file-validate` on its
+desktop entry and `appstreamcli validate` on its AppStream metainfo.
 `gnome-shell-extension-astra-monitor` runs 3 — a
 byte-identity gate on the 68 compiled `.js` files and one on the 7 `.mo`
 catalogs, both against upstream's release artifact (`Source1`), plus an assert

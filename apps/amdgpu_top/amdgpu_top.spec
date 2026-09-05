@@ -3,13 +3,21 @@
 
 Name:           amdgpu_top
 Version:        0.11.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Tool to display AMD GPU usage
 
 # Upstream is MIT. The GUI front end embeds the BIZ UDGothic font, which is OFL-1.1.
 License:        MIT AND OFL-1.1
 URL:            %{forgeurl}
 Source0:        %{forgeurl}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
+# Replaces upstream's two entries. Theirs are "AMDGPU TOP (GUI)" and
+# "AMDGPU TOP (TUI)": 16 characters that differ only in the token the GNOME app
+# grid truncates, so they render as two identical "AMDGPU TOP (..." tiles. One
+# entry instead, with the terminal and SMI views as right-click actions.
+Source1:        %{name}.desktop
+# The metainfo advertises a launchable for the -tui desktop entry this package
+# no longer ships.
+Patch0:         metainfo-single-launchable.patch
 
 ExclusiveArch:  %{rust_arches}
 
@@ -20,9 +28,13 @@ BuildRequires:  gcc
 # libdrm_amdgpu_sys is built with its link_drm feature: it links -ldrm and
 # -ldrm_amdgpu instead of dlopen()ing them, so the headers are needed here.
 BuildRequires:  pkgconfig(libdrm)
-# %%check validators only.
+# desktop-file-install, plus the %%check validators.
 BuildRequires:  desktop-file-utils
 BuildRequires:  appstream
+
+# Desktop actions cannot carry Terminal=true (desktop-file-validate rejects the
+# key outside [Desktop Entry]), so the terminal views launch through this.
+Requires:       xdg-terminal-exec
 
 %description
 amdgpu_top reports AMD GPU utilization from the GPU performance counters (GRBM,
@@ -31,7 +43,7 @@ mode (the default), an SMI mode (--smi), a GUI mode (--gui), JSON output
 (--json) and a one-shot device dump (-d).
 
 %prep
-%autosetup -n %{name}-%{version}
+%autosetup -p1 -n %{name}-%{version}
 
 %build
 # Crates are fetched from crates.io during the build. They are not vendored and
@@ -49,16 +61,15 @@ cargo build --release --locked \
 %install
 install -Dpm 0755 target/release/%{name} %{buildroot}%{_bindir}/%{name}
 install -Dpm 0644 docs/%{name}.1 %{buildroot}%{_mandir}/man1/%{name}.1
-install -Dpm 0644 assets/%{name}.desktop \
-    %{buildroot}%{_datadir}/applications/%{name}.desktop
-install -Dpm 0644 assets/%{name}-tui.desktop \
-    %{buildroot}%{_datadir}/applications/%{name}-tui.desktop
+desktop-file-install                                    \
+--delete-original                                       \
+--dir=%{buildroot}%{_datadir}/applications              \
+%{SOURCE1}
 install -Dpm 0644 assets/%{appid}.metainfo.xml \
     %{buildroot}%{_metainfodir}/%{appid}.metainfo.xml
 
 %check
 desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}.desktop
-desktop-file-validate %{buildroot}%{_datadir}/applications/%{name}-tui.desktop
 appstreamcli validate --no-net %{buildroot}%{_metainfodir}/%{appid}.metainfo.xml
 
 %files
@@ -68,9 +79,15 @@ appstreamcli validate --no-net %{buildroot}%{_metainfodir}/%{appid}.metainfo.xml
 %{_bindir}/%{name}
 %{_mandir}/man1/%{name}.1*
 %{_datadir}/applications/%{name}.desktop
-%{_datadir}/applications/%{name}-tui.desktop
 %{_metainfodir}/%{appid}.metainfo.xml
 
 %changelog
+* Sat Sep 05 2026 Hector Diaz <hdiazc@live.com> - 0.11.5-2
+- Ship one desktop entry, "AMD GPU", with the tabbed, terminal and SMI views
+  as right-click actions.
+  Upstream's two entries both render as "AMDGPU TOP (..." in the GNOME app grid,
+  which truncates before the token that tells them apart
+- Drop the metainfo launchable for the desktop entry no longer shipped
+
 * Sat Sep 05 2026 Hector Diaz <hdiazc@live.com> - 0.11.5-1
 - Initial package

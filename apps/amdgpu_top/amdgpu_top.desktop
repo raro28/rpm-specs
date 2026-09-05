@@ -1,0 +1,23 @@
+[Desktop Entry]
+Type=Application
+Name=AMD GPU
+GenericName=GPU monitor
+Comment=Monitor AMD GPU usage, sensors and per-process activity
+Icon=utilities-system-monitor
+Exec=/usr/bin/amdgpu_top --gui
+Categories=System;Monitor;
+Keywords=amd;amdgpu;radeon;gpu;vram;sensors;monitor;
+Terminal=false
+Actions=TabGui;Tui;Smi;
+
+[Desktop Action TabGui]
+Name=Tabbed view
+Exec=/usr/bin/amdgpu_top --tab-gui
+
+[Desktop Action Tui]
+Name=Terminal view
+Exec=/usr/bin/xdg-terminal-exec /usr/bin/amdgpu_top
+
+[Desktop Action Smi]
+Name=SMI view (one row per GPU)
+Exec=/usr/bin/xdg-terminal-exec /usr/bin/amdgpu_top --smi
