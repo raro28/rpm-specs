@@ -11,6 +11,7 @@ package lives in `<category>/<spec-dir>/`.
 |---|---|---|
 | themes/colloid-gtk-theme | `20260808-1` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | themes/fluent-gtk-theme | `20250417-9` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
+| apps/gnome-shell-extension-astra-monitor | `42-1` | GNOME Shell extension, top-bar CPU/GPU/memory/disk/network/sensor monitors ([AstraExt/astra-monitor](https://github.com/AstraExt/astra-monitor)) |
 | apps/gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
 | apps/llama.cpp | `0^b10333-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | apps/looking-glass-client | `7.0.0-15` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
@@ -91,6 +92,37 @@ mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-5.fc44.src.r
 ```
 
 `gnome-shell-extension-per-monitor-wallpaper` installs system-wide; each user enables it with `gnome-extensions enable per-monitor-wallpaper@ekthor`. Requires GNOME Shell 50.x (versioned `Requires`). Authored in TypeScript, built by CI into the release tarball (Source0); the RPM compiles nothing and has no `BuildRequires`.
+
+### gnome-shell-extension-astra-monitor
+
+Top-bar system monitor, authored in TypeScript. Unlike the other TypeScript
+packages here, the RPM compiles it: `Source0` is the `v42` source tag and
+`%build` runs Fedora's `tsc` (`BuildRequires: typescript glib2-devel gettext
+unzip`). `tsc` exits non-zero — the `@girs/*` ambient type packages are npm-only,
+so every `gi://` and `resource://` import is reported unresolved — but emission is
+unaffected.
+
+`Source1` is upstream's CI-built release zip. It is never installed: `%check`
+uses it as ground truth and asserts that the 68 emitted `.js` files and the 7
+compiled `.mo` catalogs are byte-identical to it, so a divergent `tsc` emit fails
+the build.
+
+Installs system-wide; enable per user with `gnome-extensions enable
+monitor@astraext.github.io`. Catalogs go to `%{_datadir}/locale` via
+`%find_lang`, matching Fedora's own extension packages (`dash-to-panel`,
+`appindicator`, `just-perfection`) — the shell binds the gettext domain there for
+extensions installed in its prefix. Requires GNOME Shell 45–51 (the range
+`metadata.json` declares). `Recommends`: `libgtop2` (GTop data source),
+`lm_sensors` (the `sensors` command, the only temperature/fan/voltage source) and
+`nethogs` (per-process network I/O; needs root or `cap_net_admin`+`cap_net_raw`).
+`amdgpu_top` is in no Fedora repo, so AMD GPU stats come from `amdgpu` sysfs.
+
+```bash
+SPEC=apps/gnome-shell-extension-astra-monitor/gnome-shell-extension-astra-monitor.spec
+spectool -g -R "$SPEC"
+rpmbuild -bs "$SPEC"
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/gnome-shell-extension-astra-monitor-42-1.fc44.src.rpm
+```
 
 ### mural
 
@@ -233,6 +265,7 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 | Spec | Local sources? | URL sources? |
 |---|---|---|
 | icons/qogir-icon-theme | No | Source0 only |
+| apps/gnome-shell-extension-astra-monitor | No | Source0 + Source1 (upstream release zip, `%check` ground truth) |
 | apps/gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
 | apps/llama.cpp | No | Source0 + Source1 (web-UI bundle) |
 | apps/mural | No | Source0 only |
@@ -258,8 +291,9 @@ rpmlint -c rpmlint.toml */*/*.spec
 these added in the theme/icon color-subpackage split:
 
 - `no-%check-section` — suppressed for the 2 specs with no test to run (the
-  kvmfr akmod, the GJS extension). All 9 vinceliuice theme/icon specs, plus
-  llama.cpp, looking-glass-client, and mural, carry a real `%check`.
+  kvmfr akmod, the per-monitor-wallpaper extension). All 9 vinceliuice
+  theme/icon specs, plus llama.cpp, looking-glass-client, mural, and
+  gnome-shell-extension-astra-monitor, carry a real `%check`.
 - `spelling-error` — this branch adds `nana`/`materia` to the filtered word
   list: `orchis-gtk-theme`'s `%description` credits the upstream projects it's
   based on (`nana-4`, `materia-theme`) — proper nouns, not misspellings.
@@ -283,7 +317,10 @@ whitesur-gtk) run 4 — GTK4 CSS parse through the real engine
 and a DPI-directory gate. `fluent-gtk-theme` runs 3: it has no DPI axis (no
 `-hdpi`/`-xhdpi` output), so no DPI gate. The 4 icon themes (qogir-icon, tela, tela-circle,
 whitesur-icon) each run 2 — an `index.theme`-presence gate and a
-zero-dangling-symlink gate. Every other warning class is fixed in the specs
+zero-dangling-symlink gate. `gnome-shell-extension-astra-monitor` runs 3 — a
+byte-identity gate on the 68 compiled `.js` files and one on the 7 `.mo`
+catalogs, both against upstream's release artifact (`Source1`), plus an assert
+that `metadata.json` still declares shell 50. Every other warning class is fixed in the specs
 (`%setup -q`/`%autosetup`, an explicit `%build`, `%%`-escaped `%changelog`
 macros), so a plain `rpmlint */*/*.spec` only surfaces the filtered
 `no-%check-section` (2 specs).
