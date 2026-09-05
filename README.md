@@ -383,7 +383,30 @@ macros), so a plain `rpmlint */*/*.spec` only surfaces the filtered
 
 ## COPR
 
-The `raro28/wdm` COPR builds these from SRPMs uploaded via `copr-cli`, or via the Custom method pulling from this repo. COPR's chroot matches `mock -r fedora-44-x86_64` exactly — anything that builds locally builds there.
+All 16 packages build by **SCM/rpkg**, not from uploaded SRPMs: each clones
+`https://github.com/raro28/rpm-specs` at `develop` and builds
+`<subdirectory>/<spec-name>.spec`. A push to `develop` is therefore what a rebuild
+picks up, and **moving a spec's directory breaks that package** until it is
+re-pointed:
+
+```bash
+copr-cli add-package-scm raro28/wdm --name <pkg> \
+  --clone-url https://github.com/raro28/rpm-specs --commit develop \
+  --subdir <category>/<spec-dir> --spec <spec-name>.spec --type git --method rpkg
+copr-cli build-package raro28/wdm --name <pkg> --nowait   # auto_rebuild is off
+```
+
+(`edit-package-scm` takes the same arguments for an existing package.)
+
+The chroot matches `mock -r fedora-44-x86_64` with **one deliberate difference**:
+the project has `enable_net` set, so COPR builds have network access and local mock
+does not. Only `apps/amdgpu_top` relies on it — it resolves Rust crates at build
+time — and locally that one needs `mock --enable-network`. Everything else builds
+identically in both.
+
+After a build succeeds, use `dnf --refresh` to see it: on dnf5 neither
+`dnf clean metadata` nor `dnf makecache` invalidates the cached repodata, so
+`dnf -q --refresh repoquery --repo=raro28-wdm <pkg>` is what confirms publication.
 
 ## Repo layout
 
@@ -395,8 +418,9 @@ The `raro28/wdm` COPR builds these from SRPMs uploaded via `copr-cli`, or via th
 │   └── <spec-dir>/
 ├── icons/                                 # icon themes (qogir, tela, tela-circle, whitesur)
 │   └── <spec-dir>/
-├── apps/                                  # standalone apps (mural, per-monitor-wallpaper,
-│   └── <spec-dir>/                        # looking-glass-client, llama.cpp)
+├── apps/                                  # standalone apps (amdgpu_top, astra-monitor,
+│   └── <spec-dir>/                        # mural, per-monitor-wallpaper,
+│                                          # looking-glass-client, llama.cpp)
 ├── kernel/                                # kernel modules (looking-glass-kvmfr-kmod)
 │   └── <spec-dir>/
 │       ├── <spec-name>.spec
