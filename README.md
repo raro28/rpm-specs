@@ -14,7 +14,7 @@ package lives in `<category>/<spec-dir>/`.
 | themes/fluent-gtk-theme | `20250417-9` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | apps/gnome-shell-extension-astra-monitor | `42-1` | GNOME Shell extension, top-bar CPU/GPU/memory/disk/network/sensor monitors ([AstraExt/astra-monitor](https://github.com/AstraExt/astra-monitor)) |
 | apps/gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
-| apps/llama.cpp | `0^b10333-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
+| apps/llama.cpp | `0.4.0-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | apps/looking-glass-client | `7.0.0-15` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | kernel/looking-glass-kvmfr-kmod | `0.0.12-8` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](kernel/looking-glass-kvmfr-kmod/README.md) |
 | apps/mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
@@ -222,7 +222,7 @@ mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/tela-icon-theme-20260707-4.fc44.src.rp
 
 ### llama.cpp
 
-No local sources, but two URL sources: `Source0` (the source tarball) and `Source1` (the prebuilt `llama-bNNNN-ui.tar.gz` web-UI bundle from the matching GitHub release, extracted into `tools/ui/dist` during `%prep` so the server embeds the SvelteKit UI without pulling in nodejs/npm at build time). `spectool -g -R` fetches both.
+No local sources, but two URL sources, and they come from **different tags on purpose**. Upstream cuts semver releases (`vX.Y.Z`) alongside its rolling nightly build tags (`bNNNN`); the semver release carries no assets at all, just a `nightly-tag.txt` naming the nightly it was cut from. So `Source0` is the `v%{version}` source tarball and `Source1` is the prebuilt `llama-bNNNN-ui.tar.gz` web-UI bundle from that *nightly* release — extracted into `tools/ui/dist` during `%prep` so the server embeds the SvelteKit UI without pulling nodejs/npm into the build. Both tags are the same commit (`v0.4.0` and `b10809` are both `5266f24`). `spectool -g -R` fetches both.
 
 One SRPM builds three coexisting binary RPMs off the `GGML_BACKEND_DL` module layout (`-DGGML_VULKAN=ON -DGGML_HIP=ON` in a single pass):
 
@@ -235,12 +235,18 @@ ggml loads whichever backend modules are installed and enumerates all their devi
 ```bash
 spectool -g -R apps/llama.cpp/llama.cpp.spec
 rpmbuild -bs apps/llama.cpp/llama.cpp.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/llama.cpp-0\^b10333-1.fc44.src.rpm
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/llama.cpp-0.4.0-1.fc44.src.rpm
 ```
 
-**Note the `\^` shell-escape** when typing the SRPM filename — `^` is the Fedora-standard post-release snapshot marker (upstream tags are `bNNNN` build numbers, no semver), and the literal caret appears in the filename.
+Through `0^b10333-1` this package tracked the nightly build tags, and the SRPM
+filename needed a `\^` shell-escape. It now follows the semver releases, so the
+caret is gone; `0^b10333 < 0.4.0`, so the change upgrades cleanly.
 
-To bump the upstream version, update `%global build_num` in the spec (one line). The current `bNNNN` tag is at <https://github.com/ggml-org/llama.cpp/releases>.
+To bump it: take the new `vX.Y.Z` from
+<https://github.com/ggml-org/llama.cpp/releases>, set `Version`, then read
+`https://github.com/ggml-org/llama.cpp/releases/download/vX.Y.Z/nightly-tag.txt`
+and set `%global build_num` from the `bNNNN` it names — that tag is where the UI
+bundle lives and what `LLAMA_BUILD_NUMBER` reports.
 
 ### looking-glass-client
 
