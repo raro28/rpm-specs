@@ -1,5 +1,5 @@
 Name:           whitesur-icon-theme
-Version:        20260811
+Version:        20260910
 Release:        1%{?dist}
 Summary:        A macOS BigSur-like icon theme for Linux desktops
 BuildArch:      noarch
@@ -7,7 +7,7 @@ BuildArch:      noarch
 License:        GPL-3.0-or-later
 
 %define dname WhiteSur-icon-theme
-%define dversion 2026-08-11
+%define dversion 2026-09-10
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz
 Patch0:         fix-dangling-symlinks.patch
@@ -83,6 +83,17 @@ echo "dangling-symlink gate: OK (0 across $n themes)"
 %{_datarootdir}/icons/WhiteSur-grey-dark
 
 %changelog
+* Sun Sep 20 2026 Hector Diaz <hdiazc@live.com> - 20260910-1
+- Bump to upstream 2026-09-10. install.sh flags unchanged
+  (--theme default --theme red --theme grey --alternative --dest).
+- Patch0 (fix-dangling-symlinks) trimmed to the one defect that persists: the
+  cp -r over links/ still clobbers real icons with self-referential symlinks, so
+  the two cp -rn hunks stay. Dropped the two now-obsolete hunks: upstream now
+  ships src/status/22/weather-clear-night.svg (the 36 aliases resolve natively),
+  and the mis-targeted links/status/symbolic/globe-symbolic.svg alias is gone
+  (globe-symbolic now only exists as a real src/actions icon). %%check (0
+  dangling) proves the trimmed patch still yields a clean tree.
+
 * Fri Aug 28 2026 Hector Diaz <hdiazc@live.com> - 20260811-1
 - Bump to upstream 2026-08-11. install.sh flags unchanged.
 - Patch0 (fix-dangling-symlinks): prior hunks still needed (install.sh keeps
