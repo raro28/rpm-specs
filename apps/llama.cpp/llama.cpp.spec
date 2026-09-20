@@ -5,7 +5,7 @@
 # b10809 are both 5266f24). On a version bump, read
 #   https://github.com/ggml-org/llama.cpp/releases/download/vX.Y.Z/nightly-tag.txt
 # and set build_num from it.
-%global build_num       10809
+%global build_num       10964
 %global nightly_tag     b%{build_num}
 # AMD GPU ISA target(s) for the ROCm/HIP backend. gfx1030 = RDNA2 (RX 6800/6900
 # XT); Fedora's rocBLAS ships Tensile kernels for it. Add space-separated targets
@@ -17,7 +17,7 @@
 %global amdgpu_targets  gfx1030
 
 Name:           llama.cpp
-Version:        0.4.0
+Version:        0.4.1
 Release:        1%{?dist}
 Summary:        LLM inference in C/C++ (CPU engine; GPU backends packaged separately)
 
@@ -165,6 +165,13 @@ ls %{buildroot}%{_bindir}/libggml-cpu-*.so >/dev/null
 %{_bindir}/libggml-hip.so
 
 %changelog
+* Sun Sep 20 2026 Hector Diaz <hdiazc@live.com> - 0.4.1-1
+- Bump to upstream v0.4.1 (nightly-tag.txt -> b10964; build_num 10809 -> 10964,
+  UI bundle Source1 tracks the nightly). Build-option surface verified unchanged
+  b10809..b10964: root CMakeLists only bumped the version patch; ggml added the
+  CUDA-only GGML_CUDA_FA_QUANTS default, irrelevant to the Vulkan/HIP/CPU build.
+  All cmake flags still valid; no local patches. %%check passes.
+
 * Sat Sep 05 2026 Hector Diaz <hdiazc@live.com> - 0.4.0-1
 - Follow upstream's new semver releases instead of the rolling bNNNN build tags.
   Version is now 0.4.0 (was 0^b10333); 0^b10333 < 0.4.0, so it upgrades cleanly
