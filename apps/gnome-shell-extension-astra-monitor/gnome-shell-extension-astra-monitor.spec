@@ -3,7 +3,7 @@
 
 Name:           gnome-shell-extension-astra-monitor
 Version:        42
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        GNOME Shell extension monitoring CPU, GPU, memory, disk, network and sensors
 BuildArch:      noarch
 
@@ -33,6 +33,8 @@ Recommends:     libgtop2
 Recommends:     lm_sensors
 # nethogs: per-process network I/O; needs root or cap_net_admin+cap_net_raw.
 Recommends:     nethogs
+# amdgpu_top: detailed AMD GPU metrics source for the GPU module.
+Recommends:     amdgpu_top
 
 %description
 Astra Monitor is a system monitor for the GNOME Shell top bar. It reports CPU,
@@ -113,5 +115,9 @@ find %{buildroot}%{_datadir}/locale -type f -exec chmod 0644 {} +
 %{_datadir}/gnome-shell/extensions/%{uuid}/
 
 %changelog
+* Sun Sep 20 2026 Hector Diaz <hdiazc@live.com> - 42-2
+- Recommends: amdgpu_top -- the AMD GPU metrics source the GPU module can read,
+  now packaged in this COPR. Weak dep, matching the other optional data sources.
+
 * Sat Sep 05 2026 Hector Diaz <hdiazc@live.com> - 42-1
 - Initial package

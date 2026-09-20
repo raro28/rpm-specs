@@ -12,7 +12,7 @@ package lives in `<category>/<spec-dir>/`.
 | apps/amdgpu_top | `0.11.5-2` | AMD GPU monitor — TUI, SMI, GUI and JSON modes ([Umio-Yasuno/amdgpu_top](https://github.com/Umio-Yasuno/amdgpu_top)) |
 | themes/colloid-gtk-theme | `20260808-1` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | themes/fluent-gtk-theme | `20250417-9` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
-| apps/gnome-shell-extension-astra-monitor | `42-1` | GNOME Shell extension, top-bar CPU/GPU/memory/disk/network/sensor monitors ([AstraExt/astra-monitor](https://github.com/AstraExt/astra-monitor)) |
+| apps/gnome-shell-extension-astra-monitor | `42-2` | GNOME Shell extension, top-bar CPU/GPU/memory/disk/network/sensor monitors ([AstraExt/astra-monitor](https://github.com/AstraExt/astra-monitor)); recommends amdgpu_top |
 | apps/gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
 | apps/llama.cpp | `0.4.1-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
 | apps/looking-glass-client | `7.0.0-15` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
@@ -165,7 +165,7 @@ extensions installed in its prefix. Requires GNOME Shell 45–51 (the range
 SPEC=apps/gnome-shell-extension-astra-monitor/gnome-shell-extension-astra-monitor.spec
 spectool -g -R "$SPEC"
 rpmbuild -bs "$SPEC"
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/gnome-shell-extension-astra-monitor-42-1.fc44.src.rpm
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/gnome-shell-extension-astra-monitor-42-2.fc44.src.rpm
 ```
 
 ### mural
