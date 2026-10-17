@@ -2,8 +2,8 @@
 %global uuid    monitor@astraext.github.io
 
 Name:           gnome-shell-extension-astra-monitor
-Version:        42
-Release:        2%{?dist}
+Version:        43
+Release:        1%{?dist}
 Summary:        GNOME Shell extension monitoring CPU, GPU, memory, disk, network and sensors
 BuildArch:      noarch
 
@@ -12,7 +12,7 @@ URL:            https://github.com/AstraExt/%{srcname}
 Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{srcname}-%{version}.tar.gz
 # Upstream's CI-built release artifact. Never installed: %%check diffs the
 # JavaScript this spec compiles against it, so a divergent tsc emit fails the build.
-Source1:        %{url}/releases/download/v%{version}/%{uuid}.shell-extension.zip
+Source1:        %{url}/releases/download/v%{version}/%{uuid}.shell-extension.zip#/%{srcname}-%{version}.shell-extension.zip
 
 # Authored in TypeScript; compiled here with Fedora's tsc.
 BuildRequires:  typescript
@@ -115,6 +115,16 @@ find %{buildroot}%{_datadir}/locale -type f -exec chmod 0644 {} +
 %{_datadir}/gnome-shell/extensions/%{uuid}/
 
 %changelog
+* Sat Oct 17 2026 Hector Diaz <hdiazc@live.com> - 43-1
+- Bump to upstream v43. metadata.json still declares shell-version 45-51 (covers
+  50; %%check grep and the Requires range 45..<52 unchanged). Build unchanged:
+  tsc compile + %%check byte-diff against upstream's release artifact. Recommends
+  amdgpu_top carried forward.
+- Source1: add a #/%%{srcname}-%%{version}.shell-extension.zip download rename. The
+  bare %%{uuid}.shell-extension.zip name is identical across releases, so a stale
+  cached copy in ~/rpmbuild/SOURCES/ silently shadowed the new one (spectool
+  "already present") and %%check would diff against the wrong version's artifact.
+
 * Sun Sep 20 2026 Hector Diaz <hdiazc@live.com> - 42-2
 - Recommends: amdgpu_top -- the AMD GPU metrics source the GPU module can read,
   now packaged in this COPR. Weak dep, matching the other optional data sources.
