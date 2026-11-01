@@ -5,7 +5,7 @@
 # b10809 are both 5266f24). On a version bump, read
 #   https://github.com/ggml-org/llama.cpp/releases/download/vX.Y.Z/nightly-tag.txt
 # and set build_num from it.
-%global build_num       11669
+%global build_num       11960
 %global nightly_tag     b%{build_num}
 # AMD GPU ISA target(s) for the ROCm/HIP backend. gfx1030 = RDNA2 (RX 6800/6900
 # XT); Fedora's rocBLAS ships Tensile kernels for it. Add space-separated targets
@@ -17,7 +17,7 @@
 %global amdgpu_targets  gfx1030
 
 Name:           llama.cpp
-Version:        0.7.0
+Version:        0.8.0
 Release:        1%{?dist}
 Summary:        LLM inference in C/C++ (CPU engine; GPU backends packaged separately)
 
@@ -165,6 +165,17 @@ ls %{buildroot}%{_bindir}/libggml-cpu-*.so >/dev/null
 %{_bindir}/libggml-hip.so
 
 %changelog
+* Sun Nov 01 2026 Hector Diaz <hdiazc@live.com> - 0.8.0-1
+- Bump to upstream v0.8.0 (nightly-tag.txt -> b11960; build_num 11669 -> 11960;
+  v0.8.0 and b11960 are both commit 8642541). Build-option surface re-evaluated
+  across b11669..b11960: ggml/ggml-hip/ggml-vulkan option() sets are identical;
+  root CMakeLists adds exactly one new option, LLAMA_CONNECT (default OFF, pulls
+  a prebuilt llama-connect binary) -- correctly left at its OFF default, a Fedora
+  package must not download prebuilt binaries. No flag change for the vulkan/rocm/
+  cpu subpackages. No local patches. %%check passes. -rocm stays gfx1030
+  (build-verified only; the 6900 XT is on vfio, the host 6400 is gfx1034, absent
+  from Fedora rocBLAS).
+
 * Sat Oct 17 2026 Hector Diaz <hdiazc@live.com> - 0.7.0-1
 - Bump to upstream v0.7.0 (nightly-tag.txt -> b11669; build_num 10964 -> 11669;
   v0.7.0 and b11669 are both commit 620d222). Build-option surface re-evaluated
