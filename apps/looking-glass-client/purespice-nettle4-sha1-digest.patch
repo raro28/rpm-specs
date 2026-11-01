@@ -1,0 +1,26 @@
+diff --git a/repos/PureSpice/src/rsa.c b/repos/PureSpice/src/rsa.c
+index 73fba92..65bb39b 100644
+--- a/repos/PureSpice/src/rsa.c
++++ b/repos/PureSpice/src/rsa.c
+@@ -44,6 +44,7 @@
+ #include <nettle/rsa.h>
+ #include <nettle/bignum.h>
+ #include <gmp.h>
++#include <nettle/version.h>
+ 
+ #define SHA1_HASH_LEN 20
+ #endif
+@@ -62,7 +63,13 @@ static void sha1(uint8_t * hash, const uint8_t *data, unsigned int len)
+ 
+   sha1_init(&ctx);
+   sha1_update(&ctx, len, data);
++  /* nettle 4.0 removed the length argument from sha1_digest(); it always
++     writes SHA1_DIGEST_SIZE bytes. Keep the 3-arg form for nettle < 4. */
++#if NETTLE_VERSION_MAJOR >= 4
++  sha1_digest(&ctx, hash);
++#else
+   sha1_digest(&ctx, SHA1_HASH_LEN, hash);
++#endif
+ }
+ 
+ static void oaep_mask(uint8_t * dest, size_t dest_len,

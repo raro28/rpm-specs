@@ -15,7 +15,7 @@ package lives in `<category>/<spec-dir>/`.
 | apps/gnome-shell-extension-astra-monitor | `43-1` | GNOME Shell extension, top-bar CPU/GPU/memory/disk/network/sensor monitors ([AstraExt/astra-monitor](https://github.com/AstraExt/astra-monitor)); recommends amdgpu_top |
 | apps/gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
 | apps/llama.cpp | `0.8.0-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
-| apps/looking-glass-client | `7.0.0-15` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
+| apps/looking-glass-client | `7.0.0-16` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | kernel/looking-glass-kvmfr-kmod | `0.0.12-8` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](kernel/looking-glass-kvmfr-kmod/README.md) |
 | apps/mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
 | themes/orchis-gtk-theme | `20260707-3` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
@@ -259,16 +259,17 @@ apps/looking-glass-client/10-looking-glass-client.conf
 apps/looking-glass-client/looking-glass-client.desktop
 apps/looking-glass-client/looking-glass-client.te
 apps/looking-glass-client/looking-glass-client.fc
+apps/looking-glass-client/purespice-nettle4-sha1-digest.patch
 ```
 
 **Upstream tarball gotcha**: GitHub's tag-archive of `gnif/LookingGlass` does not recurse into git submodules. The spec declares `Source10..15` for each submodule (LGMP, PureSpice, cimgui, imgui, nanosvg, wayland-protocols) pinned to its gitlink SHA. `spectool` fetches all of them.
 
 ```bash
-cp apps/looking-glass-client/{10-looking-glass-client.conf,looking-glass-client.desktop,looking-glass-client.te,looking-glass-client.fc} \
+cp apps/looking-glass-client/{10-looking-glass-client.conf,looking-glass-client.desktop,looking-glass-client.te,looking-glass-client.fc,purespice-nettle4-sha1-digest.patch} \
    ~/rpmbuild/SOURCES/
 spectool -g -R apps/looking-glass-client/looking-glass-client.spec
 rpmbuild -bs apps/looking-glass-client/looking-glass-client.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-15.fc44.src.rpm
+mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-16.fc44.src.rpm
 ```
 
 To bump the upstream version, update `%global upstream_tag` in the spec and refresh the six submodule SHAs via:
@@ -322,7 +323,7 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 | apps/mural | No | Source0 only |
 | 5 vinceliuice GTK themes (`themes/`) | **Yes** — 2–4 patches | Source0 only |
 | icons/tela-icon-theme, icons/tela-circle-icon-theme, icons/whitesur-icon-theme | **Yes** — 1 patch (fix-dangling-symlinks.patch) | Source0 only |
-| apps/looking-glass-client | **Yes** — 4 files | Source0 + 6 submodule URLs |
+| apps/looking-glass-client | **Yes** — 4 files + 1 patch (PureSpice nettle 4.0) | Source0 + 6 submodule URLs |
 | kernel/looking-glass-kvmfr-kmod | **Yes** — 5 files + 1 patch | Source0 only |
 
 When sources drift between the spec directory and `~/rpmbuild/SOURCES/`, the build silently uses the stale copies. Re-copying before `rpmbuild -bs` is cheap insurance.

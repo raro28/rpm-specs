@@ -12,7 +12,7 @@
 
 Name:           looking-glass-client
 Version:        7.0.0
-Release:        15%{?dist}
+Release:        16%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPL-2.0-only
@@ -31,6 +31,11 @@ Source12:       https://github.com/cimgui/cimgui/archive/%{commit_cimgui}.tar.gz
 Source13:       https://github.com/ocornut/imgui/archive/%{commit_imgui}.tar.gz#/imgui-%{commit_imgui}.tar.gz
 Source14:       https://github.com/memononen/nanosvg/archive/%{commit_nanosvg}.tar.gz#/nanosvg-%{commit_nanosvg}.tar.gz
 Source15:       https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/%{commit_wp}/wayland-protocols-%{commit_wp}.tar.gz
+
+# Fix the bundled PureSpice submodule for nettle 4.0 (Fedora 45): sha1_digest()
+# lost its length argument. Version-guarded, so it still builds on nettle 3.x
+# (Fedora 44). Applied by hand in %%prep after the submodule is unpacked.
+Patch0:         purespice-nettle4-sha1-digest.patch
 
 Requires:       font(dejavusansmono)
 Requires:       texlive-gnu-freefont
@@ -72,7 +77,9 @@ SELinux policy module for %{name}. Grants the client the access it needs to
 the KVMFR shared-memory device under /dev/shm.
 
 %prep
-%autosetup -n LookingGlass-%{upstream_tag}
+# -N: do not auto-apply patches here; Patch0 targets repos/PureSpice, which is
+# unpacked below, so it is applied by hand after the submodule tarballs.
+%autosetup -N -n LookingGlass-%{upstream_tag}
 # Populate git submodule directories (upstream's GitHub archive doesn't recurse).
 # Order matches Source10..15.
 mkdir -p repos/LGMP repos/PureSpice repos/cimgui repos/cimgui/imgui \
@@ -83,6 +90,7 @@ tar xf %{SOURCE12} --strip-components=1 -C repos/cimgui
 tar xf %{SOURCE13} --strip-components=1 -C repos/cimgui/imgui
 tar xf %{SOURCE14} --strip-components=1 -C repos/nanosvg
 tar xf %{SOURCE15} --strip-components=1 -C repos/wayland-protocols
+%patch -P 0 -p1
 
 %build
 pushd client
@@ -151,6 +159,15 @@ fi
 %selinux_relabel_post -s targeted
 
 %changelog
+* Sun Nov 01 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-16
+- Fedora 45 build fix. F45 ships nettle 4.0, which dropped the length argument
+  from sha1_digest(ctx, length, digest) -> sha1_digest(ctx, digest); the bundled
+  PureSpice submodule (repos/PureSpice/src/rsa.c) still used the 3-arg form, so
+  gcc rejected it (int-to-pointer, fatal under -Werror). Add Patch0 guarding the
+  call on NETTLE_VERSION_MAJOR: 2-arg on nettle >= 4, 3-arg otherwise -- builds on
+  both F44 (nettle 3.10) and F45 (nettle 4.0), no distro conditional. Patch0 is
+  applied by hand after %%prep unpacks the submodule (%%autosetup -N).
+
 * Sat Aug 29 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-15
 - Desktop entry: drop win:jitRender=yes from all Exec lines. JIT render caused
   idle-input frame-pacing stutter on GNOME/Wayland (smooth only while the pointer
