@@ -5,7 +5,7 @@
 # b10809 are both 5266f24). On a version bump, read
 #   https://github.com/ggml-org/llama.cpp/releases/download/vX.Y.Z/nightly-tag.txt
 # and set build_num from it.
-%global build_num       11960
+%global build_num       12359
 %global nightly_tag     b%{build_num}
 # AMD GPU ISA target(s) for the ROCm/HIP backend. gfx1030 = RDNA2 (RX 6800/6900
 # XT); Fedora's rocBLAS ships Tensile kernels for it. Add space-separated targets
@@ -17,7 +17,7 @@
 %global amdgpu_targets  gfx1030
 
 Name:           llama.cpp
-Version:        0.8.0
+Version:        1.0.0
 Release:        1%{?dist}
 Summary:        LLM inference in C/C++ (CPU engine; GPU backends packaged separately)
 
@@ -165,6 +165,14 @@ ls %{buildroot}%{_bindir}/libggml-cpu-*.so >/dev/null
 %{_bindir}/libggml-hip.so
 
 %changelog
+* Mon Nov 16 2026 Hector Diaz <hdiazc@live.com> - 1.0.0-1
+- Bump to upstream v1.0.0 (nightly-tag.txt -> b12359; build_num 11960 -> 12359;
+  v1.0.0 and b12359 are both commit b1b770d). Build-option surface re-evaluated
+  across b11960..b12359: root/ggml-hip/ggml-vulkan option() sets are identical;
+  ggml adds only the CUDA-only GGML_CUDA_FA_QUANTS f8_e4m3 entry and the SYCL-only
+  GGML_SYCL_SUPPORT_XMX option -- neither affects the vulkan/rocm/cpu subpackages.
+  No flag change, no local patches. %%check passes.
+
 * Sun Nov 01 2026 Hector Diaz <hdiazc@live.com> - 0.8.0-1
 - Bump to upstream v0.8.0 (nightly-tag.txt -> b11960; build_num 11669 -> 11960;
   v0.8.0 and b11960 are both commit 8642541). Build-option surface re-evaluated
