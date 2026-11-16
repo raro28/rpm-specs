@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-RPM spec files for Fedora 44, built in the raro28/wdm COPR. One subdirectory per
+RPM spec files for Fedora, built in the raro28/wdm COPR. One subdirectory per
 source package. See README.md for per-spec build details.
 
 ## Verify, don't assert (governing rule)
@@ -10,8 +10,8 @@ source package. See README.md for per-spec build details.
 - "Verified" means reproduced on this host: build it (`mock` exit 0), parse it
   (real GTK engine), diff it against ground truth (`gresource extract`), grep the
   actual compiled output. A plan is not a result.
-- Derive from the reference implementation present on this host (GNOME 50.2,
-  GTK 4.22) — not from training data or upstream READMEs.
+- Derive from the reference implementation present on this host (its live
+  GNOME/GTK, not a pinned version) — not from training data or upstream READMEs.
 - When something is unverified or unverifiable (e.g. live pixel rendering), say so
   explicitly; never imply it was checked.
 - No silent scope: report what you ran, what passed, and what you skipped.
@@ -25,9 +25,13 @@ source package. See README.md for per-spec build details.
   changed and why in as few words as the fact needs.
 
 ## Build / verify loop
-- Target = Fedora 44 (GNOME 50.2, GTK 4.22); build in a clean chroot.
+- Target = the host's current Fedora release; build in a clean chroot for it.
+  Currently Fedora 45 / GNOME 51.1 / GTK 4.24.1 — re-derive, don't trust this
+  snapshot: `rpm -E %fedora`, `rpm -q gnome-shell gtk4`. (COPR builds a fixed
+  chroot set — fedora-44 and fedora-45 — independent of the host release.)
 - Flow: `spectool -g -R <spec>` → `rpmbuild -bs <spec>` →
-  `mock -r fedora-44-x86_64 <srpm>`. Output in `/var/lib/mock/fedora-44-x86_64/result/`.
+  `mock -r fedora-$(rpm -E %fedora)-x86_64 <srpm>`. Output in
+  `/var/lib/mock/fedora-$(rpm -E %fedora)-x86_64/result/`.
 - Patch basenames collide across specs: five specs each ship `gnome50-selectors.patch`,
   three ship `fix-dangling-symlinks.patch`. `~/rpmbuild/SOURCES/` is flat, so
   `cp */*/*.patch ~/rpmbuild/SOURCES/` silently overwrites and a spec builds against

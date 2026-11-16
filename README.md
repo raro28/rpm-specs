@@ -1,6 +1,6 @@
 # rpm-specs
 
-RPM spec files for Fedora 44 packages I maintain in the COPR
+RPM spec files for Fedora packages I maintain in the COPR
 [raro28/wdm](https://copr.fedorainfracloud.org/coprs/raro28/wdm/).
 Specs are grouped by category (`themes/`, `icons/`, `apps/`, `kernel/`); each
 package lives in `<category>/<spec-dir>/`.
@@ -39,7 +39,7 @@ rpmdev-setuptree            # creates ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS
 
 - `rpm-build`  → `rpmbuild`
 - `rpmdevtools` → `spectool` (fetches `Source:` URLs), `rpmdev-setuptree`
-- `mock` → clean fedora-44-x86_64 chroot builder
+- `mock` → clean per-release chroot builder (`fedora-$(rpm -E %fedora)-x86_64`)
 - `rpmlint` → the lint gate (`rpmlint -c rpmlint.toml */*/*.spec`, see Linting)
 - `createrepo_c` → optional, for local repodata checks
 
@@ -66,17 +66,17 @@ spectool -g -R "$SPEC"
 # 3. Build the SRPM
 rpmbuild -bs "$SPEC"
 
-# 4. Build binary RPMs in a clean F44 chroot
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/<srpm-basename>.fc44.src.rpm
-# Results: /var/lib/mock/fedora-44-x86_64/result/*.rpm
+# 4. Build binary RPMs in a clean chroot for the host's Fedora release
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/<srpm-basename>.fc*.src.rpm
+# Results: /var/lib/mock/fedora-$(rpm -E %fedora)-x86_64/result/*.rpm
 
 # 5. (optional) install locally
-sudo dnf install /var/lib/mock/fedora-44-x86_64/result/*.rpm
+sudo dnf install /var/lib/mock/fedora-$(rpm -E %fedora)-x86_64/result/*.rpm
 ```
 
 `mock` reads each `Source:` from `~/rpmbuild/SOURCES/`. URLs are NOT fetched at mock time — `spectool` is what populates the cache.
 
-One exception to step 4: `apps/amdgpu_top` builds its Rust dependencies from crates.io and needs `mock -r fedora-44-x86_64 --enable-network <srpm>`. See its section below.
+One exception to step 4: `apps/amdgpu_top` builds its Rust dependencies from crates.io and needs `mock -r "fedora-$(rpm -E %fedora)-x86_64" --enable-network <srpm>`. See its section below.
 
 ## Per-spec build instructions
 
@@ -91,7 +91,7 @@ One exception to step 4: `apps/amdgpu_top` builds its Rust dependencies from cra
 ```bash
 spectool -g -R icons/qogir-icon-theme/qogir-icon-theme.spec
 rpmbuild -bs icons/qogir-icon-theme/qogir-icon-theme.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-5.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-5.fc*.src.rpm
 ```
 
 `gnome-shell-extension-per-monitor-wallpaper` installs system-wide; each user enables it with `gnome-extensions enable per-monitor-wallpaper@ekthor`. Requires GNOME Shell 51.x (versioned `Requires`). Authored in TypeScript, built by CI into the release tarball (Source0); the RPM compiles nothing and has no `BuildRequires`.
@@ -115,7 +115,7 @@ the alternative would mean carrying 523 crates (74 MB compressed) as a source.
 cp apps/amdgpu_top/amdgpu_top.desktop apps/amdgpu_top/*.patch ~/rpmbuild/SOURCES/
 spectool -g -R apps/amdgpu_top/amdgpu_top.spec
 rpmbuild -bs apps/amdgpu_top/amdgpu_top.spec
-mock -r fedora-44-x86_64 --enable-network ~/rpmbuild/SRPMS/amdgpu_top-0.11.5-2.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" --enable-network ~/rpmbuild/SRPMS/amdgpu_top-0.11.5-2.fc*.src.rpm
 ```
 
 Plain `mock` fails here: it sets `rpmbuild_networking` and `use_host_resolv` to
@@ -165,7 +165,7 @@ extensions installed in its prefix. Requires GNOME Shell 45–51 (the range
 SPEC=apps/gnome-shell-extension-astra-monitor/gnome-shell-extension-astra-monitor.spec
 spectool -g -R "$SPEC"
 rpmbuild -bs "$SPEC"
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/gnome-shell-extension-astra-monitor-43-1.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/gnome-shell-extension-astra-monitor-43-1.fc*.src.rpm
 ```
 
 ### mural
@@ -175,7 +175,7 @@ Standalone GTK4/libadwaita editor for the config the `gnome-shell-extension-per-
 ```bash
 spectool -g -R apps/mural/mural.spec
 rpmbuild -bs apps/mural/mural.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/mural-1.0.2-1.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/mural-1.0.2-1.fc*.src.rpm
 ```
 
 ### vinceliuice GTK themes (GNOME 50 patches, color subpackages)
@@ -198,7 +198,7 @@ Example (`themes/qogir-gtk-theme`):
 cp themes/qogir-gtk-theme/*.patch ~/rpmbuild/SOURCES/
 spectool -g -R themes/qogir-gtk-theme/qogir-gtk-theme.spec
 rpmbuild -bs themes/qogir-gtk-theme/qogir-gtk-theme.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-gtk-theme-20250817-7.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/qogir-gtk-theme-20250817-7.fc*.src.rpm
 ```
 
 Patch reference:
@@ -217,7 +217,7 @@ Patch reference:
 cp icons/tela-icon-theme/*.patch ~/rpmbuild/SOURCES/
 spectool -g -R icons/tela-icon-theme/tela-icon-theme.spec
 rpmbuild -bs icons/tela-icon-theme/tela-icon-theme.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/tela-icon-theme-20260707-4.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/tela-icon-theme-20260707-4.fc*.src.rpm
 ```
 
 ### llama.cpp
@@ -235,7 +235,7 @@ ggml loads whichever backend modules are installed and enumerates all their devi
 ```bash
 spectool -g -R apps/llama.cpp/llama.cpp.spec
 rpmbuild -bs apps/llama.cpp/llama.cpp.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/llama.cpp-1.0.0-1.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/llama.cpp-1.0.0-1.fc*.src.rpm
 ```
 
 Through `0^b10333-1` this package tracked the nightly build tags, and the SRPM
@@ -269,7 +269,7 @@ cp apps/looking-glass-client/{10-looking-glass-client.conf,looking-glass-client.
    ~/rpmbuild/SOURCES/
 spectool -g -R apps/looking-glass-client/looking-glass-client.spec
 rpmbuild -bs apps/looking-glass-client/looking-glass-client.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-16.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-16.fc*.src.rpm
 ```
 
 To bump the upstream version, update `%global upstream_tag` in the spec and refresh the six submodule SHAs via:
@@ -306,7 +306,7 @@ cp kernel/looking-glass-kvmfr-kmod/{kvmfr.conf,99-kvmfr.rules,kvmfr.te,kvmfr.fc,
    ~/rpmbuild/SOURCES/
 spectool -g -R kernel/looking-glass-kvmfr-kmod/looking-glass-kvmfr-kmod.spec
 rpmbuild -bs kernel/looking-glass-kvmfr-kmod/looking-glass-kvmfr-kmod.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-kvmfr-kmod-0.0.12-8.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/looking-glass-kvmfr-kmod-0.0.12-8.fc*.src.rpm
 ```
 
 After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (libvirt cgroup ACL + VM XML cutover) the package cannot do for you — see [kernel/looking-glass-kvmfr-kmod/README.md](kernel/looking-glass-kvmfr-kmod/README.md) for the full setup, verification, rollback, and SELinux details.
@@ -399,7 +399,7 @@ copr-cli build-package raro28/wdm --name <pkg> --nowait   # auto_rebuild is off
 
 (`edit-package-scm` takes the same arguments for an existing package.)
 
-The chroot matches `mock -r fedora-44-x86_64` with **one deliberate difference**:
+The chroot matches `mock -r "fedora-$(rpm -E %fedora)-x86_64"` with **one deliberate difference**:
 the project has `enable_net` set, so COPR builds have network access and local mock
 does not. Only `apps/amdgpu_top` relies on it — it resolves Rust crates at build
 time — and locally that one needs `mock --enable-network`. Everything else builds
