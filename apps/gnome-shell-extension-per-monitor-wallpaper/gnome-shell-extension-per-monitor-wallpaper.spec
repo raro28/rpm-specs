@@ -2,7 +2,7 @@
 %global uuid    per-monitor-wallpaper@ekthor
 
 Name:           gnome-shell-extension-per-monitor-wallpaper
-Version:        2.2.1
+Version:        2.3.0
 Release:        1%{?dist}
 Summary:        GNOME Shell extension that paints each monitor its own wallpaper
 BuildArch:      noarch
@@ -14,9 +14,9 @@ Source0:        %{url}/releases/download/v%{version}/per-monitor-wallpaper-%{ver
 # Authored in TypeScript, built by CI into the release tarball; the RPM
 # compiles nothing and needs no BuildRequires.
 
-# The extension declares shell-version ["50"] and shell extensions break across
-# GNOME major versions, so pin to the 50.x series.
-Requires:       (gnome-shell >= 50 with gnome-shell < 51)
+# The extension declares shell-version ["51"] and shell extensions break across
+# GNOME major versions, so pin to the 51.x series.
+Requires:       (gnome-shell >= 51 with gnome-shell < 52)
 # Reads the org.gnome.desktop.background schema.
 Requires:       gsettings-desktop-schemas
 
@@ -46,6 +46,11 @@ install -pm 0644 metadata.json extension.js \
 %{_datadir}/gnome-shell/extensions/%{uuid}/
 
 %changelog
+* Mon Nov 16 2026 Hector Diaz <hdiazc@live.com> - 2.3.0-1
+- Upstream 2.3.0: port to GNOME Shell 51. GNOME 51 removed Meta.Background.set_file;
+  backgrounds are now built from a Glycin-decoded texture via set_texture.
+- Requires gnome-shell 51 (drops 50); shell-version pinned to 51.
+
 * Thu Jul 09 2026 Hector Diaz <hdiazc@live.com> - 2.2.1-1
 - Paint per-monitor wallpapers when the session opens in the overview; a system-wide
   install enabled after the overview was shown, leaving GNOME's single wallpaper on
