@@ -1,12 +1,23 @@
-%global build_num       10333
-%global upstream_tag    b%{build_num}
+# Upstream now cuts semver releases (vX.Y.Z) alongside the rolling nightly build
+# tags (bNNNN). The semver release carries no assets: it ships a single
+# nightly-tag.txt naming the nightly it was cut from, and that nightly release is
+# where the prebuilt UI bundle lives. Both tags are the same commit (v0.4.0 and
+# b10809 are both 5266f24). On a version bump, read
+#   https://github.com/ggml-org/llama.cpp/releases/download/vX.Y.Z/nightly-tag.txt
+# and set build_num from it.
+%global build_num       12359
+%global nightly_tag     b%{build_num}
 # AMD GPU ISA target(s) for the ROCm/HIP backend. gfx1030 = RDNA2 (RX 6800/6900
 # XT); Fedora's rocBLAS ships Tensile kernels for it. Add space-separated targets
 # here to widen -rocm coverage (each adds build time).
+# Deliberate, do not "correct" to match the display GPU: Fedora's rocBLAS covers
+# gfx1010/1012/1030/1031/1035/1036/1100+ but skips gfx1034, so this host's RX 6400
+# cannot be targeted natively at all. Both cards are RDNA2/GFX10_3, so this build
+# runs on a 6400 under HSA_OVERRIDE_GFX_VERSION=10.3.0 if needed.
 %global amdgpu_targets  gfx1030
 
 Name:           llama.cpp
-Version:        0^b%{build_num}
+Version:        1.0.0
 Release:        1%{?dist}
 Summary:        LLM inference in C/C++ (CPU engine; GPU backends packaged separately)
 
@@ -15,11 +26,11 @@ Summary:        LLM inference in C/C++ (CPU engine; GPU backends packaged separa
 License:        MIT
 URL:            https://github.com/ggml-org/llama.cpp
 
-Source0:        https://github.com/ggml-org/llama.cpp/archive/refs/tags/%{upstream_tag}.tar.gz#/llama.cpp-%{upstream_tag}.tar.gz
+Source0:        %{url}/archive/refs/tags/v%{version}.tar.gz#/%{name}-%{version}.tar.gz
 # Prebuilt SvelteKit web UI bundle (bundle.{css,js}, index.html, loading.html,
-# checksums.txt). Released alongside the source tag. Avoids a network fetch
-# during %%build which mock blocks by default.
-Source1:        https://github.com/ggml-org/llama.cpp/releases/download/%{upstream_tag}/llama-%{upstream_tag}-ui.tar.gz
+# checksums.txt). Published on the nightly release, not the semver one. Avoids a
+# network fetch during %%build which mock blocks by default.
+Source1:        %{url}/releases/download/%{nightly_tag}/llama-%{nightly_tag}-ui.tar.gz
 
 BuildRequires:  cmake
 BuildRequires:  gcc
@@ -40,8 +51,6 @@ BuildRequires:  rocm-comgr-devel
 BuildRequires:  rocm-cmake
 BuildRequires:  clang
 BuildRequires:  llvm
-# common
-BuildRequires:  libcurl-devel
 # Activates LLAMA_OPENSSL (default ON): HTTPS support in the server's httplib client.
 BuildRequires:  openssl-devel
 
@@ -87,7 +96,7 @@ hipBLAS. ggml discovers and loads it at runtime; install alongside the llama.cpp
 base package. AMD-only and specific to the gfx1030 target.
 
 %prep
-%autosetup -n llama.cpp-%{upstream_tag}
+%autosetup -n %{name}-%{version}
 # Stage prebuilt UI assets so scripts/ui-assets.cmake picks them up via its
 # "assets already present" branch and skips the HF download (mock is offline).
 mkdir -p tools/ui/dist
@@ -109,7 +118,7 @@ tar xf %{SOURCE1} --strip-components=1 -C tools/ui/dist
     -DLLAMA_BUILD_UI=ON \
     -DLLAMA_USE_PREBUILT_UI=ON \
     -DLLAMA_BUILD_NUMBER=%{build_num} \
-    -DLLAMA_CURL=ON \
+    -DLLAMA_BUILD_IS_DEV=OFF \
     -DLLAMA_OPENSSL=ON \
     -DBUILD_SHARED_LIBS=ON \
     -DCMAKE_INSTALL_LIBDIR=%{_lib}
@@ -156,6 +165,53 @@ ls %{buildroot}%{_bindir}/libggml-cpu-*.so >/dev/null
 %{_bindir}/libggml-hip.so
 
 %changelog
+* Mon Nov 16 2026 Hector Diaz <hdiazc@live.com> - 1.0.0-1
+- Bump to upstream v1.0.0 (nightly-tag.txt -> b12359; build_num 11960 -> 12359;
+  v1.0.0 and b12359 are both commit b1b770d). Build-option surface re-evaluated
+  across b11960..b12359: root/ggml-hip/ggml-vulkan option() sets are identical;
+  ggml adds only the CUDA-only GGML_CUDA_FA_QUANTS f8_e4m3 entry and the SYCL-only
+  GGML_SYCL_SUPPORT_XMX option -- neither affects the vulkan/rocm/cpu subpackages.
+  No flag change, no local patches. %%check passes.
+
+* Sun Nov 01 2026 Hector Diaz <hdiazc@live.com> - 0.8.0-1
+- Bump to upstream v0.8.0 (nightly-tag.txt -> b11960; build_num 11669 -> 11960;
+  v0.8.0 and b11960 are both commit 8642541). Build-option surface re-evaluated
+  across b11669..b11960: ggml/ggml-hip/ggml-vulkan option() sets are identical;
+  root CMakeLists adds exactly one new option, LLAMA_CONNECT (default OFF, pulls
+  a prebuilt llama-connect binary) -- correctly left at its OFF default, a Fedora
+  package must not download prebuilt binaries. No flag change for the vulkan/rocm/
+  cpu subpackages. No local patches. %%check passes. -rocm stays gfx1030
+  (build-verified only; the 6900 XT is on vfio, the host 6400 is gfx1034, absent
+  from Fedora rocBLAS).
+
+* Sat Oct 17 2026 Hector Diaz <hdiazc@live.com> - 0.7.0-1
+- Bump to upstream v0.7.0 (nightly-tag.txt -> b11669; build_num 10964 -> 11669;
+  v0.7.0 and b11669 are both commit 620d222). Build-option surface re-evaluated
+  across the 705-build jump b10964..b11669: root/ggml/ggml-hip/ggml-vulkan
+  option() sets are identical; the only additions are CUDA-only cache vars
+  (GGML_CUDA_CCCL_VERSION, GGML_CUDA_FA_QUANTS), irrelevant to the Vulkan/HIP/CPU
+  build. All flags still valid; nothing deprecated, no new backend option worth
+  enabling for the vulkan/rocm/cpu subpackages on this host. No local patches.
+  %%check passes. -rocm stays gfx1030 (build-verified only; the 6900 XT is on
+  vfio and the host 6400 is gfx1034, absent from Fedora rocBLAS).
+
+* Sun Sep 20 2026 Hector Diaz <hdiazc@live.com> - 0.4.1-1
+- Bump to upstream v0.4.1 (nightly-tag.txt -> b10964; build_num 10809 -> 10964,
+  UI bundle Source1 tracks the nightly). Build-option surface verified unchanged
+  b10809..b10964: root CMakeLists only bumped the version patch; ggml added the
+  CUDA-only GGML_CUDA_FA_QUANTS default, irrelevant to the Vulkan/HIP/CPU build.
+  All cmake flags still valid; no local patches. %%check passes.
+
+* Sat Sep 05 2026 Hector Diaz <hdiazc@live.com> - 0.4.0-1
+- Follow upstream's new semver releases instead of the rolling bNNNN build tags.
+  Version is now 0.4.0 (was 0^b10333); 0^b10333 < 0.4.0, so it upgrades cleanly
+- Source0 is the v%%{version} tag; Source1 stays on the nightly tag, since the
+  semver release ships only nightly-tag.txt and no assets. Same commit (5266f24)
+- Pass -DLLAMA_BUILD_IS_DEV=OFF: it defaults ON and would report "0.4.0-dev"
+- Drop -DLLAMA_CURL=ON and BuildRequires libcurl-devel. Upstream removed libcurl:
+  the only CURL reference left is llama_option_depr(WARNING LLAMA_CURL) and no
+  source includes curl/curl.h. HTTP is vendored cpp-httplib, TLS via LLAMA_OPENSSL
+
 * Sun Aug 09 2026 Hector Diaz <hdiazc@live.com> - 0^b10333-1
 - Rebase to upstream tag b10333 (265 builds from b10068). Pure version bump;
   build-option surface verified unchanged against the b10068..b10333 CMake source:

@@ -1,6 +1,6 @@
 # rpm-specs
 
-RPM spec files for Fedora 44 packages I maintain in the COPR
+RPM spec files for Fedora packages I maintain in the COPR
 [raro28/wdm](https://copr.fedorainfracloud.org/coprs/raro28/wdm/).
 Specs are grouped by category (`themes/`, `icons/`, `apps/`, `kernel/`); each
 package lives in `<category>/<spec-dir>/`.
@@ -9,11 +9,13 @@ package lives in `<category>/<spec-dir>/`.
 
 | Spec | Current build | What it ships |
 |---|---|---|
+| apps/amdgpu_top | `0.11.5-2` | AMD GPU monitor — TUI, SMI, GUI and JSON modes ([Umio-Yasuno/amdgpu_top](https://github.com/Umio-Yasuno/amdgpu_top)) |
 | themes/colloid-gtk-theme | `20260808-1` | GTK theme ([vinceliuice/Colloid-gtk-theme](https://github.com/vinceliuice/Colloid-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
 | themes/fluent-gtk-theme | `20250417-9` | GTK theme ([vinceliuice/Fluent-gtk-theme](https://github.com/vinceliuice/Fluent-gtk-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
-| apps/gnome-shell-extension-per-monitor-wallpaper | `2.2.1-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
-| apps/llama.cpp | `0^b10333-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
-| apps/looking-glass-client | `7.0.0-14` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
+| apps/gnome-shell-extension-astra-monitor | `43-1` | GNOME Shell extension, top-bar CPU/GPU/memory/disk/network/sensor monitors ([AstraExt/astra-monitor](https://github.com/AstraExt/astra-monitor)); recommends amdgpu_top |
+| apps/gnome-shell-extension-per-monitor-wallpaper | `2.3.0-1` | GNOME Shell extension, per-monitor wallpapers; reader-only (editing GUI is `mural`) ([raro28/per-monitor-wallpaper](https://github.com/raro28/per-monitor-wallpaper)) |
+| apps/llama.cpp | `1.0.0-1` | LLM inference, CPU engine + embedded web UI; GPU via `-vulkan`/`-rocm` backend subpackages ([ggml-org/llama.cpp](https://github.com/ggml-org/llama.cpp)) |
+| apps/looking-glass-client | `7.0.0-16` | Looking Glass B7 client + SELinux subpackage ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) |
 | kernel/looking-glass-kvmfr-kmod | `0.0.12-8` | akmod for the `kvmfr` kernel module ([gnif/LookingGlass](https://github.com/gnif/LookingGlass)) — see [its README](kernel/looking-glass-kvmfr-kmod/README.md) |
 | apps/mural | `1.0.2-1` | Per-monitor wallpaper editor, standalone GTK4/libadwaita app ([raro28/mural](https://github.com/raro28/mural)) |
 | themes/orchis-gtk-theme | `20260707-3` | GTK theme ([vinceliuice/Orchis-theme](https://github.com/vinceliuice/Orchis-theme)), GNOME 50 patches; ships blue, blue-compact, red, red-compact, grey, grey-compact |
@@ -21,8 +23,8 @@ package lives in `<category>/<spec-dir>/`.
 | icons/qogir-icon-theme | `20250215-5` | Icon theme ([vinceliuice/Qogir-icon-theme](https://github.com/vinceliuice/Qogir-icon-theme)); single package, no color subpackages (same reason) |
 | icons/tela-circle-icon-theme | `20260707-4` | Icon theme ([vinceliuice/Tela-circle-icon-theme](https://github.com/vinceliuice/Tela-circle-icon-theme)); ships blue, red, grey |
 | icons/tela-icon-theme | `20260707-4` | Icon theme ([vinceliuice/Tela-icon-theme](https://github.com/vinceliuice/Tela-icon-theme)); ships blue, red, grey |
-| themes/whitesur-gtk-theme | `20260808-1` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 patches; ships blue, blue-solid, red, red-solid, grey, grey-solid |
-| icons/whitesur-icon-theme | `20260707-4` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)); ships blue, red, grey |
+| themes/whitesur-gtk-theme | `20260910-1` | GTK theme ([vinceliuice/WhiteSur-gtk-theme](https://github.com/vinceliuice/WhiteSur-gtk-theme)), GNOME 50 patches; ships blue, blue-solid, red, red-solid, grey, grey-solid |
+| icons/whitesur-icon-theme | `20260910-1` | Icon theme ([vinceliuice/WhiteSur-icon-theme](https://github.com/vinceliuice/WhiteSur-icon-theme)); ships blue, red, grey |
 
 ## Host setup (once)
 
@@ -37,7 +39,7 @@ rpmdev-setuptree            # creates ~/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS
 
 - `rpm-build`  → `rpmbuild`
 - `rpmdevtools` → `spectool` (fetches `Source:` URLs), `rpmdev-setuptree`
-- `mock` → clean fedora-44-x86_64 chroot builder
+- `mock` → clean per-release chroot builder (`fedora-$(rpm -E %fedora)-x86_64`)
 - `rpmlint` → the lint gate (`rpmlint -c rpmlint.toml */*/*.spec`, see Linting)
 - `createrepo_c` → optional, for local repodata checks
 
@@ -64,15 +66,17 @@ spectool -g -R "$SPEC"
 # 3. Build the SRPM
 rpmbuild -bs "$SPEC"
 
-# 4. Build binary RPMs in a clean F44 chroot
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/<srpm-basename>.fc44.src.rpm
-# Results: /var/lib/mock/fedora-44-x86_64/result/*.rpm
+# 4. Build binary RPMs in a clean chroot for the host's Fedora release
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/<srpm-basename>.fc*.src.rpm
+# Results: /var/lib/mock/fedora-$(rpm -E %fedora)-x86_64/result/*.rpm
 
 # 5. (optional) install locally
-sudo dnf install /var/lib/mock/fedora-44-x86_64/result/*.rpm
+sudo dnf install /var/lib/mock/fedora-$(rpm -E %fedora)-x86_64/result/*.rpm
 ```
 
 `mock` reads each `Source:` from `~/rpmbuild/SOURCES/`. URLs are NOT fetched at mock time — `spectool` is what populates the cache.
+
+One exception to step 4: `apps/amdgpu_top` builds its Rust dependencies from crates.io and needs `mock -r "fedora-$(rpm -E %fedora)-x86_64" --enable-network <srpm>`. See its section below.
 
 ## Per-spec build instructions
 
@@ -87,10 +91,82 @@ sudo dnf install /var/lib/mock/fedora-44-x86_64/result/*.rpm
 ```bash
 spectool -g -R icons/qogir-icon-theme/qogir-icon-theme.spec
 rpmbuild -bs icons/qogir-icon-theme/qogir-icon-theme.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-5.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/qogir-icon-theme-20250215-5.fc*.src.rpm
 ```
 
-`gnome-shell-extension-per-monitor-wallpaper` installs system-wide; each user enables it with `gnome-extensions enable per-monitor-wallpaper@ekthor`. Requires GNOME Shell 50.x (versioned `Requires`). Authored in TypeScript, built by CI into the release tarball (Source0); the RPM compiles nothing and has no `BuildRequires`.
+`gnome-shell-extension-per-monitor-wallpaper` installs system-wide; each user enables it with `gnome-extensions enable per-monitor-wallpaper@ekthor`. Requires GNOME Shell 51.x (versioned `Requires`). Authored in TypeScript, built by CI into the release tarball (Source0); the RPM compiles nothing and has no `BuildRequires`.
+
+### amdgpu_top
+
+Rust, built from the `v0.11.5` source tag with upstream's own `package` feature
+(`libdrm_link,tui,gui,json`) — that feature exists for packagers: it is the
+default set minus `git_version`, which reads a `.git` a release tarball has not
+got. Licensed `MIT AND OFL-1.1`: the GUI front end embeds the BIZ UDGothic font,
+so both license files ship.
+
+**This is the only spec that needs network during the build.** Its crates are not
+vendored and cannot come from Fedora's `rust-*` packages, because
+`libdrm_amdgpu_sys` is pinned to a git revision rather than a crates.io release.
+`cargo build --locked` fetches them, held to the exact versions and checksums in
+`Cargo.lock`, so the build stays reproducible without being hermetic. Vendoring
+the alternative would mean carrying 523 crates (74 MB compressed) as a source.
+
+```bash
+cp apps/amdgpu_top/amdgpu_top.desktop apps/amdgpu_top/*.patch ~/rpmbuild/SOURCES/
+spectool -g -R apps/amdgpu_top/amdgpu_top.spec
+rpmbuild -bs apps/amdgpu_top/amdgpu_top.spec
+mock -r "fedora-$(rpm -E %fedora)-x86_64" --enable-network ~/rpmbuild/SRPMS/amdgpu_top-0.11.5-2.fc*.src.rpm
+```
+
+Plain `mock` fails here: it sets `rpmbuild_networking` and `use_host_resolv` to
+`False` by default, so cargo cannot resolve crates.io. The COPR needs no change —
+`raro28/wdm` has `enable_net` set. Upstream's `[profile.release]` sets
+`strip = true`, but Fedora's `%build_rustflags` exports `-Cstrip=none`, which
+wins, so the normal debuginfo packages are produced and no `debug_package`
+override is needed.
+
+Ships **one** desktop entry, the local `amdgpu_top.desktop` (`Source1`,
+installed with `desktop-file-install` like `looking-glass-client`'s). Upstream's
+two entries are `AMDGPU TOP (GUI)` and `AMDGPU TOP (TUI)` — 16 characters
+differing only in the token the GNOME app grid truncates, so both render as
+`AMDGPU TOP (...`. Ours is `AMD GPU`, with the terminal and SMI views as
+right-click actions. Those actions run through `xdg-terminal-exec` (a hard
+`Requires`) because `desktop-file-validate` rejects `Terminal=true` outside the
+`[Desktop Entry]` group. `metainfo-single-launchable.patch` drops the metainfo's
+launchable for the entry no longer shipped. Also ships the man page and the
+AppStream metainfo. Carries a `%check`: `desktop-file-validate` on the entry and
+`appstreamcli validate` on the metainfo.
+
+### gnome-shell-extension-astra-monitor
+
+Top-bar system monitor, authored in TypeScript. Unlike the other TypeScript
+packages here, the RPM compiles it: `Source0` is the `v42` source tag and
+`%build` runs Fedora's `tsc` (`BuildRequires: typescript glib2-devel gettext
+unzip`). `tsc` exits non-zero — the `@girs/*` ambient type packages are npm-only,
+so every `gi://` and `resource://` import is reported unresolved — but emission is
+unaffected.
+
+`Source1` is upstream's CI-built release zip. It is never installed: `%check`
+uses it as ground truth and asserts that the 68 emitted `.js` files and the 7
+compiled `.mo` catalogs are byte-identical to it, so a divergent `tsc` emit fails
+the build.
+
+Installs system-wide; enable per user with `gnome-extensions enable
+monitor@astraext.github.io`. Catalogs go to `%{_datadir}/locale` via
+`%find_lang`, matching Fedora's own extension packages (`dash-to-panel`,
+`appindicator`, `just-perfection`) — the shell binds the gettext domain there for
+extensions installed in its prefix. Requires GNOME Shell 45–51 (the range
+`metadata.json` declares). `Recommends`: `libgtop2` (GTop data source),
+`lm_sensors` (the `sensors` command, the only temperature/fan/voltage source) and
+`nethogs` (per-process network I/O; needs root or `cap_net_admin`+`cap_net_raw`).
+`amdgpu_top` is in no Fedora repo, so AMD GPU stats come from `amdgpu` sysfs.
+
+```bash
+SPEC=apps/gnome-shell-extension-astra-monitor/gnome-shell-extension-astra-monitor.spec
+spectool -g -R "$SPEC"
+rpmbuild -bs "$SPEC"
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/gnome-shell-extension-astra-monitor-43-1.fc*.src.rpm
+```
 
 ### mural
 
@@ -99,7 +175,7 @@ Standalone GTK4/libadwaita editor for the config the `gnome-shell-extension-per-
 ```bash
 spectool -g -R apps/mural/mural.spec
 rpmbuild -bs apps/mural/mural.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/mural-1.0.2-1.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/mural-1.0.2-1.fc*.src.rpm
 ```
 
 ### vinceliuice GTK themes (GNOME 50 patches, color subpackages)
@@ -122,7 +198,7 @@ Example (`themes/qogir-gtk-theme`):
 cp themes/qogir-gtk-theme/*.patch ~/rpmbuild/SOURCES/
 spectool -g -R themes/qogir-gtk-theme/qogir-gtk-theme.spec
 rpmbuild -bs themes/qogir-gtk-theme/qogir-gtk-theme.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/qogir-gtk-theme-20250817-7.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/qogir-gtk-theme-20250817-7.fc*.src.rpm
 ```
 
 Patch reference:
@@ -141,12 +217,12 @@ Patch reference:
 cp icons/tela-icon-theme/*.patch ~/rpmbuild/SOURCES/
 spectool -g -R icons/tela-icon-theme/tela-icon-theme.spec
 rpmbuild -bs icons/tela-icon-theme/tela-icon-theme.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/tela-icon-theme-20260707-4.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/tela-icon-theme-20260707-4.fc*.src.rpm
 ```
 
 ### llama.cpp
 
-No local sources, but two URL sources: `Source0` (the source tarball) and `Source1` (the prebuilt `llama-bNNNN-ui.tar.gz` web-UI bundle from the matching GitHub release, extracted into `tools/ui/dist` during `%prep` so the server embeds the SvelteKit UI without pulling in nodejs/npm at build time). `spectool -g -R` fetches both.
+No local sources, but two URL sources, and they come from **different tags on purpose**. Upstream cuts semver releases (`vX.Y.Z`) alongside its rolling nightly build tags (`bNNNN`); the semver release carries no assets at all, just a `nightly-tag.txt` naming the nightly it was cut from. So `Source0` is the `v%{version}` source tarball and `Source1` is the prebuilt `llama-bNNNN-ui.tar.gz` web-UI bundle from that *nightly* release — extracted into `tools/ui/dist` during `%prep` so the server embeds the SvelteKit UI without pulling nodejs/npm into the build. Both tags are the same commit (`v1.0.0` and `b12359` are both `b1b770d`). `spectool -g -R` fetches both.
 
 One SRPM builds three coexisting binary RPMs off the `GGML_BACKEND_DL` module layout (`-DGGML_VULKAN=ON -DGGML_HIP=ON` in a single pass):
 
@@ -159,12 +235,18 @@ ggml loads whichever backend modules are installed and enumerates all their devi
 ```bash
 spectool -g -R apps/llama.cpp/llama.cpp.spec
 rpmbuild -bs apps/llama.cpp/llama.cpp.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/llama.cpp-0\^b10333-1.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/llama.cpp-1.0.0-1.fc*.src.rpm
 ```
 
-**Note the `\^` shell-escape** when typing the SRPM filename — `^` is the Fedora-standard post-release snapshot marker (upstream tags are `bNNNN` build numbers, no semver), and the literal caret appears in the filename.
+Through `0^b10333-1` this package tracked the nightly build tags, and the SRPM
+filename needed a `\^` shell-escape. It now follows the semver releases, so the
+caret is gone; `0^b10333 < 0.4.0`, so the change upgrades cleanly.
 
-To bump the upstream version, update `%global build_num` in the spec (one line). The current `bNNNN` tag is at <https://github.com/ggml-org/llama.cpp/releases>.
+To bump it: take the new `vX.Y.Z` from
+<https://github.com/ggml-org/llama.cpp/releases>, set `Version`, then read
+`https://github.com/ggml-org/llama.cpp/releases/download/vX.Y.Z/nightly-tag.txt`
+and set `%global build_num` from the `bNNNN` it names — that tag is where the UI
+bundle lives and what `LLAMA_BUILD_NUMBER` reports.
 
 ### looking-glass-client
 
@@ -177,16 +259,17 @@ apps/looking-glass-client/10-looking-glass-client.conf
 apps/looking-glass-client/looking-glass-client.desktop
 apps/looking-glass-client/looking-glass-client.te
 apps/looking-glass-client/looking-glass-client.fc
+apps/looking-glass-client/purespice-nettle4-sha1-digest.patch
 ```
 
 **Upstream tarball gotcha**: GitHub's tag-archive of `gnif/LookingGlass` does not recurse into git submodules. The spec declares `Source10..15` for each submodule (LGMP, PureSpice, cimgui, imgui, nanosvg, wayland-protocols) pinned to its gitlink SHA. `spectool` fetches all of them.
 
 ```bash
-cp apps/looking-glass-client/{10-looking-glass-client.conf,looking-glass-client.desktop,looking-glass-client.te,looking-glass-client.fc} \
+cp apps/looking-glass-client/{10-looking-glass-client.conf,looking-glass-client.desktop,looking-glass-client.te,looking-glass-client.fc,purespice-nettle4-sha1-digest.patch} \
    ~/rpmbuild/SOURCES/
 spectool -g -R apps/looking-glass-client/looking-glass-client.spec
 rpmbuild -bs apps/looking-glass-client/looking-glass-client.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-14.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/looking-glass-client-7.0.0-16.fc*.src.rpm
 ```
 
 To bump the upstream version, update `%global upstream_tag` in the spec and refresh the six submodule SHAs via:
@@ -223,7 +306,7 @@ cp kernel/looking-glass-kvmfr-kmod/{kvmfr.conf,99-kvmfr.rules,kvmfr.te,kvmfr.fc,
    ~/rpmbuild/SOURCES/
 spectool -g -R kernel/looking-glass-kvmfr-kmod/looking-glass-kvmfr-kmod.spec
 rpmbuild -bs kernel/looking-glass-kvmfr-kmod/looking-glass-kvmfr-kmod.spec
-mock -r fedora-44-x86_64 ~/rpmbuild/SRPMS/looking-glass-kvmfr-kmod-0.0.12-8.fc44.src.rpm
+mock -r "fedora-$(rpm -E %fedora)-x86_64" ~/rpmbuild/SRPMS/looking-glass-kvmfr-kmod-0.0.12-8.fc*.src.rpm
 ```
 
 After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (libvirt cgroup ACL + VM XML cutover) the package cannot do for you — see [kernel/looking-glass-kvmfr-kmod/README.md](kernel/looking-glass-kvmfr-kmod/README.md) for the full setup, verification, rollback, and SELinux details.
@@ -232,13 +315,15 @@ After installing, `/dev/kvmfr0` needs **two manual host configuration steps** (l
 
 | Spec | Local sources? | URL sources? |
 |---|---|---|
+| apps/amdgpu_top | **Yes** — 1 desktop entry + 1 patch | Source0 only — **but needs `mock --enable-network`** |
 | icons/qogir-icon-theme | No | Source0 only |
+| apps/gnome-shell-extension-astra-monitor | No | Source0 + Source1 (upstream release zip, `%check` ground truth) |
 | apps/gnome-shell-extension-per-monitor-wallpaper | No | Source0 only |
 | apps/llama.cpp | No | Source0 + Source1 (web-UI bundle) |
 | apps/mural | No | Source0 only |
 | 5 vinceliuice GTK themes (`themes/`) | **Yes** — 2–4 patches | Source0 only |
 | icons/tela-icon-theme, icons/tela-circle-icon-theme, icons/whitesur-icon-theme | **Yes** — 1 patch (fix-dangling-symlinks.patch) | Source0 only |
-| apps/looking-glass-client | **Yes** — 4 files | Source0 + 6 submodule URLs |
+| apps/looking-glass-client | **Yes** — 4 files + 1 patch (PureSpice nettle 4.0) | Source0 + 6 submodule URLs |
 | kernel/looking-glass-kvmfr-kmod | **Yes** — 5 files + 1 patch | Source0 only |
 
 When sources drift between the spec directory and `~/rpmbuild/SOURCES/`, the build silently uses the stale copies. Re-copying before `rpmbuild -bs` is cheap insurance.
@@ -258,11 +343,15 @@ rpmlint -c rpmlint.toml */*/*.spec
 these added in the theme/icon color-subpackage split:
 
 - `no-%check-section` — suppressed for the 2 specs with no test to run (the
-  kvmfr akmod, the GJS extension). All 9 vinceliuice theme/icon specs, plus
-  llama.cpp, looking-glass-client, and mural, carry a real `%check`.
+  kvmfr akmod, the per-monitor-wallpaper extension). All 9 vinceliuice
+  theme/icon specs, plus llama.cpp, looking-glass-client, mural,
+  gnome-shell-extension-astra-monitor and amdgpu_top, carry a real `%check`.
 - `spelling-error` — this branch adds `nana`/`materia` to the filtered word
   list: `orchis-gtk-theme`'s `%description` credits the upstream projects it's
-  based on (`nana-4`, `materia-theme`) — proper nouns, not misspellings.
+  based on (`nana-4`, `materia-theme`) — proper nouns, not misspellings. It also
+  adds `fdinfo`/`smi`/`gui` for `amdgpu_top`: the kernel `fdinfo` interface it
+  reads, plus the literal `--smi`/`--gui` flags its `%description` documents
+  (rpmlint strips the dashes and spell-checks what is left).
 - `no-documentation` for the vinceliuice theme family (`colloid|fluent|orchis|
   qogir|tela|tela-circle|whitesur` `-gtk|icon-theme`) — the color/size
   subpackages ship `%license` only (in `tela-circle`'s case, not even that);
@@ -283,14 +372,42 @@ whitesur-gtk) run 4 — GTK4 CSS parse through the real engine
 and a DPI-directory gate. `fluent-gtk-theme` runs 3: it has no DPI axis (no
 `-hdpi`/`-xhdpi` output), so no DPI gate. The 4 icon themes (qogir-icon, tela, tela-circle,
 whitesur-icon) each run 2 — an `index.theme`-presence gate and a
-zero-dangling-symlink gate. Every other warning class is fixed in the specs
+zero-dangling-symlink gate. `amdgpu_top` runs 2 — `desktop-file-validate` on its
+desktop entry and `appstreamcli validate` on its AppStream metainfo.
+`gnome-shell-extension-astra-monitor` runs 3 — a
+byte-identity gate on the 68 compiled `.js` files and one on the 7 `.mo`
+catalogs, both against upstream's release artifact (`Source1`), plus an assert
+that `metadata.json` still declares shell 50. Every other warning class is fixed in the specs
 (`%setup -q`/`%autosetup`, an explicit `%build`, `%%`-escaped `%changelog`
 macros), so a plain `rpmlint */*/*.spec` only surfaces the filtered
 `no-%check-section` (2 specs).
 
 ## COPR
 
-The `raro28/wdm` COPR builds these from SRPMs uploaded via `copr-cli`, or via the Custom method pulling from this repo. COPR's chroot matches `mock -r fedora-44-x86_64` exactly — anything that builds locally builds there.
+All 16 packages build by **SCM/rpkg**, not from uploaded SRPMs: each clones
+`https://github.com/raro28/rpm-specs` at `develop` and builds
+`<subdirectory>/<spec-name>.spec`. A push to `develop` is therefore what a rebuild
+picks up, and **moving a spec's directory breaks that package** until it is
+re-pointed:
+
+```bash
+copr-cli add-package-scm raro28/wdm --name <pkg> \
+  --clone-url https://github.com/raro28/rpm-specs --commit develop \
+  --subdir <category>/<spec-dir> --spec <spec-name>.spec --type git --method rpkg
+copr-cli build-package raro28/wdm --name <pkg> --nowait   # auto_rebuild is off
+```
+
+(`edit-package-scm` takes the same arguments for an existing package.)
+
+The chroot matches `mock -r "fedora-$(rpm -E %fedora)-x86_64"` with **one deliberate difference**:
+the project has `enable_net` set, so COPR builds have network access and local mock
+does not. Only `apps/amdgpu_top` relies on it — it resolves Rust crates at build
+time — and locally that one needs `mock --enable-network`. Everything else builds
+identically in both.
+
+After a build succeeds, use `dnf --refresh` to see it: on dnf5 neither
+`dnf clean metadata` nor `dnf makecache` invalidates the cached repodata, so
+`dnf -q --refresh repoquery --repo=raro28-wdm <pkg>` is what confirms publication.
 
 ## Repo layout
 
@@ -302,8 +419,9 @@ The `raro28/wdm` COPR builds these from SRPMs uploaded via `copr-cli`, or via th
 │   └── <spec-dir>/
 ├── icons/                                 # icon themes (qogir, tela, tela-circle, whitesur)
 │   └── <spec-dir>/
-├── apps/                                  # standalone apps (mural, per-monitor-wallpaper,
-│   └── <spec-dir>/                        # looking-glass-client, llama.cpp)
+├── apps/                                  # standalone apps (amdgpu_top, astra-monitor,
+│   └── <spec-dir>/                        # mural, per-monitor-wallpaper,
+│                                          # looking-glass-client, llama.cpp)
 ├── kernel/                                # kernel modules (looking-glass-kvmfr-kmod)
 │   └── <spec-dir>/
 │       ├── <spec-name>.spec

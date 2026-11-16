@@ -2,7 +2,7 @@
 # (libs/lib-core.sh; no native GNOME 49/50 sheet), so the downstream GNOME 50
 # login / notification patches below remain necessary.
 Name:           whitesur-gtk-theme
-Version:        20260808
+Version:        20260910
 Release:        1%{?dist}
 Summary:        Theme for GNOME/GTK based desktop environments
 BuildArch:      noarch
@@ -10,7 +10,7 @@ BuildArch:      noarch
 License:        GPL-3.0-or-later
 
 %define dname WhiteSur-gtk-theme
-%define dversion 2026-08-08
+%define dversion 2026-09-10
 URL:            https://github.com/vinceliuice/%{dname}
 Source0:        https://github.com/vinceliuice/%{dname}/archive/refs/tags/%{dversion}.tar.gz#/%{dname}-%{dversion}.tar.gz
 # Downstream GNOME 50 styling, split into the uniform two-patch model shared with
@@ -169,6 +169,17 @@ echo "dpi gate: OK"
 %{_datarootdir}/themes/WhiteSur-Dark-solid-grey
 
 %changelog
+* Sun Sep 20 2026 Hector Diaz <hdiazc@live.com> - 20260910-1
+- Bump to upstream tag 2026-09-10. All four downstream patches re-verified
+  against the new source and kept, each still necessary: upstream still clamps
+  shells >= 48 to widgets-48-0 (no native GNOME 49/50 sheet), still lacks
+  .a11y-button / .login-dialog-bottom-button-group / the widgets-48-0
+  .message-list-clear-button coverage (Patch0/Patch1), the FSF postal address in
+  gnome-shell _common.scss is still the old form (Patch2), and %%apple_activites
+  still uses the keyword background-position (Patch3). install.sh flags unchanged
+  (-t blue -t red -t grey -N mojave --shell -i gnome; all variants still valid).
+  %%check passes (GTK4 CSS parse 0 errors, shell node-gate, strip/dpi gates).
+
 * Sun Aug 09 2026 Hector Diaz <hdiazc@live.com> - 20260808-1
 - Bump to upstream tag 2026-08-08.
 - All four downstream patches re-verified against the new source: each applies
