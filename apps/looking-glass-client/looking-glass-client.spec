@@ -1,18 +1,32 @@
-%global upstream_tag       B7
+%global upstream_tag       B8-rc1
 %global selinux_modulename %{name}
 
-# Git submodule pins (from `git ls-tree %%{upstream_tag} repos/` in gnif/LookingGlass
-# and `git ls-tree <cimgui_sha> imgui` in cimgui/cimgui)
-%global commit_lgmp        de89c63bfe5e31f4ff83ea999c17022e235d96e4
-%global commit_purespice   5e844a62878c74eda556009b91d6c7f1098cf3d2
-%global commit_cimgui      d6b4ecda718352bb4adcd30ec25784fd16538b73
-%global commit_imgui       dbb5eeaadffb6a3ba6a60de1290312e5802dba5a
+# B8's client CMakeLists (client/CMakeLists.txt) strips the binary and splits its
+# debug info into a separate .debug file in a POST_BUILD step. The installed
+# binary is therefore already stripped, so rpm's find-debuginfo collects no
+# sources and the debugsource subpackage fails with an empty file list. Match
+# upstream's stripped release binary: disable rpm's debug packages.
+%global debug_package      %{nil}
+
+# Git submodule pins for %%{upstream_tag}, taken from the tag's own gitlinks:
+#   git ls-tree -r <tag> | grep ^160000            (top-level submodules)
+#   git ls-tree <cimgui> imgui, <cimplot> implot   (nested submodules)
+# B8 layout: cimgui/cimplot moved under repos/gui/; imgui nests in cimgui,
+# implot in cimplot; LGProtocol and cimplot are new; wayland-protocols now
+# tracks the quantum5 GitHub fork (was gitlab.freedesktop.org).
+%global commit_lgmp        10e3fef41de71d5ecb4fe34e4a6aa721a86df84d
+%global commit_lgproto     62b52724b63b6e179b8fb7e0c7c03e9a8b4e1636
+%global commit_purespice   a077e3f4771cb6c7f209f6df77afaae50999a9ef
+%global commit_cimgui      4e8fcc13674481a8c4c04abbfea90915e3896fe7
+%global commit_imgui       a9e7a8c880cf4a7fbf142b13a41bcbb1f43d0938
+%global commit_cimplot     b38705f4399b04a51e7a7641cc38dc68b1f485b4
+%global commit_implot      1351ab2c46d7a05a60f3533047bfba8a953520a1
 %global commit_nanosvg     cb0ae54e6b147ccdf85401ef3ef20f2c761252c0
-%global commit_wp          d324986823519c15b2162fc3e0a720f349e43b0c
+%global commit_wp          02e63e74a807afed95bc25a386173110afef24e3
 
 Name:           looking-glass-client
-Version:        7.0.0
-Release:        16%{?dist}
+Version:        8.0.0~rc1
+Release:        1%{?dist}
 Summary:        Low latency KVMFR implementation for guests with VGA PCI Passthrough
 
 License:        GPL-2.0-only
@@ -24,18 +38,16 @@ Source2:        10-%{name}.conf
 Source3:        %{name}.te
 Source4:        %{name}.fc
 
-# Submodule tarballs (GitHub/GitLab archives by commit SHA)
+# Submodule tarballs (GitHub archives by commit SHA). Order matches %%prep.
 Source10:       https://github.com/gnif/LGMP/archive/%{commit_lgmp}.tar.gz#/LGMP-%{commit_lgmp}.tar.gz
 Source11:       https://github.com/gnif/PureSpice/archive/%{commit_purespice}.tar.gz#/PureSpice-%{commit_purespice}.tar.gz
 Source12:       https://github.com/cimgui/cimgui/archive/%{commit_cimgui}.tar.gz#/cimgui-%{commit_cimgui}.tar.gz
 Source13:       https://github.com/ocornut/imgui/archive/%{commit_imgui}.tar.gz#/imgui-%{commit_imgui}.tar.gz
 Source14:       https://github.com/memononen/nanosvg/archive/%{commit_nanosvg}.tar.gz#/nanosvg-%{commit_nanosvg}.tar.gz
-Source15:       https://gitlab.freedesktop.org/wayland/wayland-protocols/-/archive/%{commit_wp}/wayland-protocols-%{commit_wp}.tar.gz
-
-# Fix the bundled PureSpice submodule for nettle 4.0 (Fedora 45): sha1_digest()
-# lost its length argument. Version-guarded, so it still builds on nettle 3.x
-# (Fedora 44). Applied by hand in %%prep after the submodule is unpacked.
-Patch0:         purespice-nettle4-sha1-digest.patch
+Source15:       https://github.com/quantum5/wayland-protocols/archive/%{commit_wp}.tar.gz#/wayland-protocols-%{commit_wp}.tar.gz
+Source16:       https://github.com/gnif/LGProtocol/archive/%{commit_lgproto}.tar.gz#/LGProtocol-%{commit_lgproto}.tar.gz
+Source17:       https://github.com/cimgui/cimplot/archive/%{commit_cimplot}.tar.gz#/cimplot-%{commit_cimplot}.tar.gz
+Source18:       https://github.com/epezent/implot/archive/%{commit_implot}.tar.gz#/implot-%{commit_implot}.tar.gz
 
 Requires:       font(dejavusansmono)
 Requires:       texlive-gnu-freefont
@@ -45,6 +57,7 @@ BuildRequires:       desktop-file-utils
 BuildRequires:       coreutils
 BuildRequires:       cmake
 BuildRequires:       fontconfig-devel
+BuildRequires:       fuse3-devel
 BuildRequires:       gcc
 BuildRequires:       gcc-c++
 BuildRequires:       libglvnd-devel
@@ -77,20 +90,22 @@ SELinux policy module for %{name}. Grants the client the access it needs to
 the KVMFR shared-memory device under /dev/shm.
 
 %prep
-# -N: do not auto-apply patches here; Patch0 targets repos/PureSpice, which is
-# unpacked below, so it is applied by hand after the submodule tarballs.
-%autosetup -N -n LookingGlass-%{upstream_tag}
+%autosetup -n LookingGlass-%{upstream_tag}
 # Populate git submodule directories (upstream's GitHub archive doesn't recurse).
-# Order matches Source10..15.
-mkdir -p repos/LGMP repos/PureSpice repos/cimgui repos/cimgui/imgui \
-         repos/nanosvg repos/wayland-protocols
+# B8 nests the GUI submodules: cimgui/cimplot live under repos/gui/, imgui
+# nests in cimgui, implot in cimplot. Order matches Source10..18.
+mkdir -p repos/LGMP repos/PureSpice repos/nanosvg repos/wayland-protocols \
+         repos/LGProtocol repos/gui/cimgui repos/gui/cimgui/imgui \
+         repos/gui/cimplot repos/gui/cimplot/implot
 tar xf %{SOURCE10} --strip-components=1 -C repos/LGMP
 tar xf %{SOURCE11} --strip-components=1 -C repos/PureSpice
-tar xf %{SOURCE12} --strip-components=1 -C repos/cimgui
-tar xf %{SOURCE13} --strip-components=1 -C repos/cimgui/imgui
+tar xf %{SOURCE12} --strip-components=1 -C repos/gui/cimgui
+tar xf %{SOURCE13} --strip-components=1 -C repos/gui/cimgui/imgui
 tar xf %{SOURCE14} --strip-components=1 -C repos/nanosvg
 tar xf %{SOURCE15} --strip-components=1 -C repos/wayland-protocols
-%patch -P 0 -p1
+tar xf %{SOURCE16} --strip-components=1 -C repos/LGProtocol
+tar xf %{SOURCE17} --strip-components=1 -C repos/gui/cimplot
+tar xf %{SOURCE18} --strip-components=1 -C repos/gui/cimplot/implot
 
 %build
 pushd client
@@ -98,6 +113,7 @@ pushd client
     -DENABLE_BACKTRACE=no \
     -DENABLE_X11=no \
     -DENABLE_PULSEAUDIO=no \
+    -DENABLE_USB_AUDIO=no \
     -DENABLE_LIBDECOR=yes \
     -DOPTIMIZE_FOR_NATIVE=x86-64-v3 \
     .
@@ -159,6 +175,20 @@ fi
 %selinux_relabel_post -s targeted
 
 %changelog
+* Mon Nov 16 2026 Hector Diaz <hdiazc@live.com> - 8.0.0~rc1-1
+- Update to upstream B8-rc1; submodule pins re-derived from the tag's gitlinks.
+  B8 moves the bundled GUI submodules under repos/gui/ (cimgui + new cimplot),
+  with imgui nested in cimgui and implot in cimplot; adds LGProtocol (header-only
+  KVMFR/LGMP interface); wayland-protocols now tracks the quantum5 GitHub fork.
+- Drop Patch0 (purespice-nettle4-sha1-digest): B8 PureSpice guards sha1_digest()
+  on USE_NETTLE_GE_4 upstream, so the hand patch is obsolete.
+- Add BuildRequires fuse3-devel (client now unconditionally requires fuse3>=3.10).
+  Add -DENABLE_USB_AUDIO=no (new in B8, defaults on, pulls libusbredirparser);
+  keep ENABLE_X11=no + ENABLE_PULSEAUDIO=no (Wayland + PipeWire only).
+- Set debug_package %%{nil}: B8's client CMakeLists strips the binary in a
+  POST_BUILD step, leaving find-debuginfo nothing to collect (empty debugsource
+  -> fatal). Drops the -debuginfo/-debugsource subpackages B7 produced.
+
 * Sun Nov 01 2026 Hector Diaz <hdiazc@live.com> - 7.0.0-16
 - Fedora 45 build fix. F45 ships nettle 4.0, which dropped the length argument
   from sha1_digest(ctx, length, digest) -> sha1_digest(ctx, digest); the bundled

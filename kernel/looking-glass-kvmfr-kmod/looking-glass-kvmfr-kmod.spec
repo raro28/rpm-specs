@@ -5,14 +5,14 @@
 # on the user's machine has the same BR set as the COPR/mock build.
 %global AkmodsBuildRequires kernel-rpm-macros systemd-rpm-macros gcc make elfutils-libelf-devel selinux-policy-devel
 
-%global upstream_tag     B7
+%global upstream_tag     B8-rc1
 %global kmod_name        kvmfr
 %global mod_workdir      %{kmod_name}-%{version}
 
 Name:           looking-glass-kvmfr-kmod
 Summary:        Looking Glass KVMFR shared-memory kernel module (akmod)
 Version:        0.0.12
-Release:        8%{?dist}
+Release:        9%{?dist}
 License:        GPL-2.0-or-later
 
 URL:            https://looking-glass.io/
@@ -150,6 +150,11 @@ fi
 %{_datadir}/selinux/packages/%{kmod_name}.pp
 
 %changelog
+* Mon Nov 16 2026 Hector Diaz <hdiazc@live.com> - 0.0.12-9
+- Track upstream B8-rc1 (upstream_tag B7 -> B8-rc1). The kvmfr module source is
+  unchanged (MODULE_VERSION still 0.0.12, module/Makefile byte-identical), so this
+  is a source-tag refresh only. Patch0 (MODULE_DESCRIPTION) still applies cleanly.
+
 * Sun Aug 09 2026 Hector Diaz <hdiazc@live.com> - 0.0.12-8
 - Add selinux-policy-devel to AkmodsBuildRequires. %%build compiles the SELinux
   .pp unconditionally (make -f /usr/share/selinux/devel/Makefile), so akmodsbuild
